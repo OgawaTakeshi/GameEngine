@@ -1,4 +1,4 @@
-//
+﻿//
 // Game.cpp
 //
 
@@ -8,8 +8,24 @@
 extern void ExitGame();
 
 using namespace DirectX;
+using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
+
+// 頂点インデックス
+uint16_t indices[] =
+{
+	0, 1, 2,
+	2, 1, 3,
+};
+// 頂点座標
+VertexPositionNormal vertices[] =
+{//	            座標			法線方向ベクトル
+	{ Vector3(-0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
+	{ Vector3(-0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
+	{ Vector3(+0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
+	{ Vector3(+0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
+};
 
 Game::Game() :
     m_window(0),
@@ -36,6 +52,45 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
+
+	{// ポリゴンを初期化
+		// コモンステートを作成
+		commonState.reset(new CommonStates(m_d3dDevice.Get()));
+		// プリミティブバッチを作成
+		primitiveBatch.reset(new PrimitiveBatch<VertexPositionNormal>(m_d3dContext.Get()));
+		// ポリゴン描画用のエフェクトを作成
+		polygonEffect.reset(new BasicEffect(m_d3dDevice.Get()));
+		// ライト計算を有効化
+		polygonEffect->SetLightingEnabled(true);
+		// 環境光の色を設定			    R     G     B
+		polygonEffect->SetAmbientLightColor(Vector3(0.2f, 0.2f, 0.2f));
+		// 拡散反射光の素材色を設定	        R     G     B
+		polygonEffect->SetDiffuseColor(Vector3(1.0f, 1.0f, 1.0f));
+		// ライト0番を有効化
+		polygonEffect->SetLightEnabled(0, true);
+		// ライト0番の色を設定			       R     G     B
+		polygonEffect->SetLightDiffuseColor(0, Vector3(0.2f, 1.0f, 0.2f));
+		// ライト0番の向きを設定			    R     G     B
+		polygonEffect->SetLightDirection(0, Vector3(1.0f, -0.5f, 2.0f));
+		// ライト1番を有効化
+		polygonEffect->SetLightEnabled(1, true);
+		// ライト1番の色を設定			       R     G     B
+		polygonEffect->SetLightDiffuseColor(1, Vector3(0.5f, 0.2f, 0.3f));
+		// ライト1番の向きを設定			     R     G     B
+		polygonEffect->SetLightDirection(1, Vector3(-1.0f, -0.5f, -2.0f));
+
+		void const* shaderByteCode;
+		size_t byteCodeLength;
+
+		// シェーダーの取得
+		polygonEffect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+		// 入力レイアウトの作成
+		m_d3dDevice.Get()->CreateInputLayout(VertexPositionNormal::InputElements,
+			VertexPositionNormal::InputElementCount,
+			shaderByteCode, byteCodeLength,
+			polygonInputLayout.GetAddressOf());
+	}
 }
 
 // Executes the basic game loop.
@@ -70,6 +125,41 @@ void Game::Render()
     Clear();
 
     // TODO: Add your rendering code here.
+	{// ポリゴンを描画
+	 // ワールド行列
+		Matrix world;
+		// ビュー行列
+		Matrix view;
+		// プロジェクション行列
+		Matrix proj;
+
+		// ワールド行列を設定
+		polygonEffect->SetWorld(world);
+		// ビュー行列を設定
+		polygonEffect->SetView(view);
+		// プロジェクション行列を設定
+		polygonEffect->SetProjection(proj);
+		// エフェクトの設定（各行列やテクスチャなどを反映）
+		polygonEffect->Apply(m_d3dContext.Get());
+
+		// 深度ステンシルステートを設定
+		m_d3dContext->OMSetDepthStencilState(commonState->DepthDefault(), 0);
+		// ブレンドステートを設定
+		m_d3dContext->OMSetBlendState(commonState->NonPremultiplied(), nullptr, 0xFFFFFFFF);
+		// ラスタライザステートを設定（時計回りを非表示）
+		m_d3dContext->RSSetState(commonState->CullClockwise());
+		// 入力レイアウトを設定
+		m_d3dContext->IASetInputLayout(polygonInputLayout.Get());
+
+		// 描画開始
+		primitiveBatch->Begin();
+
+		// 頂点情報を渡して描画
+		primitiveBatch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
+
+		// 描画終了
+		primitiveBatch->End();
+	}
 
     Present();
 }
