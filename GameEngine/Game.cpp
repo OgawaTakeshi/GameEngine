@@ -31,8 +31,14 @@ Game::Game() :
     m_window(0),
     m_outputWidth(800),
     m_outputHeight(600),
-    m_featureLevel(D3D_FEATURE_LEVEL_9_1)
+    m_featureLevel(D3D_FEATURE_LEVEL_9_1),
+	camera(nullptr)
 {
+}
+
+Game::~Game()
+{
+	SAFE_DELETE(camera);
 }
 
 // Initialize the Direct3D resources required to run.
@@ -52,6 +58,10 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
+
+	{// デバッグカメラを生成
+		camera = new DebugCamera(width, height);
+	}
 
 	{// ポリゴンを初期化
 		// コモンステートを作成
@@ -110,7 +120,8 @@ void Game::Update(DX::StepTimer const& timer)
     float elapsedTime = float(timer.GetElapsedSeconds());
 
     // TODO: Add your game logic here.
-    elapsedTime;
+	// カメラ更新
+	camera->Update();
 }
 
 // Draws the scene.
@@ -129,9 +140,9 @@ void Game::Render()
 	 // ワールド行列
 		Matrix world;
 		// ビュー行列
-		Matrix view;
+		Matrix view = camera->GetCameraMatrix();
 		// プロジェクション行列
-		Matrix proj;
+		Matrix proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(60.0f), m_outputWidth / (float)m_outputHeight, 0.1f, 1000.0f);
 
 		// ワールド行列を設定
 		polygonEffect->SetWorld(world);
