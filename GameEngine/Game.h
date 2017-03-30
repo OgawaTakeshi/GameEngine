@@ -4,12 +4,24 @@
 
 #pragma once
 
+#include <VertexTypes.h>
+#include <PrimitiveBatch.h>
+#include <SimpleMath.h>
+#include <Effects.h>
+#include <CommonStates.h>
+
 #include "StepTimer.h"
-#include "VertexTypes.h"
-#include "PrimitiveBatch.h"
-#include "SimpleMath.h"
-#include "Effects.h"
-#include "CommonStates.h"
+#include "DebugCamera.h"
+
+#ifndef SAFE_DELETE
+#define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
+#endif    
+#ifndef SAFE_DELETE_ARRAY
+#define SAFE_DELETE_ARRAY(p) { if (p) { delete[] (p);   (p)=NULL; } }
+#endif    
+#ifndef SAFE_RELEASE
+#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
+#endif
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -18,6 +30,8 @@ class Game
 public:
 
     Game();
+
+	virtual ~Game();
 
     // Initialization and management
     void Initialize(HWND window, int width, int height);
@@ -81,4 +95,6 @@ private:
 
 	// Rendering loop timer.
     DX::StepTimer                                   m_timer;
+
+	DebugCamera*	debugCamera;
 };

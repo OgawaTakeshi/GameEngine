@@ -21,18 +21,24 @@ uint16_t indices[] =
 // 頂点座標
 VertexPositionNormal vertices[] =
 {//	            座標			法線方向ベクトル
-	{ Vector3(-0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
-	{ Vector3(-0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
-	{ Vector3(+0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
-	{ Vector3(+0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
+	{ Vector3(-0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+1.0f) },
+	{ Vector3(-0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+1.0f) },
+	{ Vector3(+0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+1.0f) },
+	{ Vector3(+0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+1.0f) },
 };
 
 Game::Game() :
-    m_window(0),
-    m_outputWidth(800),
-    m_outputHeight(600),
-    m_featureLevel(D3D_FEATURE_LEVEL_9_1)
+	m_window(0),
+	m_outputWidth(800),
+	m_outputHeight(600),
+	m_featureLevel(D3D_FEATURE_LEVEL_9_1),
+	debugCamera(nullptr)
 {
+}
+
+Game::~Game()
+{
+	SAFE_DELETE(debugCamera);
 }
 
 // Initialize the Direct3D resources required to run.
@@ -52,6 +58,10 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
+	
+	{// デバッグカメラを生成
+		debugCamera = new DebugCamera(width, height);
+	}
 
 	{// ポリゴンを初期化
 		// コモンステートを作成
@@ -110,7 +120,7 @@ void Game::Update(DX::StepTimer const& timer)
     float elapsedTime = float(timer.GetElapsedSeconds());
 
     // TODO: Add your game logic here.
-    elapsedTime;
+	debugCamera->Update();
 }
 
 // Draws the scene.
@@ -126,12 +136,12 @@ void Game::Render()
 
     // TODO: Add your rendering code here.
 	{// ポリゴンを描画
-	 // ワールド行列
+		// ワールド行列
 		Matrix world;
 		// ビュー行列
-		Matrix view;
+		Matrix view = debugCamera->GetCameraMatrix();
 		// プロジェクション行列
-		Matrix proj;
+		Matrix proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(60.0f), m_outputWidth / (float)m_outputHeight, 0.1f, 1000.0f);
 
 		// ワールド行列を設定
 		polygonEffect->SetWorld(world);
