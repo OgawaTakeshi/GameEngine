@@ -1,11 +1,16 @@
-//
+﻿//
 // Game.h
 //
 
 #pragma once
 
-#include "StepTimer.h"
+#include <VertexTypes.h>
+#include <PrimitiveBatch.h>
+#include <SimpleMath.h>
+#include <Effects.h>
+#include <CommonStates.h>
 
+#include "StepTimer.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -44,6 +49,12 @@ private:
 
     void OnDeviceLost();
 
+	void PolygonInit();
+
+	void PolygonTerm();
+
+	void PolygonDraw(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
+
     // Device resources.
     HWND                                            m_window;
     int                                             m_outputWidth;
@@ -60,6 +71,15 @@ private:
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_renderTargetView;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
 
-    // Rendering loop timer.
+	// コモンステート
+	std::unique_ptr <DirectX::CommonStates> commonState;	
+	// プリミティブバッチ
+	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>> primitiveBatch;
+	// ポリゴン表示用エフェクト
+	std::unique_ptr<DirectX::BasicEffect>	polygonEffect;
+	// ポリゴン表示用入力レイアウト
+	Microsoft::WRL::ComPtr<ID3D11InputLayout>	polygonInputLayout;
+
+	// Rendering loop timer.
     DX::StepTimer                                   m_timer;
 };
