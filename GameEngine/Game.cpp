@@ -21,10 +21,10 @@ uint16_t indices[] =
 // 頂点座標
 VertexPositionNormal vertices[] =
 {//	            座標			法線方向ベクトル
-	{ Vector3(-0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
-	{ Vector3(-0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
-	{ Vector3(+0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
-	{ Vector3(+0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+0.5f) },
+	{ Vector3(-0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+1.0f) },
+	{ Vector3(-0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+1.0f) },
+	{ Vector3(+0.5f,+0.5f, 0.0f), Vector3(0.0f,0.0f,+1.0f) },
+	{ Vector3(+0.5f,-0.5f, 0.0f), Vector3(0.0f,0.0f,+1.0f) },
 };
 
 Game::Game() :
