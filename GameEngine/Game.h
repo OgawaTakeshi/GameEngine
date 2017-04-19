@@ -9,6 +9,7 @@
 #include <SimpleMath.h>
 #include <Effects.h>
 #include <CommonStates.h>
+#include <Model.h>
 
 #include "StepTimer.h"
 #include "DebugCamera.h"
@@ -86,6 +87,8 @@ private:
 
 	// コモンステート
 	std::unique_ptr<DirectX::CommonStates> m_states;
+	// ポリゴン表示用エフェクトファクトリ
+	std::unique_ptr<DirectX::EffectFactory> m_effectFactory;
 	// ポリゴン表示用エフェクト
 	std::unique_ptr<DirectX::BasicEffect> m_effect;
 	// プリミティブバッチ
@@ -96,6 +99,9 @@ private:
 	DirectX::SimpleMath::Matrix m_world;
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
+
+	std::unique_ptr<DirectX::Model> m_ModelSkydome;
+	std::unique_ptr<DirectX::Model> m_ModelGround;
 
 	// Rendering loop timer.
     DX::StepTimer                                   m_timer;

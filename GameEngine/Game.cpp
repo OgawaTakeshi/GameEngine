@@ -86,7 +86,14 @@ void Game::Initialize(HWND window, int width, int height)
 	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
 		Vector3::Zero, Vector3::UnitY);
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
-		float(m_outputWidth) / float(m_outputHeight), 0.1f, 10.f);
+		float(m_outputWidth) / float(m_outputHeight), 0.1f, 200.f);
+
+	// エフェクトファクトリ生成
+	m_effectFactory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
+	m_effectFactory->SetDirectory(L"Resources");
+	// モデルをファイルからロード
+	m_ModelSkydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skydome.cmo", *m_effectFactory);
+	m_ModelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground.cmo", *m_effectFactory);
 }
 
 // Executes the basic game loop.
@@ -108,6 +115,8 @@ void Game::Update(DX::StepTimer const& timer)
     // TODO: Add your game logic here.
 	// カメラ更新
 	camera->Update();
+
+	m_view = camera->GetCameraMatrix();
 }
 
 // Draws the scene.
@@ -125,7 +134,7 @@ void Game::Render()
 	m_d3dContext->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 	m_d3dContext->RSSetState(m_states->CullNone());
 
-	m_effect->SetView(camera->GetCameraMatrix());
+	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
 
 	m_effect->SetWorld(m_world);
@@ -171,6 +180,9 @@ void Game::Render()
 	VertexPositionColor v3(Vector3(-0.5f, -0.5f, 0.5f), Colors::Yellow);
 
 	m_batch->DrawTriangle(v1, v2, v3);
+
+	m_ModelSkydome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	m_ModelGround->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
 
 	m_batch->End();
 

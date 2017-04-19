@@ -31,4 +31,12 @@
       <Filter>Assets</Filter>
     </Manifest>
   </ItemGroup>
+  <ItemGroup>
+    <MeshContentTask Include="Assets\ground.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\skydome.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+  </ItemGroup>
 </Project>
