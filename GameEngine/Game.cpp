@@ -86,14 +86,14 @@ void Game::Initialize(HWND window, int width, int height)
 	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
 		Vector3::Zero, Vector3::UnitY);
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
-		float(m_outputWidth) / float(m_outputHeight), 0.1f, 200.f);
+		float(m_outputWidth) / float(m_outputHeight), 0.1f, 1000.f);
 
 	// エフェクトファクトリ生成
 	m_effectFactory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
 	m_effectFactory->SetDirectory(L"Resources");
 	// モデルをファイルからロード
 	m_ModelSkydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skydome.cmo", *m_effectFactory);
-	m_ModelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground.cmo", *m_effectFactory);
+	m_ModelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground200m.cmo", *m_effectFactory);
 }
 
 // Executes the basic game loop.
@@ -145,8 +145,8 @@ void Game::Render()
 
 	m_batch->Begin();
 
-	Vector3 xaxis(2.f, 0.f, 0.f);
-	Vector3 yaxis(0.f, 0.f, 2.f);
+	Vector3 xaxis(20.f, 0.f, 0.f);
+	Vector3 yaxis(0.f, 0.f, 20.f);
 	Vector3 origin = Vector3::Zero;
 
 	size_t divisions = 20;

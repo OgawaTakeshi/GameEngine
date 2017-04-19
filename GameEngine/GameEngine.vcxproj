@@ -198,6 +198,7 @@
     <MeshContentTask Include="Assets\ground.FBX">
       <FileType>Document</FileType>
     </MeshContentTask>
+    <MeshContentTask Include="Assets\ground200m.FBX" />
     <MeshContentTask Include="Assets\skydome.FBX" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
