@@ -63,44 +63,30 @@ void Game::Initialize(HWND window, int width, int height)
 		camera = new DebugCamera(width, height);
 	}
 
-	{// ポリゴンを初期化
-		// コモンステートを作成
-		commonState.reset(new CommonStates(m_d3dDevice.Get()));
-		// プリミティブバッチを作成
-		primitiveBatch.reset(new PrimitiveBatch<VertexPositionNormal>(m_d3dContext.Get()));
-		// ポリゴン描画用のエフェクトを作成
-		polygonEffect.reset(new BasicEffect(m_d3dDevice.Get()));
-		// ライト計算を有効化
-		polygonEffect->SetLightingEnabled(true);
-		// 環境光の色を設定			    R     G     B
-		polygonEffect->SetAmbientLightColor(Vector3(0.2f, 0.2f, 0.2f));
-		// 拡散反射光の素材色を設定	        R     G     B
-		polygonEffect->SetDiffuseColor(Vector3(1.0f, 1.0f, 1.0f));
-		// ライト0番を有効化
-		polygonEffect->SetLightEnabled(0, true);
-		// ライト0番の色を設定			       R     G     B
-		polygonEffect->SetLightDiffuseColor(0, Vector3(0.2f, 1.0f, 0.2f));
-		// ライト0番の向きを設定			    R     G     B
-		polygonEffect->SetLightDirection(0, Vector3(1.0f, -0.5f, 2.0f));
-		// ライト1番を有効化
-		polygonEffect->SetLightEnabled(1, true);
-		// ライト1番の色を設定			       R     G     B
-		polygonEffect->SetLightDiffuseColor(1, Vector3(0.5f, 0.2f, 0.3f));
-		// ライト1番の向きを設定			     R     G     B
-		polygonEffect->SetLightDirection(1, Vector3(-1.0f, -0.5f, -2.0f));
+	m_states = std::make_unique<CommonStates>(m_d3dDevice.Get());
 
-		void const* shaderByteCode;
-		size_t byteCodeLength;
+	m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
+	m_effect->SetVertexColorEnabled(true);
 
-		// シェーダーの取得
-		polygonEffect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+	void const* shaderByteCode;
+	size_t byteCodeLength;
 
-		// 入力レイアウトの作成
-		m_d3dDevice.Get()->CreateInputLayout(VertexPositionNormal::InputElements,
-			VertexPositionNormal::InputElementCount,
+	m_effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+
+	DX::ThrowIfFailed(
+		m_d3dDevice->CreateInputLayout(VertexPositionColor::InputElements,
+			VertexPositionColor::InputElementCount,
 			shaderByteCode, byteCodeLength,
-			polygonInputLayout.GetAddressOf());
-	}
+			m_inputLayout.ReleaseAndGetAddressOf()));
+
+	m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(m_d3dContext.Get());
+
+	m_world = Matrix::Identity;
+
+	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
+		Vector3::Zero, Vector3::UnitY);
+	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
+		float(m_outputWidth) / float(m_outputHeight), 0.1f, 10.f);
 }
 
 // Executes the basic game loop.
@@ -135,42 +121,58 @@ void Game::Render()
 
     Clear();
 
-    // TODO: Add your rendering code here.
-	{// ポリゴンを描画
-	 // ワールド行列
-		Matrix world;
-		// ビュー行列
-		Matrix view = camera->GetCameraMatrix();
-		// プロジェクション行列
-		Matrix proj = Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(60.0f), m_outputWidth / (float)m_outputHeight, 0.1f, 1000.0f);
+	m_d3dContext->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
+	m_d3dContext->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+	m_d3dContext->RSSetState(m_states->CullNone());
 
-		// ワールド行列を設定
-		polygonEffect->SetWorld(world);
-		// ビュー行列を設定
-		polygonEffect->SetView(view);
-		// プロジェクション行列を設定
-		polygonEffect->SetProjection(proj);
-		// エフェクトの設定（各行列やテクスチャなどを反映）
-		polygonEffect->Apply(m_d3dContext.Get());
+	m_effect->SetView(camera->GetCameraMatrix());
+	m_effect->SetProjection(m_proj);
 
-		// 深度ステンシルステートを設定
-		m_d3dContext->OMSetDepthStencilState(commonState->DepthDefault(), 0);
-		// ブレンドステートを設定
-		m_d3dContext->OMSetBlendState(commonState->NonPremultiplied(), nullptr, 0xFFFFFFFF);
-		// ラスタライザステートを設定（時計回りを非表示）
-		m_d3dContext->RSSetState(commonState->CullClockwise());
-		// 入力レイアウトを設定
-		m_d3dContext->IASetInputLayout(polygonInputLayout.Get());
+	m_effect->SetWorld(m_world);
 
-		// 描画開始
-		primitiveBatch->Begin();
+	m_effect->Apply(m_d3dContext.Get());
 
-		// 頂点情報を渡して描画
-		primitiveBatch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
+	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
 
-		// 描画終了
-		primitiveBatch->End();
+	m_batch->Begin();
+
+	Vector3 xaxis(2.f, 0.f, 0.f);
+	Vector3 yaxis(0.f, 0.f, 2.f);
+	Vector3 origin = Vector3::Zero;
+
+	size_t divisions = 20;
+
+	for (size_t i = 0; i <= divisions; ++i)
+	{
+		float fPercent = float(i) / float(divisions);
+		fPercent = (fPercent * 2.0f) - 1.0f;
+
+		Vector3 scale = xaxis * fPercent + origin;
+
+		VertexPositionColor v1(scale - yaxis, Colors::White);
+		VertexPositionColor v2(scale + yaxis, Colors::White);
+		m_batch->DrawLine(v1, v2);
 	}
+
+	for (size_t i = 0; i <= divisions; i++)
+	{
+		float fPercent = float(i) / float(divisions);
+		fPercent = (fPercent * 2.0f) - 1.0f;
+
+		Vector3 scale = yaxis * fPercent + origin;
+
+		VertexPositionColor v1(scale - xaxis, Colors::White);
+		VertexPositionColor v2(scale + xaxis, Colors::White);
+		m_batch->DrawLine(v1, v2);
+	}
+
+	VertexPositionColor v1(Vector3(0.f, 0.5f, 0.5f), Colors::Yellow);
+	VertexPositionColor v2(Vector3(0.5f, -0.5f, 0.5f), Colors::Yellow);
+	VertexPositionColor v3(Vector3(-0.5f, -0.5f, 0.5f), Colors::Yellow);
+
+	m_batch->DrawTriangle(v1, v2, v3);
+
+	m_batch->End();
 
     Present();
 }

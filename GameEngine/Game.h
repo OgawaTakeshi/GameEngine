@@ -85,13 +85,17 @@ private:
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
 
 	// コモンステート
-	std::unique_ptr <DirectX::CommonStates> commonState;	
-	// プリミティブバッチ
-	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>> primitiveBatch;
+	std::unique_ptr<DirectX::CommonStates> m_states;
 	// ポリゴン表示用エフェクト
-	std::unique_ptr<DirectX::BasicEffect>	polygonEffect;
+	std::unique_ptr<DirectX::BasicEffect> m_effect;
+	// プリミティブバッチ
+	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_batch;
 	// ポリゴン表示用入力レイアウト
-	Microsoft::WRL::ComPtr<ID3D11InputLayout>	polygonInputLayout;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
+
+	DirectX::SimpleMath::Matrix m_world;
+	DirectX::SimpleMath::Matrix m_view;
+	DirectX::SimpleMath::Matrix m_proj;
 
 	// Rendering loop timer.
     DX::StepTimer                                   m_timer;
