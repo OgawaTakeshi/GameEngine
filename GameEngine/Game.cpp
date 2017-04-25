@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "Game.h"
+#include <time.h>
 
 extern void ExitGame();
 
@@ -34,6 +35,7 @@ Game::Game() :
     m_featureLevel(D3D_FEATURE_LEVEL_9_1),
 	camera(nullptr)
 {
+	srand((unsigned int)time(nullptr));
 }
 
 Game::~Game()
@@ -93,11 +95,32 @@ void Game::Initialize(HWND window, int width, int height)
 	m_ModelSkydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skydome.cmo", *m_effectFactory);
 	m_ModelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground200m.cmo", *m_effectFactory);
 	m_ModelBall = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ball.cmo", *m_effectFactory);
+	m_ModelTeapot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/teapot.cmo", *m_effectFactory);
 
 	m_angle = 0.0f;
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
 	m_debugText = std::make_unique<DebugText>(m_d3dDevice.Get(), m_spriteBatch.get());
+
+	// 指定範囲をランダムで返すラムダ式
+	auto rand_value = [](float min, float max)
+	{
+		return (max - min) * (float)rand() / RAND_MAX + min;
+	};
+
+	for (int i = 0; i < 20; i++)
+	{
+		//float x = rand_value(-30.0, 30.0f);
+		//float z = rand_value(-30.0, 30.0f);
+		float radius = rand_value(0, XM_2PI);
+		float distance = rand_value(0, 99.0f);
+		float x = cosf(radius) * distance;
+		float z = sinf(radius) * distance;
+
+		m_pos[i] = Vector3(x, 0, z);
+	}
+
+	m_dfactor = 1.0f;
 }
 
 // Executes the basic game loop.
@@ -129,25 +152,20 @@ void Game::Update(DX::StepTimer const& timer)
 
 	// 角度を加算
 	m_angle += XMConvertToRadians(1.0f);
-
-	m_worldC = Matrix::CreateScale(2.0f) *
-		Matrix::CreateTranslation(Vector3(0, 0, 0)) *
-		Matrix::CreateRotationY(-m_angle);
-
-	for (int i = 0; i < 10; i++)
+	m_scale = (sinf(m_angle)/2.0f+0.5f)*4.0f + 1.0f;
+	m_dfactor -= (1.0f / 60.0f / 10.0f);
+	if (m_dfactor <= 0.0f)
 	{
-		m_world[i] = 
-			Matrix::CreateScale(0.5f) * 
-			Matrix::CreateTranslation(Vector3(10, 0, 0)) * 
-			Matrix::CreateRotationY(m_angle + XM_2PI / 10.0f * i);
+		m_dfactor = 0.0f;
 	}
+	m_scale = 1.0f;
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 20; i++)
 	{
-		m_world[10+i] =
-			Matrix::CreateScale(0.8f) *
-			Matrix::CreateTranslation(Vector3(20, 0, 0)) *
-			Matrix::CreateRotationY(-m_angle + XM_2PI / 10.0f * i);
+		m_world[i] =
+			Matrix::CreateScale(m_scale) *
+			Matrix::CreateRotationY(m_angle) *
+			Matrix::CreateTranslation(m_pos[i]*m_dfactor);
 	}
 }
 
@@ -218,9 +236,8 @@ void Game::Render()
 
 	for (int i = 0; i < 20; i++)
 	{
-		m_ModelBall->Draw(m_d3dContext.Get(), *m_states, m_world[i], m_view, m_proj);
+		m_ModelTeapot->Draw(m_d3dContext.Get(), *m_states, m_world[i], m_view, m_proj);
 	}
-	m_ModelBall->Draw(m_d3dContext.Get(), *m_states, m_worldC, m_view, m_proj);
 
 	m_batch->End();
 

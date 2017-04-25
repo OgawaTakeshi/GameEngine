@@ -98,14 +98,18 @@ private:
 
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
+
+	DirectX::SimpleMath::Vector3 m_pos[20];
 	// 球のワールド行列
 	DirectX::SimpleMath::Matrix m_world[20];
-	DirectX::SimpleMath::Matrix m_worldC;
 	float m_angle;
+	float m_scale;
+	float m_dfactor;
 
 	std::unique_ptr<DirectX::Model> m_ModelSkydome;
 	std::unique_ptr<DirectX::Model> m_ModelGround;
 	std::unique_ptr<DirectX::Model> m_ModelBall;
+	std::unique_ptr<DirectX::Model> m_ModelTeapot;
 
 	// Rendering loop timer.
     DX::StepTimer                                   m_timer;
