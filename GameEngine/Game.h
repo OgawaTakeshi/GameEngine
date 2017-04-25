@@ -13,6 +13,7 @@
 
 #include "StepTimer.h"
 #include "DebugCamera.h"
+#include "DebugText.h"
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
@@ -63,12 +64,6 @@ private:
 
     void OnDeviceLost();
 
-	void PolygonInit();
-
-	void PolygonTerm();
-
-	void PolygonDraw(DirectX::SimpleMath::Matrix view, DirectX::SimpleMath::Matrix proj);
-
     // Device resources.
     HWND                                            m_window;
     int                                             m_outputWidth;
@@ -85,6 +80,11 @@ private:
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_renderTargetView;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
 
+	// スプライトバッチ
+	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+	// デバッグテキスト
+	std::unique_ptr<DebugText> m_debugText;
+
 	// コモンステート
 	std::unique_ptr<DirectX::CommonStates> m_states;
 	// ポリゴン表示用エフェクトファクトリ
@@ -96,12 +96,16 @@ private:
 	// ポリゴン表示用入力レイアウト
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 
-	DirectX::SimpleMath::Matrix m_world;
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
+	// 球のワールド行列
+	DirectX::SimpleMath::Matrix m_world[20];
+	DirectX::SimpleMath::Matrix m_worldC;
+	float m_angle;
 
 	std::unique_ptr<DirectX::Model> m_ModelSkydome;
 	std::unique_ptr<DirectX::Model> m_ModelGround;
+	std::unique_ptr<DirectX::Model> m_ModelBall;
 
 	// Rendering loop timer.
     DX::StepTimer                                   m_timer;

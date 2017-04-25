@@ -81,8 +81,6 @@ void Game::Initialize(HWND window, int width, int height)
 
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(m_d3dContext.Get());
 
-	m_world = Matrix::Identity;
-
 	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
 		Vector3::Zero, Vector3::UnitY);
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
@@ -94,6 +92,12 @@ void Game::Initialize(HWND window, int width, int height)
 	// モデルをファイルからロード
 	m_ModelSkydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skydome.cmo", *m_effectFactory);
 	m_ModelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground200m.cmo", *m_effectFactory);
+	m_ModelBall = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ball.cmo", *m_effectFactory);
+
+	m_angle = 0.0f;
+
+	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
+	m_debugText = std::make_unique<DebugText>(m_d3dDevice.Get(), m_spriteBatch.get());
 }
 
 // Executes the basic game loop.
@@ -112,11 +116,39 @@ void Game::Update(DX::StepTimer const& timer)
 {
     float elapsedTime = float(timer.GetElapsedSeconds());
 
+	float fps = m_timer.GetFramesPerSecond();
+
+	m_debugText->AddText(Vector2(0, 0), L"FPS:%d", m_timer.GetFramesPerSecond());
+
     // TODO: Add your game logic here.
 	// カメラ更新
 	camera->Update();
 
 	m_view = camera->GetCameraMatrix();
+	//m_view = Matrix::CreateLookAt(Vector3(0, 70, 0), Vector3(0, 0, 0), Vector3::UnitZ);
+
+	// 角度を加算
+	m_angle += XMConvertToRadians(1.0f);
+
+	m_worldC = Matrix::CreateScale(2.0f) *
+		Matrix::CreateTranslation(Vector3(0, 0, 0)) *
+		Matrix::CreateRotationY(-m_angle);
+
+	for (int i = 0; i < 10; i++)
+	{
+		m_world[i] = 
+			Matrix::CreateScale(0.5f) * 
+			Matrix::CreateTranslation(Vector3(10, 0, 0)) * 
+			Matrix::CreateRotationY(m_angle + XM_2PI / 10.0f * i);
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		m_world[10+i] =
+			Matrix::CreateScale(0.8f) *
+			Matrix::CreateTranslation(Vector3(20, 0, 0)) *
+			Matrix::CreateRotationY(-m_angle + XM_2PI / 10.0f * i);
+	}
 }
 
 // Draws the scene.
@@ -137,7 +169,7 @@ void Game::Render()
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
 
-	m_effect->SetWorld(m_world);
+	m_effect->SetWorld(Matrix::Identity);
 
 	m_effect->Apply(m_d3dContext.Get());
 
@@ -151,29 +183,29 @@ void Game::Render()
 
 	size_t divisions = 20;
 
-	for (size_t i = 0; i <= divisions; ++i)
-	{
-		float fPercent = float(i) / float(divisions);
-		fPercent = (fPercent * 2.0f) - 1.0f;
+	//for (size_t i = 0; i <= divisions; ++i)
+	//{
+	//	float fPercent = float(i) / float(divisions);
+	//	fPercent = (fPercent * 2.0f) - 1.0f;
 
-		Vector3 scale = xaxis * fPercent + origin;
+	//	Vector3 scale = xaxis * fPercent + origin;
 
-		VertexPositionColor v1(scale - yaxis, Colors::White);
-		VertexPositionColor v2(scale + yaxis, Colors::White);
-		m_batch->DrawLine(v1, v2);
-	}
+	//	VertexPositionColor v1(scale - yaxis, Colors::White);
+	//	VertexPositionColor v2(scale + yaxis, Colors::White);
+	//	m_batch->DrawLine(v1, v2);
+	//}
 
-	for (size_t i = 0; i <= divisions; i++)
-	{
-		float fPercent = float(i) / float(divisions);
-		fPercent = (fPercent * 2.0f) - 1.0f;
+	//for (size_t i = 0; i <= divisions; i++)
+	//{
+	//	float fPercent = float(i) / float(divisions);
+	//	fPercent = (fPercent * 2.0f) - 1.0f;
 
-		Vector3 scale = yaxis * fPercent + origin;
+	//	Vector3 scale = yaxis * fPercent + origin;
 
-		VertexPositionColor v1(scale - xaxis, Colors::White);
-		VertexPositionColor v2(scale + xaxis, Colors::White);
-		m_batch->DrawLine(v1, v2);
-	}
+	//	VertexPositionColor v1(scale - xaxis, Colors::White);
+	//	VertexPositionColor v2(scale + xaxis, Colors::White);
+	//	m_batch->DrawLine(v1, v2);
+	//}
 
 	VertexPositionColor v1(Vector3(0.f, 0.5f, 0.5f), Colors::Yellow);
 	VertexPositionColor v2(Vector3(0.5f, -0.5f, 0.5f), Colors::Yellow);
@@ -181,10 +213,20 @@ void Game::Render()
 
 	m_batch->DrawTriangle(v1, v2, v3);
 
-	m_ModelSkydome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
-	m_ModelGround->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	m_ModelSkydome->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
+	m_ModelGround->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
+
+	for (int i = 0; i < 20; i++)
+	{
+		m_ModelBall->Draw(m_d3dContext.Get(), *m_states, m_world[i], m_view, m_proj);
+	}
+	m_ModelBall->Draw(m_d3dContext.Get(), *m_states, m_worldC, m_view, m_proj);
 
 	m_batch->End();
+
+	m_spriteBatch->Begin();
+	m_debugText->Draw();
+	m_spriteBatch->End();
 
     Present();
 }
