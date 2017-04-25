@@ -1,4 +1,5 @@
-﻿// デバッグ用カメラクラス
+﻿#pragma once
+// デバッグ用カメラクラス
 #include <d3d11.h>
 #include <SimpleMath.h>
 #include <Mouse.h>
