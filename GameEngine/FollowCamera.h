@@ -35,6 +35,10 @@ private:
 	float m_NearClip;
 	// ファークリップ
 	float m_FarClip;
+	// 距離
+	float m_Distance;
+	// 参照点オフセット
+	DirectX::SimpleMath::Vector3 m_Offset;
 public:
 	// コンストラクタ
 	FollowCamera();

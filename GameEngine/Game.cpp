@@ -156,7 +156,25 @@ void Game::Update(DX::StepTimer const& timer)
     // TODO: Add your game logic here.
 	// カメラ更新
 	m_DebugCamera->Update();
-	m_FollowCamera->Update();
+
+	// 追従カメラ
+	{
+		const float CAMERA_DISTANCE = 5.0f;
+		Vector3 eyepos, refpos;
+
+		refpos = m_TankPos + Vector3(0, 2, 0);
+		Vector3 cameraV(0, 0, CAMERA_DISTANCE);
+
+		Matrix rotmat = Matrix::CreateRotationY(m_TankAngle);
+		cameraV = Vector3::TransformNormal(cameraV, rotmat);
+
+		eyepos = refpos + cameraV;
+
+		m_FollowCamera->SetEyepos(eyepos);
+		m_FollowCamera->SetRefpos(refpos);
+
+		m_FollowCamera->Update();
+	}
 
 	m_view = m_DebugCamera->GetCameraMatrix();
 	m_view = m_FollowCamera->GetViewmat();

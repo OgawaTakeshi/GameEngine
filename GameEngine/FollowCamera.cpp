@@ -26,6 +26,8 @@ FollowCamera::FollowCamera()
 	m_Refpos = Vector3(0.0f, 2.0f, 0.0f);
 	m_Upvec = Vector3(0.0f, 1.0f, 0.0f);
 	m_Projmat = Matrix::Identity;
+	m_Distance = 5.0f;
+	m_Offset = Vector3(0, 2, 0);
 }
 
 /**
