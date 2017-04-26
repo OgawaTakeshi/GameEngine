@@ -33,14 +33,14 @@ Game::Game() :
     m_outputWidth(800),
     m_outputHeight(600),
     m_featureLevel(D3D_FEATURE_LEVEL_9_1),
-	camera(nullptr)
+	m_DebugCamera(nullptr)
 {
 	srand((unsigned int)time(nullptr));
 }
 
 Game::~Game()
 {
-	SAFE_DELETE(camera);
+	SAFE_DELETE(m_DebugCamera);
 }
 
 // Initialize the Direct3D resources required to run.
@@ -62,8 +62,11 @@ void Game::Initialize(HWND window, int width, int height)
     */
 
 	{// デバッグカメラを生成
-		camera = new DebugCamera(width, height);
+		m_DebugCamera = new DebugCamera(width, height);
 	}
+
+	// 追従カメラを生成
+	m_FollowCamera = std::make_unique<FollowCamera>();
 
 	m_states = std::make_unique<CommonStates>(m_d3dDevice.Get());
 
@@ -152,10 +155,14 @@ void Game::Update(DX::StepTimer const& timer)
 
     // TODO: Add your game logic here.
 	// カメラ更新
-	camera->Update();
+	m_DebugCamera->Update();
+	m_FollowCamera->Update();
 
-	m_view = camera->GetCameraMatrix();
+	m_view = m_DebugCamera->GetCameraMatrix();
+	m_view = m_FollowCamera->GetViewmat();
 	//m_view = Matrix::CreateLookAt(Vector3(0, 70, 0), Vector3(0, 0, 0), Vector3::UnitZ);
+
+	m_proj = m_FollowCamera->GetProjmat();
 
 	// 角度を加算
 	m_angle += XMConvertToRadians(1.0f);

@@ -15,6 +15,7 @@
 #include "StepTimer.h"
 #include "DebugCamera.h"
 #include "DebugText.h"
+#include "FollowCamera.h"
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
@@ -122,5 +123,7 @@ private:
 	// Rendering loop timer.
     DX::StepTimer                                   m_timer;
 	// デバッグ用カメラ
-	DebugCamera*	camera;
+	DebugCamera*	m_DebugCamera;
+	// 追従カメラ
+	std::unique_ptr<FollowCamera> m_FollowCamera;
 };
