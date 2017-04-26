@@ -97,6 +97,8 @@ void Game::Initialize(HWND window, int width, int height)
 	m_ModelBall = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ball.cmo", *m_effectFactory);
 	m_ModelTeapot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/teapot.cmo", *m_effectFactory);
 
+	m_ModelHead = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/head.cmo", *m_effectFactory);
+
 	m_angle = 0.0f;
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
@@ -121,6 +123,11 @@ void Game::Initialize(HWND window, int width, int height)
 	}
 
 	m_dfactor = 1.0f;
+
+	m_keyboard = std::make_unique<Keyboard>();
+
+	m_TankAngle = 0.0f;
+
 }
 
 // Executes the basic game loop.
@@ -167,6 +174,43 @@ void Game::Update(DX::StepTimer const& timer)
 			Matrix::CreateRotationY(m_angle) *
 			Matrix::CreateTranslation(m_pos[i]*m_dfactor);
 	}
+
+	auto kb = m_keyboard->GetState();
+
+	if (kb.A)
+	{
+		m_TankAngle += XMConvertToRadians(+1.0f);
+	}
+
+	if (kb.D)
+	{
+		m_TankAngle += XMConvertToRadians(-1.0f);
+	}
+
+	if (kb.W)
+	{
+		Vector3 moveV(0, 0, -0.1f);
+
+		Matrix rotM = Matrix::CreateRotationY(m_TankAngle);
+		moveV = Vector3::Transform(moveV, rotM);
+
+		m_TankPos += moveV;
+	}
+
+	if (kb.S)
+	{
+		Vector3 moveV(0, 0, +0.1f);
+
+		Matrix rotM = Matrix::CreateRotationY(m_TankAngle);
+		moveV = Vector3::Transform(moveV, rotM);
+
+		m_TankPos += moveV;
+	}
+
+
+	m_TankWorld = 
+		Matrix::CreateRotationY(m_TankAngle) *
+		Matrix::CreateTranslation(m_TankPos);
 }
 
 // Draws the scene.
@@ -234,10 +278,11 @@ void Game::Render()
 	m_ModelSkydome->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
 	m_ModelGround->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
 
-	for (int i = 0; i < 20; i++)
-	{
-		m_ModelTeapot->Draw(m_d3dContext.Get(), *m_states, m_world[i], m_view, m_proj);
-	}
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	m_ModelTeapot->Draw(m_d3dContext.Get(), *m_states, m_world[i], m_view, m_proj);
+	//}
+	m_ModelHead->Draw(m_d3dContext.Get(), *m_states, m_TankWorld, m_view, m_proj);
 
 	m_batch->End();
 

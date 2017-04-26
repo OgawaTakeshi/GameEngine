@@ -10,6 +10,7 @@
 #include <Effects.h>
 #include <CommonStates.h>
 #include <Model.h>
+#include <Keyboard.h>
 
 #include "StepTimer.h"
 #include "DebugCamera.h"
@@ -110,6 +111,13 @@ private:
 	std::unique_ptr<DirectX::Model> m_ModelGround;
 	std::unique_ptr<DirectX::Model> m_ModelBall;
 	std::unique_ptr<DirectX::Model> m_ModelTeapot;
+
+	std::unique_ptr<DirectX::Model> m_ModelHead;
+
+	std::unique_ptr<DirectX::Keyboard> m_keyboard;
+	DirectX::SimpleMath::Vector3 m_TankPos;
+	float	m_TankAngle;
+	DirectX::SimpleMath::Matrix m_TankWorld;
 
 	// Rendering loop timer.
     DX::StepTimer                                   m_timer;

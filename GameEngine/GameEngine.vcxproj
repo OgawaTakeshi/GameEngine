@@ -202,6 +202,7 @@
       <FileType>Document</FileType>
     </MeshContentTask>
     <MeshContentTask Include="Assets\ground200m.FBX" />
+    <MeshContentTask Include="Assets\head.FBX" />
     <MeshContentTask Include="Assets\skydome.FBX" />
     <MeshContentTask Include="Assets\teapot.FBX" />
   </ItemGroup>
