@@ -16,16 +16,9 @@ using namespace DirectX::SimpleMath;
 *	@brief コンストラクタ
 */
 FollowCamera::FollowCamera()
-: m_FovY(XMConvertToRadians(60.0f))
-, m_Aspect(640.0f/480.0f)
-, m_NearClip(0.1f)
-, m_FarClip(1000.0f)
 {
-	m_Viewmat= Matrix::Identity;
-	m_Eyepos = Vector3(0.0f,6.0f, 10.0f);
-	m_Refpos = Vector3(0.0f, 2.0f, 0.0f);
-	m_Upvec = Vector3(0.0f, 1.0f, 0.0f);
-	m_Projmat = Matrix::Identity;
+	m_TargetPos = Vector3::Zero;
+	m_TargetAngle = 0.0f;
 	m_Distance = 5.0f;
 	m_Offset = Vector3(0, 2, 0);
 }
@@ -35,6 +28,7 @@ FollowCamera::FollowCamera()
 */
 FollowCamera::~FollowCamera()
 {
+
 }
 
 /**
@@ -42,8 +36,37 @@ FollowCamera::~FollowCamera()
 */
 void FollowCamera::Update()
 {
-	// ビュー行列を計算
-	m_Viewmat = Matrix::CreateLookAt(m_Eyepos, m_Refpos, m_Upvec);
-	// プロジェクション行列を計算
-	m_Projmat = Matrix::CreatePerspectiveFieldOfView(m_FovY, m_Aspect, m_NearClip, m_FarClip);
+	// 追従カメラ
+	const float CAMERA_DISTANCE = 5.0f;
+	Vector3 eyepos, refpos;
+
+	refpos = m_TargetPos + Vector3(0, 2, 0);
+	Vector3 cameraV(0, 0, CAMERA_DISTANCE);
+
+	Matrix rotmat = Matrix::CreateRotationY(m_TargetAngle);
+	cameraV = Vector3::TransformNormal(cameraV, rotmat);
+
+	eyepos = refpos + cameraV;
+
+	Vector3 eyeposPre = GetEyepos();
+	Vector3 refposPre = GetRefpos();
+
+	eyepos = eyeposPre + (eyepos - eyeposPre) * 0.05f;
+	refpos = refposPre + (refpos - refposPre) * 0.05f;
+
+	SetEyepos(eyepos);
+	SetRefpos(refpos);
+
+	// カメラの更新
+	Camera::Update();
+}
+
+void FollowCamera::SetTargetPos(DirectX::SimpleMath::Vector3 target)
+{
+	m_TargetPos = target;
+}
+
+void FollowCamera::SetTargetAngle(float target)
+{
+	m_TargetAngle = target;
 }

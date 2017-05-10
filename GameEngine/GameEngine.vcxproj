@@ -164,6 +164,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DebugText.h" />
     <ClInclude Include="FollowCamera.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="StepTimer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="DebugText.cpp" />
     <ClCompile Include="FollowCamera.cpp" />

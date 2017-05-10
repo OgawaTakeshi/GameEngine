@@ -13,6 +13,7 @@
     <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="DebugText.h" />
     <ClInclude Include="FollowCamera.h" />
+    <ClInclude Include="Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -21,6 +22,7 @@
     <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="DebugText.cpp" />
     <ClCompile Include="FollowCamera.cpp" />
+    <ClCompile Include="Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
