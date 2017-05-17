@@ -36,6 +36,9 @@ FollowCamera::~FollowCamera()
 */
 void FollowCamera::Update()
 {
+	SetTargetPos(m_Target->GetTrans());
+	const Matrix& targetWorld = m_Target->GetLocalWorld();
+
 	// í«è]ÉJÉÅÉâ
 	const float CAMERA_DISTANCE = 5.0f;
 	Vector3 eyepos, refpos;
@@ -43,8 +46,8 @@ void FollowCamera::Update()
 	refpos = m_TargetPos + Vector3(0, 2, 0);
 	Vector3 cameraV(0, 0, CAMERA_DISTANCE);
 
-	Matrix rotmat = Matrix::CreateRotationY(m_TargetAngle);
-	cameraV = Vector3::TransformNormal(cameraV, rotmat);
+	//Matrix rotmat = Matrix::CreateRotationY(m_TargetAngle);
+	cameraV = Vector3::TransformNormal(cameraV, targetWorld);
 
 	eyepos = refpos + cameraV;
 
@@ -52,7 +55,7 @@ void FollowCamera::Update()
 	Vector3 refposPre = GetRefpos();
 
 	eyepos = eyeposPre + (eyepos - eyeposPre) * 0.05f;
-	refpos = refposPre + (refpos - refposPre) * 0.05f;
+	refpos = refposPre + (refpos - refposPre) * 0.20f;
 
 	SetEyepos(eyepos);
 	SetRefpos(refpos);

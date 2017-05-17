@@ -68,6 +68,8 @@ void Game::Initialize(HWND window, int width, int height)
 	// 追従カメラを生成
 	m_FollowCamera = std::make_unique<FollowCamera>();
 
+	m_CurrentCamera = m_FollowCamera.get();
+
 	m_states = std::make_unique<CommonStates>(m_d3dDevice.Get());
 
 	m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
@@ -86,23 +88,31 @@ void Game::Initialize(HWND window, int width, int height)
 
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(m_d3dContext.Get());
 
+	// エフェクトファクトリ生成
+	m_effectFactory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
+	m_effectFactory->SetDirectory(L"Resources");
+
+	// Obj3Dの静的な初期化
+	Obj3D::StaticInitialize(m_d3dDevice.Get(),
+		m_d3dContext.Get(),
+		m_states.get(),
+		m_effectFactory.get(),
+		m_FollowCamera.get());
+
+	m_keyboard = std::make_unique<Keyboard>();
+
+	// プレイヤー作成
+	m_Player = std::make_unique<Player>(m_keyboard.get());
+		
 	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
 		Vector3::Zero, Vector3::UnitY);
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
 		float(m_outputWidth) / float(m_outputHeight), 0.1f, 1000.f);
 
-	// エフェクトファクトリ生成
-	m_effectFactory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
-	m_effectFactory->SetDirectory(L"Resources");
+	
 	// モデルをファイルからロード
 	m_ModelSkydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skydome.cmo", *m_effectFactory);
 	m_ModelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground200m.cmo", *m_effectFactory);
-	m_ModelBall = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ball.cmo", *m_effectFactory);
-	m_ModelTeapot = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/teapot.cmo", *m_effectFactory);
-
-	m_ModelHead = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/head.cmo", *m_effectFactory);
-
-	m_angle = 0.0f;
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
 	m_debugText = std::make_unique<DebugText>(m_d3dDevice.Get(), m_spriteBatch.get());
@@ -112,24 +122,6 @@ void Game::Initialize(HWND window, int width, int height)
 	{
 		return (max - min) * (float)rand() / RAND_MAX + min;
 	};
-
-	for (int i = 0; i < 20; i++)
-	{
-		//float x = rand_value(-30.0, 30.0f);
-		//float z = rand_value(-30.0, 30.0f);
-		float radius = rand_value(0, XM_2PI);
-		float distance = rand_value(0, 99.0f);
-		float x = cosf(radius) * distance;
-		float z = sinf(radius) * distance;
-
-		m_pos[i] = Vector3(x, 0, z);
-	}
-
-	m_dfactor = 1.0f;
-
-	m_keyboard = std::make_unique<Keyboard>();
-
-	m_TankAngle = 0.0f;
 
 }
 
@@ -158,70 +150,21 @@ void Game::Update(DX::StepTimer const& timer)
 	m_DebugCamera->Update();
 
 	// 追従カメラ
-	m_FollowCamera->SetTargetPos(m_TankPos);
-	m_FollowCamera->SetTargetAngle(m_TankAngle);
+	m_FollowCamera->SetTarget(m_Player.get());
 	m_FollowCamera->Update();
 
-	m_view = m_DebugCamera->GetCameraMatrix();
-	m_view = m_FollowCamera->GetViewmat();
-	//m_view = Matrix::CreateLookAt(Vector3(0, 70, 0), Vector3(0, 0, 0), Vector3::UnitZ);
+	m_view = m_CurrentCamera->GetViewmat();
+	m_proj = m_CurrentCamera->GetProjmat();
 
-	m_proj = m_FollowCamera->GetProjmat();
+	m_Player->Update();
 
-	// 角度を加算
-	m_angle += XMConvertToRadians(1.0f);
-	m_scale = (sinf(m_angle)/2.0f+0.5f)*4.0f + 1.0f;
-	m_dfactor -= (1.0f / 60.0f / 10.0f);
-	if (m_dfactor <= 0.0f)
+	Keyboard::State keystate = m_keyboard->GetState();
+	m_keyboardTracker.Update(keystate);
+
+	if (m_keyboardTracker.IsKeyPressed(Keyboard::D1))
 	{
-		m_dfactor = 0.0f;
+		CollisionNode::SetDebugVisible(!CollisionNode::GetDebugVisible());
 	}
-	m_scale = 1.0f;
-
-	for (int i = 0; i < 20; i++)
-	{
-		m_world[i] =
-			Matrix::CreateScale(m_scale) *
-			Matrix::CreateRotationY(m_angle) *
-			Matrix::CreateTranslation(m_pos[i]*m_dfactor);
-	}
-
-	auto kb = m_keyboard->GetState();
-
-	if (kb.A)
-	{
-		m_TankAngle += XMConvertToRadians(+1.0f);
-	}
-
-	if (kb.D)
-	{
-		m_TankAngle += XMConvertToRadians(-1.0f);
-	}
-
-	if (kb.W)
-	{
-		Vector3 moveV(0, 0, -0.1f);
-
-		Matrix rotM = Matrix::CreateRotationY(m_TankAngle);
-		moveV = Vector3::Transform(moveV, rotM);
-
-		m_TankPos += moveV;
-	}
-
-	if (kb.S)
-	{
-		Vector3 moveV(0, 0, +0.1f);
-
-		Matrix rotM = Matrix::CreateRotationY(m_TankAngle);
-		moveV = Vector3::Transform(moveV, rotM);
-
-		m_TankPos += moveV;
-	}
-
-
-	m_TankWorld = 
-		Matrix::CreateRotationY(m_TankAngle) *
-		Matrix::CreateTranslation(m_TankPos);
 }
 
 // Draws the scene.
@@ -289,11 +232,7 @@ void Game::Render()
 	m_ModelSkydome->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
 	m_ModelGround->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
 
-	//for (int i = 0; i < 20; i++)
-	//{
-	//	m_ModelTeapot->Draw(m_d3dContext.Get(), *m_states, m_world[i], m_view, m_proj);
-	//}
-	m_ModelHead->Draw(m_d3dContext.Get(), *m_states, m_TankWorld, m_view, m_proj);
+	m_Player->Draw();
 
 	m_batch->End();
 

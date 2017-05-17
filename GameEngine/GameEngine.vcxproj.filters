@@ -14,6 +14,12 @@
     <ClInclude Include="DebugText.h" />
     <ClInclude Include="FollowCamera.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="LandShape.h" />
+    <ClInclude Include="LandShapeData.h" />
+    <ClInclude Include="Obj3D.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Collision.h" />
+    <ClInclude Include="CollisionNode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -23,6 +29,12 @@
     <ClCompile Include="DebugText.cpp" />
     <ClCompile Include="FollowCamera.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="LandShape.cpp" />
+    <ClCompile Include="LandShapeData.cpp" />
+    <ClCompile Include="Obj3D.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="CollisionNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -54,6 +66,27 @@
       <Filter>Assets</Filter>
     </MeshContentTask>
     <MeshContentTask Include="Assets\head.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\arm.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\breast.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\gun.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\tank.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\waist.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\CapsuleNode.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\SphereNode.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
   </ItemGroup>

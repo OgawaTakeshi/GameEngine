@@ -16,6 +16,8 @@
 #include "DebugCamera.h"
 #include "DebugText.h"
 #include "FollowCamera.h"
+#include "Obj3D.h"
+#include "Player.h"
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
@@ -101,24 +103,11 @@ private:
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
 
-	DirectX::SimpleMath::Vector3 m_pos[20];
-	// 球のワールド行列
-	DirectX::SimpleMath::Matrix m_world[20];
-	float m_angle;
-	float m_scale;
-	float m_dfactor;
-
 	std::unique_ptr<DirectX::Model> m_ModelSkydome;
 	std::unique_ptr<DirectX::Model> m_ModelGround;
-	std::unique_ptr<DirectX::Model> m_ModelBall;
-	std::unique_ptr<DirectX::Model> m_ModelTeapot;
-
-	std::unique_ptr<DirectX::Model> m_ModelHead;
 
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
-	DirectX::SimpleMath::Vector3 m_TankPos;
-	float	m_TankAngle;
-	DirectX::SimpleMath::Matrix m_TankWorld;
+	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
 
 	// Rendering loop timer.
     DX::StepTimer                                   m_timer;
@@ -126,4 +115,9 @@ private:
 	DebugCamera*	m_DebugCamera;
 	// 追従カメラ
 	std::unique_ptr<FollowCamera> m_FollowCamera;
+
+	// 現在のカメラ
+	Camera* m_CurrentCamera;
+
+	std::unique_ptr<Player> m_Player;
 };
