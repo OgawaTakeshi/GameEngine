@@ -103,6 +103,13 @@ void Game::Initialize(HWND window, int width, int height)
 
 	// プレイヤー作成
 	m_Player = std::make_unique<Player>(m_keyboard.get());
+
+	m_Enemies.resize(ENEMY_NUM);
+	for (int i = 0; i < ENEMY_NUM; i++)
+	{
+		m_Enemies[i] = std::make_unique<Enemy>();
+		m_Enemies[i]->Initialize();
+	}
 		
 	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
 		Vector3::Zero, Vector3::UnitY);
@@ -111,8 +118,12 @@ void Game::Initialize(HWND window, int width, int height)
 
 	
 	// モデルをファイルからロード
-	m_ModelSkydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/skydome.cmo", *m_effectFactory);
-	m_ModelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources/ground200m.cmo", *m_effectFactory);
+	m_ObjSkydome = std::make_unique<Obj3D>();
+	m_ObjGround = std::make_unique<Obj3D>();
+	m_ObjSkydome->LoadModelFile(L"Resources/skydome.cmo");
+	m_ObjGround->LoadModelFile(L"Resources/ground200m.cmo");
+	m_ObjSkydome->DisableLighting();
+	m_ObjGround->DisableLighting();
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
 	m_debugText = std::make_unique<DebugText>(m_d3dDevice.Get(), m_spriteBatch.get());
@@ -157,6 +168,13 @@ void Game::Update(DX::StepTimer const& timer)
 	m_proj = m_CurrentCamera->GetProjmat();
 
 	m_Player->Update();
+
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
+		it != m_Enemies.end();
+		it++)
+	{
+		(*it)->Update();
+	}
 
 	Keyboard::State keystate = m_keyboard->GetState();
 	m_keyboardTracker.Update(keystate);
@@ -229,10 +247,17 @@ void Game::Render()
 
 	m_batch->DrawTriangle(v1, v2, v3);
 
-	m_ModelSkydome->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
-	m_ModelGround->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
+	m_ObjSkydome->Draw();
+	m_ObjGround->Draw();
 
 	m_Player->Draw();
+
+	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
+		it != m_Enemies.end();
+		it++)
+	{
+		(*it)->Draw();
+	}
 
 	m_batch->End();
 

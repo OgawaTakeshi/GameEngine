@@ -78,26 +78,19 @@ void Obj3D::DisableLighting()
 				assert(meshpart);
 
 				// メッシュパーツにセットされたエフェクトをBasicEffectとして取得
-				BasicEffect* eff = static_cast<BasicEffect*>(meshpart->effect.get());
+				std::shared_ptr<IEffect> ieff = meshpart->effect;
+				BasicEffect* eff = dynamic_cast<BasicEffect*>(ieff.get());
 				if (eff != nullptr)
 				{
-					eff->SetLightingEnabled(false);
-					XMVECTOR emissive;
-					emissive.m128_f32[0] = 1.0f;
-					emissive.m128_f32[1] = 1.0f;
-					emissive.m128_f32[2] = 1.0f;
-					emissive.m128_f32[3] = 1.0f;
-					//eff->SetEmissiveColor(emissive);
-					//eff->SetEmissiveColor(Vector3(0.5f, 0.5f, 0.5f));
-					//eff->EnableDefaultLighting();
-					eff->SetAmbientLightColor(Vector3(1,1,1));
-					eff->SetDiffuseColor(Vector3(1, 1, 1));
-					// エフェクトの含む全ての平行光源分回す
-					//for (int i = 0; i < BasicEffect::MaxDirectionalLights; i++)
-					//{
-					//	// ライトを無効にする
-					//	eff->SetLightEnabled(i, false);
-					//}
+					// 自己発光を最大値に
+					eff->SetEmissiveColor(Vector3(1,1,1));
+
+					// エフェクトに含む全ての平行光源分について処理する
+					for (int i = 0; i < BasicEffect::MaxDirectionalLights; i++)
+					{
+						// ライトを無効にする
+						eff->SetLightEnabled(i, false);
+					}
 				}
 			}
 		}

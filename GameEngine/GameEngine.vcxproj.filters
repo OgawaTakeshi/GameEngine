@@ -20,6 +20,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="CollisionNode.h" />
+    <ClInclude Include="Enemy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -35,6 +36,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="CollisionNode.cpp" />
+    <ClCompile Include="Enemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

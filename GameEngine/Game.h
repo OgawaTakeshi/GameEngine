@@ -18,6 +18,7 @@
 #include "FollowCamera.h"
 #include "Obj3D.h"
 #include "Player.h"
+#include "Enemy.h"
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
@@ -34,6 +35,7 @@
 class Game
 {
 public:
+	static const int ENEMY_NUM = 5;
 
     Game();
 
@@ -103,8 +105,8 @@ private:
 	DirectX::SimpleMath::Matrix m_view;
 	DirectX::SimpleMath::Matrix m_proj;
 
-	std::unique_ptr<DirectX::Model> m_ModelSkydome;
-	std::unique_ptr<DirectX::Model> m_ModelGround;
+	std::unique_ptr<Obj3D> m_ObjSkydome;
+	std::unique_ptr<Obj3D> m_ObjGround;
 
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
@@ -120,4 +122,6 @@ private:
 	Camera* m_CurrentCamera;
 
 	std::unique_ptr<Player> m_Player;
+
+	std::vector<std::unique_ptr<Enemy>> m_Enemies;
 };

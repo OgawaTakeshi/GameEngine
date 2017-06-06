@@ -14,6 +14,14 @@
 // 当たり判定ノード管理クラス
 class CollisionNode
 {
+public:
+	enum TYPE
+	{
+		TYPE_SPHERE,	// 球
+		TYPE_CAPSULE,	// カプセル
+
+		TYPE_NUM
+	};
 protected:
 	// デバッグ表示のON/OFFフラグ
 	static bool s_DebugVisible;

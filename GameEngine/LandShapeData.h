@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <d3d11_1.h>
 #include <SimpleMath.h>
 
 // 地形当たりデータ
