@@ -6,6 +6,7 @@
 //--------------------------------------------------------------------------------------
 
 #include "Player.h"
+#include "Game.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -107,16 +108,35 @@ void Player::Update()
 	// ÇPÉtÉåÅ[ÉÄÇ≈ÇÃê˘âÒë¨ìx<ÉâÉWÉAÉì>
 	const float ROT_SPEED = 0.03f;
 
+	
+
 	// Å©âÒì]/Å®âÒì]
-	if (keystate.IsKeyDown(Keyboard::Keys::A))
+	if (keystate.IsKeyDown(Keyboard::Keys::Space))
+	{
+		// âÒì]å„ÇÃäpìxÇîΩâf
+		m_Obj[PARTS_TANK].SetRot(Vector3(0,0,0));
+	}
+
+	// Å©âÒì]/Å®âÒì]
+	if (keystate.IsKeyDown(Keyboard::Keys::Q))
 	{
 		// åªç›ÇÃäpìxÇéÊìæ
 		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
-		rot.y += ROT_SPEED;
+		rot.x -= ROT_SPEED;
 		// âÒì]å„ÇÃäpìxÇîΩâf
 		m_Obj[PARTS_TANK].SetRot(rot);
 	}
-	if (keystate.IsKeyDown(Keyboard::Keys::D))
+	if (keystate.IsKeyDown(Keyboard::Keys::E))
+	{
+		// åªç›ÇÃäpìxÇéÊìæ
+		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
+		rot.x += ROT_SPEED;
+		// âÒì]å„ÇÃäpìxÇîΩâf
+		m_Obj[PARTS_TANK].SetRot(rot);
+	}
+
+	// Å©âÒì]/Å®âÒì]
+	if (keystate.IsKeyDown(Keyboard::Keys::A))
 	{
 		// åªç›ÇÃäpìxÇéÊìæ
 		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
@@ -124,227 +144,43 @@ void Player::Update()
 		// âÒì]å„ÇÃäpìxÇîΩâf
 		m_Obj[PARTS_TANK].SetRot(rot);
 	}
-
-	// ëOêi/å„ëﬁ
-	if (keystate.IsKeyDown(Keyboard::Keys::W))
+	if (keystate.IsKeyDown(Keyboard::Keys::D))
 	{
-		// åªç›ÇÃç¿ïWÅEâÒì]äpÇéÊìæ
-		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
-		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// à⁄ìÆÉxÉNÉgÉã(Zç¿ïWëOêi)
-		SimpleMath::Vector3 moveV(0, 0, -0.1f);
-		Matrix rotm = Matrix::CreateRotationY(rot_y);
-		// à⁄ìÆÉxÉNÉgÉãÇâÒì]Ç∑ÇÈ
-		moveV = Vector3::TransformNormal(moveV, rotm);
-		// à⁄ìÆ
-		trans += moveV;
-		// à⁄ìÆÇµÇΩç¿ïWÇîΩâf
-		m_Obj[PARTS_TANK].SetTrans(trans);
-	}
-	if (keystate.IsKeyDown(Keyboard::Keys::S))
-	{
-		// åªç›ÇÃç¿ïWÅEâÒì]äpÇéÊìæ
-		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
-		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// à⁄ìÆÉxÉNÉgÉã(Zç¿ïWå„ëﬁ)
-		Vector3 moveV(0, 0, +0.1f);
-		Matrix rotm = Matrix::CreateRotationY(rot_y);
-		// à⁄ìÆÉxÉNÉgÉãÇâÒì]Ç∑ÇÈ
-		moveV = Vector3::TransformNormal(moveV, rotm);
-		// à⁄ìÆ
-		trans += moveV;
-		// à⁄ìÆÇµÇΩç¿ïWÇîΩâf
-		m_Obj[PARTS_TANK].SetTrans(trans);
+		// åªç›ÇÃäpìxÇéÊìæ
+		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
+		rot.y += ROT_SPEED;
+		// âÒì]å„ÇÃäpìxÇîΩâf
+		m_Obj[PARTS_TANK].SetRot(rot);
 	}
 
-	// è„è∏/â∫ç~
-	//if (m_pInputManager->GetKeyboard()->IsKeyDown(VK_UP))
-	//{
-	//	// åªç›ÇÃç¿ïWÅEâÒì]äpÇéÊìæ
-	//	Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
-	//	// à⁄ìÆÉxÉNÉgÉã(è„è∏)
-	//	SimpleMath::Vector3 moveV(0, 0.1f, 0);
-	//	trans += moveV;
-	//	// à⁄ìÆÇµÇΩç¿ïWÇîΩâf
-	//	m_Obj[PARTS_TANK].SetTrans(trans);
-	//}
-	//if (m_pInputManager->GetKeyboard()->IsKeyDown(VK_DOWN))
-	//{
-	//	// åªç›ÇÃç¿ïWÅEâÒì]äpÇéÊìæ
-	//	Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
-	//	// à⁄ìÆÉxÉNÉgÉã(Zç¿ïWå„ëﬁ)
-	//	Vector3 moveV(0, -0.1f, 0);
-	//	// à⁄ìÆ
-	//	trans += moveV;
-	//	// à⁄ìÆÇµÇΩç¿ïWÇîΩâf
-	//	m_Obj[PARTS_TANK].SetTrans(trans);
-	//}
-
-	// çòâÒì]
+	// Å©âÒì]/Å®âÒì]
 	if (keystate.IsKeyDown(Keyboard::Keys::Z))
 	{
-		Vector3 rot = m_Obj[PARTS_WAIST].GetRot();
-		rot.y += 0.03f;
-		m_Obj[PARTS_WAIST].SetRot(rot);
+		// åªç›ÇÃäpìxÇéÊìæ
+		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
+		rot.z -= ROT_SPEED;
+		// âÒì]å„ÇÃäpìxÇîΩâf
+		m_Obj[PARTS_TANK].SetRot(rot);
 	}
-	if (keystate.IsKeyDown(Keyboard::Keys::X))
-	{
-		Vector3 rot = m_Obj[PARTS_WAIST].GetRot();
-		rot.y -= 0.03f;
-		m_Obj[PARTS_WAIST].SetRot(rot);
-	}
-
-	// ãπâÒì]
 	if (keystate.IsKeyDown(Keyboard::Keys::C))
 	{
-		Vector3 rot = m_Obj[PARTS_BREAST].GetRot();
-		rot.y += 0.03f;
-		m_Obj[PARTS_BREAST].SetRot(rot);
-	}
-	if (keystate.IsKeyDown(Keyboard::Keys::V))
-	{
-		Vector3 rot = m_Obj[PARTS_BREAST].GetRot();
-		rot.y -= 0.03f;
-		m_Obj[PARTS_BREAST].SetRot(rot);
+		// åªç›ÇÃäpìxÇéÊìæ
+		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
+		rot.z += ROT_SPEED;
+		// âÒì]å„ÇÃäpìxÇîΩâf
+		m_Obj[PARTS_TANK].SetRot(rot);
 	}
 
-	// ì™ç∂âEâÒì]
-	if (keystate.IsKeyDown(Keyboard::Keys::U))
 	{
-		Vector3 rot = m_Obj[PARTS_HEAD].GetRot();
-		rot.y += 0.03f;
-		m_Obj[PARTS_HEAD].SetRot(rot);
-	}
-	if (keystate.IsKeyDown(Keyboard::Keys::I))
-	{
-		Vector3 rot = m_Obj[PARTS_HEAD].GetRot();
-		rot.y -= 0.03f;
-		m_Obj[PARTS_HEAD].SetRot(rot);
+		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
+
+		Game::m_debugText->AddText(Vector2(20, 20), L"Q E:Rotate X ... %+04d", (int)XMConvertToDegrees(rot.x));
+		Game::m_debugText->AddText(Vector2(20, 40), L"A D:Rotate Y ... %+04d", (int)XMConvertToDegrees(rot.y));
+		Game::m_debugText->AddText(Vector2(20, 60), L"Z C:Rotate Z ... %+04d", (int)XMConvertToDegrees(rot.z));
+		Game::m_debugText->AddText(Vector2(20, 80), L"Space: Reset");
 	}
 
-	// ì™è„â∫âÒì]
-	if (keystate.IsKeyDown(Keyboard::Keys::O))
-	{
-		Vector3 rot = m_Obj[PARTS_HEAD].GetRot();
-		rot.x -= 0.03f;
-		if (rot.x < -0.1f)
-		{
-			rot.x = -0.1f;
-		}
-		m_Obj[PARTS_HEAD].SetRot(rot);
-	}
-	if (keystate.IsKeyDown(Keyboard::Keys::P))
-	{
-		Vector3 rot = m_Obj[PARTS_HEAD].GetRot();
-		rot.x += 0.03f;
-		if (rot.x > 0.5f)
-		{
-			rot.x = 0.5f;
-		}
-		m_Obj[PARTS_HEAD].SetRot(rot);
-	}
-
-	// òrç∂âEâÒì]
-	if (keystate.IsKeyDown(Keyboard::Keys::D7))
-	{
-		Vector3 rot = m_Obj[PARTS_ARM_R].GetRot();
-		rot.y += 0.03f;
-		if (rot.y > 0.0f)
-		{
-			rot.y = 0.0f;
-		}
-		m_Obj[PARTS_ARM_R].SetRot(rot);
-	}
-	if (keystate.IsKeyDown(Keyboard::Keys::D8))
-	{
-		Vector3 rot = m_Obj[PARTS_ARM_R].GetRot();
-		rot.y -= 0.03f;
-		if (rot.y < -XM_PIDIV2)
-		{
-			rot.y = -XM_PIDIV2;
-		}
-		m_Obj[PARTS_ARM_R].SetRot(rot);
-	}
-
-	// òrè„â∫âÒì]
-	if (keystate.IsKeyDown(Keyboard::Keys::D9))
-	{
-		Vector3 rot = m_Obj[PARTS_ARM_R].GetRot();
-		rot.x -= 0.03f;
-		if (rot.x < -XM_PIDIV4)
-		{
-			rot.x = -XM_PIDIV4;
-		}
-		m_Obj[PARTS_ARM_R].SetRot(rot);
-	}
-	if (keystate.IsKeyDown(Keyboard::Keys::D0))
-	{
-		Vector3 rot = m_Obj[PARTS_ARM_R].GetRot();
-		rot.x += 0.03f;
-		if (rot.x > XM_PIDIV4)
-		{
-			rot.x = XM_PIDIV4;
-		}
-		m_Obj[PARTS_ARM_R].SetRot(rot);
-	}
-
-	// èeç∂âEâÒì]
-	if (keystate.IsKeyDown(Keyboard::Keys::J))
-	{
-		Vector3 rot = m_Obj[PARTS_GUN_R].GetRot();
-		rot.y += 0.03f;
-		if (rot.y > XM_PIDIV4)
-		{
-			rot.y = XM_PIDIV4;
-		}
-		m_Obj[PARTS_GUN_R].SetRot(rot);
-	}
-	if (keystate.IsKeyDown(Keyboard::Keys::K))
-	{
-		Vector3 rot = m_Obj[PARTS_GUN_R].GetRot();
-		rot.y -= 0.03f;
-		if (rot.y < -XM_PIDIV2)
-		{
-			rot.y = -XM_PIDIV2;
-		}
-		m_Obj[PARTS_GUN_R].SetRot(rot);
-	}
-
-	// ÉÅÉìÉoïœêîÇ≈ÉTÉCÉìópÇÃäpìxÇâ¡éZÇµë±ÇØÇÈ
-	m_cycle += 0.1f;
-	// 1 + (-1~+1)ÇÃîÕàÕÅ@Ç¬Ç‹ÇË(0~2)î{ÇÃÉXÉPÅ[ÉäÉìÉOÇ≈ïœìÆ
-	float scale = 1.0f + sinf(m_cycle);
-	// ÉpÅ[ÉcÇ…ÉXÉPÅ[ÉäÉìÉOÇÃêîílÇê›íËÇ∑ÇÈ
-	m_Obj[PARTS_HEAD].SetScale(Vector3(scale));
-
-	if (m_KeyboardTracker.IsKeyPressed(Keyboard::Keys::E))
-	{
-		if (m_FireFlag)
-		{
-			ResetBullet();
-		}
-		else
-		{
-			// î≠éÀ
-			FireBullet();
-		}
-	}
-
-	if (m_FireFlag)
-	{
-		// åªç›ÇÃç¿ïWÇéÊìæ
-		Vector3 trans = m_Obj[PARTS_GUN_R].GetTrans();
-
-		trans += m_BulletVel;
-		
-		// à⁄ìÆÇµÇΩç¿ïWÇîΩâf
-		m_Obj[PARTS_GUN_R].SetTrans(trans);
-
-		if (--m_FireCount < 0)
-		{
-			ResetBullet();
-		}
-	}
+	
 
 	// à⁄ìÆÇîΩâfÇµÇƒçsóÒçXêV
 	Calc();

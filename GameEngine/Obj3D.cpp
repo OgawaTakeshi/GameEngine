@@ -1,5 +1,6 @@
 #include "Obj3D.h"
 #include "VertexTypes.h"
+#include "Game.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -11,6 +12,8 @@ DirectX::CommonStates*	Obj3D::s_pStates;
 DirectX::EffectFactory* Obj3D::s_pEffectFactory;
 Camera* Obj3D::s_pCamera;
 std::map<std::wstring, std::unique_ptr<DirectX::Model>> Obj3D::s_modelarray;
+
+static int mode = 0;
 
 void Obj3D::StaticInitialize(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, DirectX::CommonStates * pStates, DirectX::EffectFactory * pfx, Camera * pCamera)
 {
@@ -97,6 +100,43 @@ void Obj3D::DisableLighting()
 	}
 }
 
+void Obj3D::UpdateOnce()
+{
+	if (Game::m_keyboardTracker.IsKeyPressed(Keyboard::Keys::Enter))
+	{
+		mode++;
+		if (mode >= 6) mode = 0;
+	}
+
+	Game::m_debugText->AddText(Vector2(20, 120), L"Enter: Change Order");
+
+	static int y_order = 140;
+
+	switch (mode)
+	{
+
+	case 0:
+		Game::m_debugText->AddText(Vector2(20, y_order), L"Z > X > Y");
+		break;
+	case 1:
+		Game::m_debugText->AddText(Vector2(20, y_order), L"Z > Y > X");
+		break;
+	case 2:
+		Game::m_debugText->AddText(Vector2(20, y_order), L"X > Y > Z");
+		break;
+	case 3:
+		Game::m_debugText->AddText(Vector2(20, y_order), L"X > Z > Y");
+		break;
+	case 4:
+		Game::m_debugText->AddText(Vector2(20, y_order), L"Y > X > Z");
+		break;
+	case 5:
+		Game::m_debugText->AddText(Vector2(20, y_order), L"Y > Z > X");
+		break;
+
+	}
+}
+
 void Obj3D::Calc()
 {
 	Matrix scalem;
@@ -105,13 +145,43 @@ void Obj3D::Calc()
 
 	scalem = Matrix::CreateScale(m_Scale);
 
+	
+
+	
+
 	if (m_UseQuternion)
 	{
 		rotm = Matrix::CreateFromQuaternion(m_RotQ);
 	}
 	else
 	{
-		rotm = Matrix::CreateFromYawPitchRoll(m_Rot.y, m_Rot.x, m_Rot.z);
+		Matrix rotx = Matrix::CreateRotationX(m_Rot.x);
+		Matrix roty = Matrix::CreateRotationY(m_Rot.y);
+		Matrix rotz = Matrix::CreateRotationZ(m_Rot.z);
+		switch (mode)
+		{
+
+		case 0:
+			rotm = rotz * rotx * roty;
+			break;
+		case 1:
+			rotm = rotz * roty * rotx;
+			break;
+		case 2:
+			rotm = rotx * roty * rotz;
+			break;
+		case 3:
+			rotm = rotx * rotz * roty;
+			break;
+		case 4:
+			rotm = roty * rotx * rotz;
+			break;
+		case 5:
+			rotm = roty * rotz * rotx;
+			break;
+
+		}
+		
 	}
 	
 	transm = Matrix::CreateTranslation(m_Trans);

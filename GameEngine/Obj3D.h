@@ -25,6 +25,8 @@ public:
 	static void SetCamera(Camera* pCamera) { s_pCamera = pCamera; }
 
 	static ID3D11DeviceContext* GetDeviceContext() { return s_pDeviceContext; }
+
+	static void UpdateOnce();
 private:
 	// 静的メンバ変数（全オブジェクトで共有）
 	// デバイスへのポインタ

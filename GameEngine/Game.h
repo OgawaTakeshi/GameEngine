@@ -57,6 +57,11 @@ public:
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
 
+	// デバッグテキスト
+	static std::unique_ptr<DebugText> m_debugText;
+	static std::unique_ptr<DirectX::Keyboard> m_keyboard;
+	static DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
+
 private:
 
     void Update(DX::StepTimer const& timer);
@@ -88,8 +93,7 @@ private:
 
 	// スプライトバッチ
 	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
-	// デバッグテキスト
-	std::unique_ptr<DebugText> m_debugText;
+	
 
 	// コモンステート
 	std::unique_ptr<DirectX::CommonStates> m_states;
@@ -107,9 +111,6 @@ private:
 
 	std::unique_ptr<Obj3D> m_ObjSkydome;
 	std::unique_ptr<Obj3D> m_ObjGround;
-
-	std::unique_ptr<DirectX::Keyboard> m_keyboard;
-	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
 
 	// Rendering loop timer.
     DX::StepTimer                                   m_timer;

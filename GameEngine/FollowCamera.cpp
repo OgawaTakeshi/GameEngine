@@ -47,7 +47,7 @@ void FollowCamera::Update()
 	Vector3 cameraV(0, 0, CAMERA_DISTANCE);
 
 	//Matrix rotmat = Matrix::CreateRotationY(m_TargetAngle);
-	cameraV = Vector3::TransformNormal(cameraV, targetWorld);
+	//cameraV = Vector3::TransformNormal(cameraV, targetWorld);
 
 	eyepos = refpos + cameraV;
 

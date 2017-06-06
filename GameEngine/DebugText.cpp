@@ -26,7 +26,7 @@ void DebugText::Draw()
 	std::vector<DebugText::Text>::iterator it;
 	for (it = textArray.begin(); it != textArray.end(); it++)
 	{
-		spriteFont->DrawString(spriteBatch, it->str.c_str(), it->pos);
+		spriteFont->DrawString(spriteBatch, it->str.c_str(), it->pos, DirectX::SimpleMath::Color(0,0,0));
 	}
 	textArray.clear();
 }

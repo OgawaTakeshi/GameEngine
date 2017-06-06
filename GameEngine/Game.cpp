@@ -13,6 +13,11 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
+std::unique_ptr<DebugText> Game::m_debugText;
+
+std::unique_ptr<DirectX::Keyboard> Game::m_keyboard;
+DirectX::Keyboard::KeyboardStateTracker Game::m_keyboardTracker;
+
 // 頂点インデックス
 uint16_t indices[] =
 {
@@ -154,7 +159,9 @@ void Game::Update(DX::StepTimer const& timer)
 
 	float fps = m_timer.GetFramesPerSecond();
 
-	m_debugText->AddText(Vector2(0, 0), L"FPS:%d", m_timer.GetFramesPerSecond());
+	
+
+	//m_debugText->AddText(Vector2(0, 0), L"FPS:%d", m_timer.GetFramesPerSecond());
 
     // TODO: Add your game logic here.
 	// カメラ更新
@@ -178,6 +185,8 @@ void Game::Update(DX::StepTimer const& timer)
 
 	Keyboard::State keystate = m_keyboard->GetState();
 	m_keyboardTracker.Update(keystate);
+
+	Obj3D::UpdateOnce();
 
 	if (m_keyboardTracker.IsKeyPressed(Keyboard::D1))
 	{
