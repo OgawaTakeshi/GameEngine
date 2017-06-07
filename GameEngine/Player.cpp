@@ -6,9 +6,12 @@
 //--------------------------------------------------------------------------------------
 
 #include "Player.h"
+#include <fstream>
+#include <sstream>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
+using namespace std;
 
 const float Player::GRAVITY_ACC = 0.03f;
 const float Player::JUMP_SPEED_FIRST = 0.5f;
@@ -31,42 +34,19 @@ Player::~Player()
 //-----------------------------------------------------------------------------
 void Player::Initialize()
 {
-	m_Obj.resize(PARTS_NUM);
-	// ロボットのモデル読み込み
-	m_Obj[PARTS_TANK].LoadModelFile(L"Resources/tank.cmo");
-	m_Obj[PARTS_WAIST].LoadModelFile(L"Resources/waist.cmo");
-	m_Obj[PARTS_BREAST].LoadModelFile(L"Resources/breast.cmo");
-	m_Obj[PARTS_HEAD].LoadModelFile(L"Resources/head.cmo");
-	m_Obj[PARTS_ARM_R].LoadModelFile(L"Resources/arm.cmo");
-	m_Obj[PARTS_GUN_R].LoadModelFile(L"Resources/gun.cmo");
-
-	// 親子関係の組み立て
-	m_Obj[PARTS_WAIST].SetParentMatrix(&m_Obj[PARTS_TANK].GetLocalWorld());
-	m_Obj[PARTS_BREAST].SetParentMatrix(&m_Obj[PARTS_WAIST].GetLocalWorld());
-	m_Obj[PARTS_HEAD].SetParentMatrix(&m_Obj[PARTS_BREAST].GetLocalWorld());
-	m_Obj[PARTS_ARM_R].SetParentMatrix(&m_Obj[PARTS_BREAST].GetLocalWorld());
-	m_Obj[PARTS_GUN_R].SetParentMatrix(&m_Obj[PARTS_ARM_R].GetLocalWorld());
-
-	// 親からのオフセット（位置の差）を設定
-	m_Obj[PARTS_TANK].SetTrans(Vector3(0, 0.01f, 0));
-	m_Obj[PARTS_WAIST].SetScale(Vector3(0.7f, 0.7f, 0.7f));
-	m_Obj[PARTS_WAIST].SetTrans(Vector3(0, 0.40f, 0));
-	m_Obj[PARTS_BREAST].SetTrans(Vector3(0, 0.5f, 0));
-	m_Obj[PARTS_HEAD].SetTrans(Vector3(0, 0.42f, 0));
-	m_Obj[PARTS_ARM_R].SetTrans(Vector3(0.5f, 0.3f, 0));
-	m_Obj[PARTS_GUN_R].SetTrans(Vector3(0.2f, 0.45f, -0.3f));
+	Load();
 
 	m_FireFlag = false;
 
 	m_CollisionNodeBody.Initialize();
-	m_CollisionNodeBody.SetParentMatrix(&m_Obj[PARTS_TANK].GetLocalWorld());
+	m_CollisionNodeBody.SetParent(&m_Obj[PARTS_TANK]);
 	m_CollisionNodeBody.SetLocalRadius(1.0f);
 	m_CollisionNodeBody.SetTrans(Vector3(0, 1.0f, 0));
 
 	// 初期化
 	m_CollisionNodeBullet.Initialize();
 	// 親行列を設定
-	m_CollisionNodeBullet.SetParentMatrix(&m_Obj[PARTS_GUN_R].GetLocalWorld());
+	m_CollisionNodeBullet.SetParent(&m_Obj[PARTS_GUN_R]);
 	// カプセルの半径
 	m_CollisionNodeBullet.SetLocalRadius(0.3f);
 	// カプセルの軸長さ
@@ -488,6 +468,88 @@ const DirectX::SimpleMath::Matrix& Player::GetLocalWorld()
 	return m_Obj[PARTS_TANK].GetLocalWorld();
 }
 
+void Player::Load()
+{
+	wifstream ifs("CSV/Player.csv");
+
+	wstring line;
+
+	// 1行目をスキップ
+	getline(ifs, line);
+
+	vector<wstring> part_names;
+	vector<wstring> parent_names;
+
+	// 名簿からデータを解析
+	while (getline(ifs, line)) {
+
+		wstring filepath;
+		wstring filename;
+
+		// 1行分を文字列ストリームに変換
+		wistringstream stream(line);
+
+		// ファイル名の文字列を読み込み
+		stream >> filename;
+		// プロジェクトの基点からの相対パスでファイル名を補う
+		filepath = L"Resources/" + filename + L".cmo";
+
+		Obj3D obj;
+		// 読み込む
+		obj.LoadModelFile(filepath.c_str());
+
+		// スケーリングの読み取り
+		Vector3 scale;
+		stream >> scale.x;
+		stream >> scale.y;
+		stream >> scale.z;
+		obj.SetScale(scale);
+
+		// 角度の読み取り
+		Vector3 rotation;
+		stream >> rotation.z;
+		stream >> rotation.x;
+		stream >> rotation.y;
+		obj.SetRot(rotation);
+
+		// 座標の読み取り
+		Vector3 position;
+		stream >> position.x;
+		stream >> position.y;
+		stream >> position.z;
+		obj.SetTrans(position);
+
+		m_Obj.push_back(obj);
+
+		wstring parent_name;
+
+		stream >> parent_name;
+
+		part_names.push_back(filename);
+
+		parent_names.push_back(parent_name);
+	}
+
+	// 親子関係の組み立て
+	for (int i = 0; i < m_Obj.size(); i++)
+	{
+		// 親の指定あり
+		if (parent_names[i].length() > 0)
+		{
+			for (int j = 0; j < m_Obj.size(); j++)
+			{
+				if (j == i) continue;
+
+				// 指定の親発見
+				if (part_names[j] == parent_names[i])
+				{
+					m_Obj[i].SetParent(&m_Obj[j]);
+				}
+			}
+		}
+	}
+}
+
 // 弾丸用のパーツを射出する
 void Player::FireBullet()
 {
@@ -522,7 +584,7 @@ void Player::FireBullet()
 	//worldm.Decompose(scale, rotq, pos);
 
 	// 親子関係を解除する
-	m_Obj[PARTS_GUN_R].SetParentMatrix(nullptr);
+	m_Obj[PARTS_GUN_R].SetParent(nullptr);
 	m_Obj[PARTS_GUN_R].SetScale(scale);
 	m_Obj[PARTS_GUN_R].SetRotQ(rotq);
 	m_Obj[PARTS_GUN_R].SetTrans(pos);
@@ -542,7 +604,7 @@ void Player::ResetBullet()
 	// 発射中ではない
 	if (!m_FireFlag)	return;
 	
-	m_Obj[PARTS_GUN_R].SetParentMatrix(&m_Obj[PARTS_ARM_R].GetLocalWorld());
+	m_Obj[PARTS_GUN_R].SetParent(&m_Obj[PARTS_ARM_R]);
 
 	m_Obj[PARTS_GUN_R].SetScale(Vector3(1, 1, 1));
 	m_Obj[PARTS_GUN_R].SetRot(Vector3(0, 0, 0));

@@ -57,7 +57,7 @@ public:
 	void SetRotQ(const DirectX::SimpleMath::Quaternion& rotq)	 { m_RotQ = rotq; m_UseQuternion = true; }
 	void SetScale(const DirectX::SimpleMath::Vector3& scale) { m_Scale = scale; }
 	void SetLocalWorld(const DirectX::SimpleMath::Matrix& mat) { m_LocalWorld = mat; }
-	void SetParentMatrix(const DirectX::SimpleMath::Matrix* pParentMatrix)	{ m_pParentMatrix = pParentMatrix; }
+	void SetParent(Obj3D* pParent)	{ m_pParent = pParent; }
 
 	const DirectX::SimpleMath::Vector3& GetTrans()	{ return m_Trans; }
 	const DirectX::SimpleMath::Vector3& GetRot()	{ return m_Rot; }
@@ -78,5 +78,5 @@ private:
 	// ワールド行列
 	DirectX::SimpleMath::Matrix m_LocalWorld;
 	// 親のワールド行列へのポインタ
-	const DirectX::SimpleMath::Matrix* m_pParentMatrix;
+	Obj3D* m_pParent;
 };

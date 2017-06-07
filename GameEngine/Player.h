@@ -61,6 +61,7 @@ public:
 	void SetRot(const DirectX::SimpleMath::Vector3& rot);
 	// ワールド行列を取得
 	const DirectX::SimpleMath::Matrix& GetLocalWorld();
+	void Load();
 	// 本体の地形当たり判定球を取得
 	const SphereNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
 	// 弾丸の当たり判定カプセルを取得

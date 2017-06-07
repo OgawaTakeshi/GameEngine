@@ -25,7 +25,7 @@ void Obj3D::StaticInitialize(ID3D11Device * pDevice, ID3D11DeviceContext * pDevi
 *	@brief コンストラクタ
 */
 Obj3D::Obj3D()
-: m_pParentMatrix(nullptr)
+: m_pParent(nullptr)
 , m_pModel(nullptr)
 , m_UseQuternion(false)
 {
@@ -123,10 +123,10 @@ void Obj3D::Calc()
 	m_LocalWorld *= transm;
 
 	// 親行列があれば
-	if ( m_pParentMatrix )
+	if ( m_pParent )
 	{
 		// 親行列を掛ける
-		m_LocalWorld = m_LocalWorld * (*m_pParentMatrix);
+		m_LocalWorld = m_LocalWorld * m_pParent->GetLocalWorld();
 	}
 }
 

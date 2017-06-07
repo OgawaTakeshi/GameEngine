@@ -11,20 +11,20 @@
 #include <SimpleMath.h>
 #include <vector>
 #include "Obj3D.h"
-//#include "CollisionNode.h"
+#include "CollisionNode.h"
 
 class Enemy
 {
 public:
 	// パーツ
-	enum
+	// 自機パーツ
+	enum PARTS
 	{
-		PARTS_TANK,		// キャタピラ
-		PARTS_WAIST,	// 腰
-		PARTS_BREAST,	// 胸
-		PARTS_HEAD,		// 頭
-		PARTS_ARM_R,	// 右腕
-		PARTS_GUN_R,	// 右の銃
+		PARTS_BODY,
+		PARTS_COCKPIT,
+		PARTS_LAUNCHER,
+		PARTS_SHIELD,
+		PARTS_DRILL,
 
 		PARTS_NUM
 	};
@@ -42,18 +42,18 @@ public:
 	void Draw();
 
 	// 弾丸の当たり判定球を取得
-	//const SphereNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
+	const CollisionNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
 
-	//// 死亡フラグを立てる
-	//void SetDeath()	{ m_Death = true; }
-	//bool GetDeath() { return m_Death; }
+	// 死亡フラグを立てる
+	void SetDeath()	{ m_Death = true; }
+	bool GetDeath() { return m_Death; }
 
 protected:
 	// メンバ変数
 	// ３Ｄオブジェクト
 	std::vector<Obj3D>	m_Obj;
 
-	//SphereNode m_CollisionNodeBody;
+	SphereNode m_CollisionNodeBody;
 
 	// 角度
 	float m_angle;

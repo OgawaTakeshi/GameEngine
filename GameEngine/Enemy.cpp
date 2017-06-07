@@ -61,43 +61,59 @@ Enemy::~Enemy()
 void Enemy::Initialize()
 {
 	m_Obj.resize(PARTS_NUM);
-	// モデル読み込み
-	m_Obj[PARTS_TANK].LoadModelFile(L"Resources/tank.cmo");
-	m_Obj[PARTS_WAIST].LoadModelFile(L"Resources/waist.cmo");
-	m_Obj[PARTS_BREAST].LoadModelFile(L"Resources/breast.cmo");
-	m_Obj[PARTS_HEAD].LoadModelFile(L"Resources/head.cmo");
-	m_Obj[PARTS_ARM_R].LoadModelFile(L"Resources/arm.cmo");
-	m_Obj[PARTS_GUN_R].LoadModelFile(L"Resources/gun.cmo");
+	m_Obj[PARTS_BODY].LoadModelFile(L"Resources/body.cmo");
+	m_Obj[PARTS_COCKPIT].LoadModelFile(L"Resources/cockpit.cmo");
+	m_Obj[PARTS_LAUNCHER].LoadModelFile(L"Resources/launcher.cmo");
+	m_Obj[PARTS_SHIELD].LoadModelFile(L"Resources/shield.cmo");
+	m_Obj[PARTS_DRILL].LoadModelFile(L"Resources/drill.cmo");
 
-	// 親子関係の組み立て
-	m_Obj[PARTS_WAIST].SetParentMatrix(&m_Obj[PARTS_TANK].GetLocalWorld());
-	m_Obj[PARTS_BREAST].SetParentMatrix(&m_Obj[PARTS_WAIST].GetLocalWorld());
-	m_Obj[PARTS_HEAD].SetParentMatrix(&m_Obj[PARTS_BREAST].GetLocalWorld());
-	m_Obj[PARTS_ARM_R].SetParentMatrix(&m_Obj[PARTS_BREAST].GetLocalWorld());
-	m_Obj[PARTS_GUN_R].SetParentMatrix(&m_Obj[PARTS_ARM_R].GetLocalWorld());
+	// パーツの親子関係をセット
+	m_Obj[PARTS_COCKPIT].SetParent(
+		&m_Obj[PARTS_BODY]);
 
-	// 親からのオフセット（位置の差）を設定
-	m_Obj[PARTS_TANK].SetTrans(Vector3(0, 0.01f, 0));
-	m_Obj[PARTS_WAIST].SetScale(Vector3(0.7f, 0.7f, 0.7f));
-	m_Obj[PARTS_WAIST].SetTrans(Vector3(0, 0.40f, 0));
-	m_Obj[PARTS_BREAST].SetTrans(Vector3(0, 0.5f, 0));
-	m_Obj[PARTS_HEAD].SetTrans(Vector3(0, 0.42f, 0));
-	m_Obj[PARTS_ARM_R].SetTrans(Vector3(0.5f, 0.3f, 0));
-	m_Obj[PARTS_GUN_R].SetTrans(Vector3(0.2f, 0.45f, -0.3f));
+	m_Obj[PARTS_DRILL].SetParent(
+		&m_Obj[PARTS_COCKPIT]);
 
+	m_Obj[PARTS_LAUNCHER].SetParent(
+		&m_Obj[PARTS_BODY]);
+
+	m_Obj[PARTS_SHIELD].SetParent(
+		&m_Obj[PARTS_BODY]);
+
+	// 親からのオフセット（座標のずらし分）をセット
+	m_Obj[PARTS_COCKPIT].SetTrans(
+		Vector3(0, 0.37f, -0.4f));
+	m_Obj[PARTS_COCKPIT].SetRot(
+		Vector3(0, XM_PI, 0));
+
+	m_Obj[PARTS_DRILL].SetTrans(
+		Vector3(0, 0.1f, 0.8f));
+
+	m_Obj[PARTS_LAUNCHER].SetTrans(
+		Vector3(0, 0.37f, 0.4f));
+
+	m_Obj[PARTS_SHIELD].SetTrans(
+		Vector3(-0.8f, 0.37f, 0));
+	m_Obj[PARTS_SHIELD].SetScale(
+		Vector3(2, 2, 2));
+	m_Obj[PARTS_SHIELD].SetRot(
+		Vector3(0, 0, XM_PIDIV2));
+
+	// 初期配置ランダム
 	Vector3 pos;
 	pos.x = (float)rand() / RAND_MAX * 20.0f - 10.0f;
 	pos.z = (float)rand() / RAND_MAX * 20.0f - 10.0f;
-	m_Obj[PARTS_TANK].SetTrans(pos);
+	m_Obj[0].SetTrans(pos);
 
 	m_angle = (float)(rand() % 360);
 
-	m_Obj[PARTS_TANK].SetRot(Vector3(0, XMConvertToRadians(m_angle), 0));
+	m_Obj[0].SetRot(Vector3(0, XMConvertToRadians(m_angle), 0));
 
-	//m_CollisionNodeBody.Initialize();
-	//m_CollisionNodeBody.SetParentMatrix(&m_Obj[PARTS_TANK].GetLocalWorld());
-	//m_CollisionNodeBody.SetTrans(Vector3(0, 0.7f, 0));
-	//m_CollisionNodeBody.SetLocalRadius(0.7f);
+	// 当たり判定
+	m_CollisionNodeBody.Initialize();
+	m_CollisionNodeBody.SetParent(&m_Obj[0]);
+	m_CollisionNodeBody.SetTrans(Vector3(0, 0.3f, 0));
+	m_CollisionNodeBody.SetLocalRadius(1.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -122,31 +138,31 @@ void Enemy::Update()
 
 	// じわじわと角度を反映
 	{
-		Vector3 rotv = m_Obj[PARTS_TANK].GetRot();
+		Vector3 rotv = m_Obj[0].GetRot();
 		float angle = GetShortAngleRad(rotv.y, XMConvertToRadians(m_angle));
 		rotv.y += angle*0.01f;
-		m_Obj[PARTS_TANK].SetRot(rotv);
+		m_Obj[0].SetRot(rotv);
 	}
 
 	// 機体の向いている方向に進む
 	{
 		// 今の座標を取得
-		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
+		Vector3 trans = m_Obj[0].GetTrans();
 
 		Vector3 move(0, 0, -0.02f);
-		Vector3 rotv = m_Obj[PARTS_TANK].GetRot();
+		Vector3 rotv = m_Obj[0].GetRot();
 		Matrix rotm = Matrix::CreateRotationY(rotv.y);
 		move = Vector3::TransformNormal(move, rotm);
 		// 座標を移動
 		trans += move;
 		// 移動後の座標をセット
-		m_Obj[PARTS_TANK].SetTrans(trans);
+		m_Obj[0].SetTrans(trans);
 	}
 
 	// 移動を反映して行列更新
 	Calc();
 
-	//m_CollisionNodeBody.Update();
+	m_CollisionNodeBody.Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -178,5 +194,5 @@ void Enemy::Draw()
 		m_Obj[i].Draw();
 	}
 
-	//m_CollisionNodeBody.Draw();
+	m_CollisionNodeBody.Draw();
 }

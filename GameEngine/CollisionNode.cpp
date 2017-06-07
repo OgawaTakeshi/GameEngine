@@ -12,6 +12,11 @@ using namespace DirectX::SimpleMath;
 // デバッグ表示のON/OFFフラグの実体
 bool CollisionNode::s_DebugVisible = false;
 
+void CollisionNode::SetParent(Obj3D* pParent)
+{
+	m_Obj.SetParent(pParent);
+}
+
 SphereNode::SphereNode()
 {
 	// 初期値（半径1m）
@@ -69,12 +74,6 @@ void SphereNode::Draw()
 		m_Obj.Draw();
 	}
 }
-
-void SphereNode::SetParentMatrix(const Matrix* pParentMatrix)
-{
-	m_Obj.SetParentMatrix(pParentMatrix);
-}
-
 
 //--------------------------------------------------------------
 CapsuleNode::CapsuleNode()
@@ -140,11 +139,6 @@ void CapsuleNode::Draw()
 	{
 		m_Obj.Draw();
 	}
-}
-
-void CapsuleNode::SetParentMatrix(const Matrix* pParentMatrix)
-{
-	m_Obj.SetParentMatrix(pParentMatrix);
 }
 
 void CapsuleNode::SetRot(const Vector3& rot)
