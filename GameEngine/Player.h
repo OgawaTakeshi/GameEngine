@@ -65,7 +65,7 @@ public:
 	// 本体の地形当たり判定球を取得
 	const SphereNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
 	// 弾丸の当たり判定カプセルを取得
-	const CapsuleNode& GetCollisionNodeBullet() { return m_CollisionNodeBullet; }
+	const SphereNode& GetCollisionNodeBullet() { return m_CollisionNodeBullet; }
 
 	// 発射
 	void FireBullet();
@@ -98,8 +98,8 @@ protected:
 	// 本体の地形当たり判定球
 	SphereNode m_CollisionNodeBody;
 
-	// 弾丸の当たり判定カプセル
-	CapsuleNode m_CollisionNodeBullet;
+	// 弾丸の当たり判定球
+	SphereNode m_CollisionNodeBullet;
 
 	// 速度
 	DirectX::SimpleMath::Vector3 m_Velocity;

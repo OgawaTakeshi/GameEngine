@@ -48,14 +48,10 @@ void Player::Initialize()
 	m_CollisionNodeBullet.Initialize();
 	// 親行列を設定
 	m_CollisionNodeBullet.SetParent(&m_Obj[PARTS_GUN_R]);
-	// カプセルの半径
+	// 半径
 	m_CollisionNodeBullet.SetLocalRadius(0.3f);
-	// カプセルの軸長さ
-	m_CollisionNodeBullet.SetLength(1.4f);
 	// 親行列からの位置
 	m_CollisionNodeBullet.SetTrans(Vector3(0, 0, 0));
-	// 親行列からの回転
-	m_CollisionNodeBullet.SetRot(Vector3(-XM_PIDIV2, 0, 0));
 
 	m_isJump = false;
 }
@@ -410,7 +406,6 @@ void Player::Update()
 	//	Calc();
 	//}
 
-	
 }
 
 //-----------------------------------------------------------------------------

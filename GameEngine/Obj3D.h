@@ -25,6 +25,9 @@ public:
 	static void SetCamera(Camera* pCamera) { s_pCamera = pCamera; }
 
 	static ID3D11DeviceContext* GetDeviceContext() { return s_pDeviceContext; }
+	// 減算描画設定をセット
+	static void SetSubtractive();
+
 private:
 	// 静的メンバ変数（全オブジェクトで共有）
 	// デバイスへのポインタ
@@ -39,6 +42,8 @@ private:
 	static Camera* s_pCamera;
 	// 読み込み済みモデルコンテナ
 	static std::map<std::wstring, std::unique_ptr<DirectX::Model>> s_modelarray;
+
+	static ID3D11BlendState* s_pBlendStateSubtract;
 public:
 	Obj3D();
 	virtual ~Obj3D();
@@ -48,9 +53,11 @@ public:
 	void Calc();
 	// 描画
 	void Draw();
+	// 減算描画での描画（影用）
+	void DrawSubtractive();
 	// オブジェクトのライティングを無効にする
 	void DisableLighting();
-
+	
 	// アクセッサ
 	void SetTrans(const DirectX::SimpleMath::Vector3& trans) { m_Trans = trans; }
 	void SetRot(const DirectX::SimpleMath::Vector3& rot)	 { m_Rot = rot; m_UseQuternion = false; }

@@ -249,6 +249,7 @@
     <MeshContentTask Include="Assets\gun.FBX" />
     <MeshContentTask Include="Assets\head.FBX" />
     <MeshContentTask Include="Assets\launcher.FBX" />
+    <MeshContentTask Include="Assets\shadow.FBX" />
     <MeshContentTask Include="Assets\shield.FBX" />
     <MeshContentTask Include="Assets\skydome.FBX" />
     <MeshContentTask Include="Assets\SphereNode.FBX" />

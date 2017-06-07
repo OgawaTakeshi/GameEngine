@@ -42,7 +42,7 @@ public:
 	void Draw();
 
 	// 弾丸の当たり判定球を取得
-	const CollisionNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
+	const SphereNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
 
 	// 死亡フラグを立てる
 	void SetDeath()	{ m_Death = true; }
@@ -52,6 +52,8 @@ protected:
 	// メンバ変数
 	// ３Ｄオブジェクト
 	std::vector<Obj3D>	m_Obj;
+
+	Obj3D m_ObjShadow;
 
 	SphereNode m_CollisionNodeBody;
 

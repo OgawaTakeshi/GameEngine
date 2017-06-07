@@ -176,6 +176,31 @@ void Game::Update(DX::StepTimer const& timer)
 		(*it)->Update();
 	}
 
+	// 攻撃当たり判定
+	{
+		// プレイヤーの攻撃当たり球
+		const Sphere& sphereA = m_Player->GetCollisionNodeBullet();
+
+		// 全ての敵について判定する
+		for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
+			it != m_Enemies.end();
+			it++)
+		{
+			Enemy* enemy = it->get();
+
+			// 敵の被攻撃当たり球
+			const Sphere& sphereB = enemy->GetCollisionNodeBody();
+
+			// 球と球の当たり
+			if (CheckSphere2Sphere(sphereA, sphereB))
+			{
+				m_Player->ResetBullet();
+
+				enemy->SetDeath();
+			}
+		}
+	}
+
 	Keyboard::State keystate = m_keyboard->GetState();
 	m_keyboardTracker.Update(keystate);
 

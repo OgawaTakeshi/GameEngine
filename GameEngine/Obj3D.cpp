@@ -1,5 +1,6 @@
 #include "Obj3D.h"
 #include "VertexTypes.h"
+#include <CommonStates.h>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -11,6 +12,7 @@ DirectX::CommonStates*	Obj3D::s_pStates;
 DirectX::EffectFactory* Obj3D::s_pEffectFactory;
 Camera* Obj3D::s_pCamera;
 std::map<std::wstring, std::unique_ptr<DirectX::Model>> Obj3D::s_modelarray;
+ID3D11BlendState* Obj3D::s_pBlendStateSubtract;
 
 void Obj3D::StaticInitialize(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, DirectX::CommonStates * pStates, DirectX::EffectFactory * pfx, Camera * pCamera)
 {
@@ -19,6 +21,26 @@ void Obj3D::StaticInitialize(ID3D11Device * pDevice, ID3D11DeviceContext * pDevi
 	SetStates(pStates);
 	SetEffectFactory(pfx);
 	SetCamera(pCamera);
+
+	// Œ¸ŽZ•`‰æ—p‚ÌƒuƒŒƒ“ƒhƒXƒe[ƒg‚ðì¬
+	D3D11_BLEND_DESC desc;
+	desc.AlphaToCoverageEnable = false;
+	desc.IndependentBlendEnable = false;
+	desc.RenderTarget[0].BlendEnable = true;
+	desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
+	desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_REV_SUBTRACT;
+	desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	HRESULT ret = s_pDevice->CreateBlendState(&desc, &s_pBlendStateSubtract);
+}
+
+void Obj3D::SetSubtractive()
+{
+	// Œ¸ŽZ•`‰æ‚ðÝ’è
+	s_pDeviceContext->OMSetBlendState(s_pBlendStateSubtract, nullptr, 0xffffff);
 }
 
 /**
@@ -142,5 +164,21 @@ void Obj3D::Draw()
 		assert(s_pStates);
 
 		m_pModel->Draw(s_pDeviceContext, *s_pStates, m_LocalWorld, view, projection);
+	}
+}
+
+void Obj3D::DrawSubtractive()
+{
+	if (m_pModel)
+	{
+		assert(s_pCamera);
+		const Matrix& view = s_pCamera->GetViewmat();
+		const Matrix& projection = s_pCamera->GetProjmat();
+
+		assert(s_pDeviceContext);
+		assert(s_pStates);
+
+		// Œ¸ŽZ•`‰æ—p‚ÌÝ’èŠÖ”‚ð“n‚µ‚Ä•`‰æ
+		m_pModel->Draw(s_pDeviceContext, *s_pStates, m_LocalWorld, view, projection, false, Obj3D::SetSubtractive);
 	}
 }

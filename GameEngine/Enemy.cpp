@@ -102,6 +102,7 @@ void Enemy::Initialize()
 	// èâä˙îzíuÉâÉìÉ_ÉÄ
 	Vector3 pos;
 	pos.x = (float)rand() / RAND_MAX * 20.0f - 10.0f;
+	pos.y = 0.5f;
 	pos.z = (float)rand() / RAND_MAX * 20.0f - 10.0f;
 	m_Obj[0].SetTrans(pos);
 
@@ -114,6 +115,10 @@ void Enemy::Initialize()
 	m_CollisionNodeBody.SetParent(&m_Obj[0]);
 	m_CollisionNodeBody.SetTrans(Vector3(0, 0.3f, 0));
 	m_CollisionNodeBody.SetLocalRadius(1.0f);
+
+	m_ObjShadow.LoadModelFile(L"Resources/shadow.cmo");
+	m_ObjShadow.SetTrans(Vector3(0, -0.4f, 0));
+	m_ObjShadow.SetParent(&m_Obj[0]);
 }
 
 //-----------------------------------------------------------------------------
@@ -178,6 +183,8 @@ void Enemy::Calc()
 	{
 		m_Obj[i].Calc();
 	}
+	
+	m_ObjShadow.Calc();
 }
 
 //-----------------------------------------------------------------------------
@@ -195,4 +202,7 @@ void Enemy::Draw()
 	}
 
 	m_CollisionNodeBody.Draw();
+
+	// âeÇå∏éZï`âÊ
+	m_ObjShadow.DrawSubtractive();
 }
