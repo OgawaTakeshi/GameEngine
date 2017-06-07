@@ -8,6 +8,7 @@
 #include "Player.h"
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -485,6 +486,11 @@ void Player::Load()
 
 		wstring filepath;
 		wstring filename;
+
+		wchar_t del = L',';
+
+		// カンマを空白に置き換え
+		std::replace(line.begin(), line.end(), L',', L' ');
 
 		// 1行分を文字列ストリームに変換
 		wistringstream stream(line);
