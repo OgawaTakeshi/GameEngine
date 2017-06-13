@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Game.h"
 #include <time.h>
+#include "ModelEffect.h"
 
 extern void ExitGame();
 
@@ -184,19 +185,36 @@ void Game::Update(DX::StepTimer const& timer)
 		// 全ての敵について判定する
 		for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
 			it != m_Enemies.end();
-			it++)
+			)
 		{
 			Enemy* enemy = it->get();
 
 			// 敵の被攻撃当たり球
 			const Sphere& sphereB = enemy->GetCollisionNodeBody();
 
+			Vector3 inter;
+
 			// 球と球の当たり
-			if (CheckSphere2Sphere(sphereA, sphereB))
+			if (CheckSphere2Sphere(sphereA, sphereB, &inter))
 			{
 				m_Player->ResetBullet();
 
-				enemy->SetDeath();
+				ModelEffectManager::getInstance()->Entry(
+					L"Resources/HitEffect.cmo",
+					10,
+					inter,	// 座標
+					Vector3(0, 0, 0),	// 速度
+					Vector3(0, 0, 0),	// 加速度
+					Vector3(0, 0, 0),	// 回転角（初期）
+					Vector3(0, 0, 0),	// 回転角（最終）
+					Vector3(0, 0, 0),	// スケール（初期）
+					Vector3(6, 6, 6)	// スケール（最終）
+				);
+				it = m_Enemies.erase(it);
+			}
+			else
+			{
+				it++;
 			}
 		}
 	}
@@ -208,6 +226,8 @@ void Game::Update(DX::StepTimer const& timer)
 	{
 		CollisionNode::SetDebugVisible(!CollisionNode::GetDebugVisible());
 	}
+
+	ModelEffectManager::getInstance()->Update();
 }
 
 // Draws the scene.
@@ -283,6 +303,8 @@ void Game::Render()
 	{
 		(*it)->Draw();
 	}
+
+	ModelEffectManager::getInstance()->Draw();
 
 	m_batch->End();
 

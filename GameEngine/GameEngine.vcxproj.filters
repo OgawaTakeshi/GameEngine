@@ -21,6 +21,7 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="CollisionNode.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="ModelEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -37,6 +38,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="CollisionNode.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="ModelEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -107,6 +109,9 @@
       <Filter>Assets</Filter>
     </MeshContentTask>
     <MeshContentTask Include="Assets\shadow.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\HitEffect.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
   </ItemGroup>
