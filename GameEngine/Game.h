@@ -19,6 +19,7 @@
 #include "Obj3D.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "LandShape.h"
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
@@ -106,7 +107,8 @@ private:
 	DirectX::SimpleMath::Matrix m_proj;
 
 	std::unique_ptr<Obj3D> m_ObjSkydome;
-	std::unique_ptr<Obj3D> m_ObjGround;
+	//std::unique_ptr<Obj3D> m_ObjGround;
+	std::unique_ptr<LandShape> m_LandShapeGround;
 
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;

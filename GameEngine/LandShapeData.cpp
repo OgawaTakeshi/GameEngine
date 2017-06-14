@@ -1,27 +1,38 @@
 #include <fstream>
 #include <algorithm>
 #include "LandShapeData.h"
-#include "CollisionNode.h"
 
 using namespace std;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 // モデルデータ読み込み
-std::unique_ptr<LandShapeData> LandShapeData::CreateFromMDL(const char* meshData)
+std::unique_ptr<LandShapeData> LandShapeData::CreateFromData(const char* meshData)
 {
 	// 最新の読み込み位置を示すポインタ
 	const void* head = meshData;
 
 	std::unique_ptr<LandShapeData> landshape(new LandShapeData());
 
-	// ノード数を読み取る
-	const UINT* p_nNode = static_cast<const UINT*>(head);
+	// ヘッダ文字列を読み取る
+	const char* str = static_cast<const char*>(head);
+
+	// 正しいヘッダ文字列
+	const string header_str = "LAND_SHAPE";
+	
+	// ヘッダ文字列が不一致なら、地形データファイルではない
+	if (strncmp(str, header_str.c_str(), header_str.length()) != 0) return nullptr;
+
 	// 読み込み位置を進める
-	head = p_nNode + 1;
+	head = str + header_str.length();
+
+	// ノード数を読み取る
+	const UINT* p_nNode = static_cast<const UINT*>(head);	
+
 	// ノード数取得
 	UINT nNode = *p_nNode;
-
+	// 読み込み位置を進める
+	head = p_nNode + 1;
 
 	// ノード情報を読み取る
 	const NodeInfo* nodeInfo_array = static_cast<const NodeInfo*>(head);
@@ -53,22 +64,27 @@ std::unique_ptr<LandShapeData> LandShapeData::CreateFromMDL(const char* meshData
 			// 頂点データ数
 			UINT nVertex = *p_nVertex;
 			vertex_array[i].reserve(nVertex);
-			size_t vbBytes = sizeof(VERTEX_FILE)* nVertex;
+			size_t vbBytes = sizeof(VERTEX_LANDSHAPE_FILE)* nVertex;
 			// 頂点データを読み取る
-			const VERTEX_FILE* node_vertex_array = static_cast<const VERTEX_FILE*>(head);
+			const VERTEX_LANDSHAPE_FILE* node_vertex_array = static_cast<const VERTEX_LANDSHAPE_FILE*>(head);
 			head = node_vertex_array + nVertex;
 
+			// 全ての頂点に対して
 			for (UINT j = 0; j < nVertex; j++)
 			{
 				// 頂点データ１個分のアドレスを計算
-				const VERTEX_FILE* vertex = &node_vertex_array[j];
-				// 使うデータだけ取り出す（Normal,UVは不要）
-				VERTEX_LANDSHAPE vertex_landshape;
-				// コピー
-				vertex_landshape.Pos = vertex->Pos;
-				vertex_landshape.Normal = vertex->Normal;
+				const VERTEX_LANDSHAPE_FILE* node_vertex = &node_vertex_array[j];
+
+				// 格納する頂点1個分のデータ
+				VERTEX_LANDSHAPE vertex;
+
+				// 座標をコピー
+				vertex.Pos = node_vertex->Pos;
+				// 法線を一旦クリア
+				vertex.Normal = Vector3(0, 0, 0);
+
 				// 頂点データを配列に格納
-				vertex_array[i].push_back(vertex_landshape);
+				vertex_array[i].push_back(vertex);
 			}
 
 			//インデックスデータ数を読み取る
@@ -83,6 +99,7 @@ std::unique_ptr<LandShapeData> LandShapeData::CreateFromMDL(const char* meshData
 			const USHORT* node_index_array = static_cast<const USHORT*>(head);
 			head = node_index_array + nIndices;
 
+			// 全てのインデックスに対して
 			for (UINT j = 0; j < nIndices; j++)
 			{
 				// インデックス１個分のアドレスを取得
@@ -117,11 +134,49 @@ std::unique_ptr<LandShapeData> LandShapeData::CreateFromMDL(const char* meshData
 		landshape->m_Indices.insert(landshape->m_Indices.end(), index_array[i].begin(), index_array[i].end());
 	}
 
+	char log_str[256];
+
+	// 頂点数、インデックス数をログ出力
+	sprintf_s(log_str, "VertexNum:%d  IndexNum:%d\n", landshape->m_Vertices.size(), landshape->m_Indices.size());
+	OutputDebugStringA(log_str);
+
+	// インデックスと頂点から、三角形データを構築
+	{
+		// 頂点インデックスの数を３で割って、三角形の数を計算
+		int nTri = landshape->m_Indices.size() / 3;
+
+		// 全ての三角形について
+		for (int i = 0; i < nTri; i++)
+		{
+			// 三角形の各頂点のインデックスを取得
+			int index0 = landshape->m_Indices[i * 3];
+			int index1 = landshape->m_Indices[i * 3 + 1];
+			int index2 = landshape->m_Indices[i * 3 + 2];
+			// 各頂点の座標を取得
+			Vector3 pos0 = landshape->m_Vertices[index0].Pos;
+			Vector3 pos1 = landshape->m_Vertices[index1].Pos;
+			Vector3 pos2 = landshape->m_Vertices[index2].Pos;
+
+			Triangle tri;
+
+			// 3点から三角形を構築
+			ComputeTriangle(pos0, pos1, pos2, &tri);
+
+			landshape->m_Vertices[index0].Normal = tri.Normal;
+			landshape->m_Vertices[index1].Normal = tri.Normal;
+			landshape->m_Vertices[index2].Normal = tri.Normal;
+
+			// 三角形データに追加
+			landshape->m_Triangles.push_back(tri);
+		}
+	}
+	
+
 	return landshape;
 }
 
 // モデルデータ読み込み
-std::unique_ptr<LandShapeData> LandShapeData::CreateFromMDL(const wchar_t* szFileName)
+std::unique_ptr<LandShapeData> LandShapeData::CreateFromFile(const wchar_t* szFileName)
 {
 	ifstream ifs;
 	std::unique_ptr<char[]> data;
@@ -153,7 +208,7 @@ std::unique_ptr<LandShapeData> LandShapeData::CreateFromMDL(const wchar_t* szFil
 	OutputDebugStringW(L"\n");
 
 	// 読み込んだデータからモデルデータを生成
-	auto model = CreateFromMDL(data.get());
+	auto model = CreateFromData(data.get());
 
 	// 名前取得
 	model->name = szFileName;
@@ -195,14 +250,11 @@ void LandShapeData::UpdateNodeMatrices(int index, const NodeInfo* nodeInfo_array
 		{
 			// 座標を変換（ノード座標系→モデル座標系）
 			it->Pos = Vector3::Transform(it->Pos, modelm);
-			it->Normal = Vector3::TransformNormal(it->Normal, modelm);
 
 			char str[256];
 
 			// 変換後の頂点座標をログ出力
 			sprintf_s(str, "(%.3f,%.3f,%.3f)\n", it->Pos.x, it->Pos.y, it->Pos.z);
-			// 変換後の法線をログ出力
-			//sprintf_s(str, "(%.3f,%.3f,%.3f)\n", it->Normal.x, it->Normal.y, it->Normal.z);
 
 			OutputDebugStringA(str);
 		}

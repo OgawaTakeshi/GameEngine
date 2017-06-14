@@ -28,15 +28,19 @@ LandShapeCommon::LandShapeCommon(LandShapeCommonDef def)
 	// エフェクトファクトリ
 	m_pEffectFactory.reset(new EffectFactory(def.pDevice));
 	// プリミティブバッチ
-	m_pPrimitiveBatch.reset(new PrimitiveBatch<VertexPositionNormal>(def.pDeviceContext));
+	m_pPrimitiveBatch.reset(new PrimitiveBatch<VertexPositionNormal>(def.pDeviceContext, BatchSize * 3, BatchSize));
 	// エフェクト
 	m_pEffect.reset(new BasicEffect(def.pDevice));
+	// ライティング有効
 	m_pEffect->SetLightingEnabled(true);
+	// マテリアルカラー設定
 	m_pEffect->SetAmbientLightColor(Vector3(0, 0.0f, 0));
 	m_pEffect->SetDiffuseColor(Vector3(1.0f, 1.0f, 1.0f));
+	// ライト0（グリーン）
 	m_pEffect->SetLightEnabled(0, true);
-	m_pEffect->SetLightDiffuseColor(0, Vector3(0.2f, 1.0f, 0.2f));
+	m_pEffect->SetLightDiffuseColor(0, Vector3(0.1f, 0.6f, 0.1f));
 	m_pEffect->SetLightDirection(0, Vector3(1, -0.5f, 2));
+	// ライト1（ピンク）
 	m_pEffect->SetLightEnabled(1, true);
 	m_pEffect->SetLightDiffuseColor(1, Vector3(0.5f, 0.2f, 0.3f));
 	m_pEffect->SetLightDirection(1, Vector3(-1, -0.5f, -2));
@@ -90,25 +94,32 @@ LandShape::LandShape()
 //--------------------------------------------------------------------------------------
 // 初期化
 //--------------------------------------------------------------------------------------
-void LandShape::Initialize(const wchar_t* filename_mdl, const wchar_t* filename_cmo)
+void LandShape::Initialize(const wstring& filename_bin, const wstring& filename_cmo)
 {
-	if (filename_mdl)
+	// ファイル名が空白でなければ
+	if (filename_bin.size() > 0)
 	{
+		// フルパスに補完
+		wstring fullpath_bin = L"LandShape/" + filename_bin + L".landshape";
+
 		std::map<std::wstring, std::unique_ptr<LandShapeData>>::iterator it;
-		it = s_dataarray.find(filename_mdl);
-		if (s_dataarray.count(filename_mdl) == 0)
+		it = s_dataarray.find(fullpath_bin);
+		if (s_dataarray.count(fullpath_bin) == 0)
 		{
 			// モデルの読み込み
-			s_dataarray[filename_mdl] = LandShapeData::CreateFromMDL(filename_mdl);
+			s_dataarray[fullpath_bin] = LandShapeData::CreateFromFile(fullpath_bin.c_str());
 		}
 		// 地形データをセット
-		m_pData = s_dataarray[filename_mdl].get();
+		m_pData = s_dataarray[fullpath_bin].get();
 	}
 
-	if (filename_cmo)
+	// ファイル名が空白でなければ
+	if (filename_cmo.size() > 0)
 	{
+		// フルパスに補完
+		wstring fullpath_cmo = L"Resources/" + filename_cmo + L".cmo";
 		// オブジェクト初期化
-		m_Obj.LoadModelFile(filename_cmo);
+		m_Obj.LoadModelFile(fullpath_cmo.c_str());
 	}
 }
 
@@ -154,7 +165,7 @@ void LandShape::Draw()
 		s_pCommon->m_pDeviceContext->OMSetBlendState(s_pCommon->m_pStates->NonPremultiplied(), nullptr, 0xFFFFFFFF);
 
 		// ラスタライザ ステートを設定する 時計回りを非表示
-		s_pCommon->m_pDeviceContext->RSSetState(s_pCommon->m_pStates->CullClockwise());
+		s_pCommon->m_pDeviceContext->RSSetState(s_pCommon->m_pStates->CullNone());
 
 		// サンプラーステートを設定する
 		auto samplerState = s_pCommon->m_pStates->PointWrap();
@@ -180,21 +191,24 @@ void LandShape::Draw()
 	}
 }
 
+void LandShape::DisableLighting()
+{
+	m_Obj.DisableLighting();
+}
+
 //--------------------------------------------------------------------------------------
 // 地形と球の交差判定
 // down : 下方向ベクトル
-// reject : 排斥ベクトル
+// reject : 押し出すベクトル
 //--------------------------------------------------------------------------------------
-bool LandShape::IntersectSphere(const Sphere& sphere, /*Vector3* down*,*/ Vector3* reject)
+bool LandShape::IntersectSphere(const Sphere& sphere, Vector3* reject)
 {
 	if (m_pData == nullptr) return false;
 
-	// 頂点インデックスの数を３で割って、三角形の数を計算
-	int nTri = m_pData->m_Indices.size() / 3;
 	// ヒットフラグを初期化
 	bool hit = false;
 	// 大きい数字で初期化
-	float distance = 1.0e5;
+	float over_length = 1.0e5;
 	Vector3 l_inter;
 	Vector3 l_normal;
 	Vector3 l_down;
@@ -212,52 +226,42 @@ bool LandShape::IntersectSphere(const Sphere& sphere, /*Vector3* down*,*/ Vector
 	// 半径をワールドをワールド座標系からモデル座標系に変換
 	localsphere.radius = sphere.radius / scale;
 
-	// 下方向ベクトルをワールド座標からモデル座標系に引き込む
-	//l_down = Vector3::TransformNormal(*down, m_WorldLocal);
-	//l_down.Normalize();
-
+	// 三角形の数
+	int nTri = m_pData->m_Triangles.size();
+	// 全ての三角形について
 	for (int i = 0; i < nTri; i++)
 	{
-		// 三角形の各頂点のインデックスを取得
-		int index0 = m_pData->m_Indices[i * 3];
-		int index1 = m_pData->m_Indices[i * 3 + 1];
-		int index2 = m_pData->m_Indices[i * 3 + 2];
-		// 各頂点のローカル座標を取得
-		Vector3 pos0 = m_pData->m_Vertices[index0].Pos;
-		Vector3 pos1 = m_pData->m_Vertices[index1].Pos;
-		Vector3 pos2 = m_pData->m_Vertices[index2].Pos;
-
-		Triangle tri;
-
-		// 3点から三角形を構築（TODO:先に計算しておく）
-		ComputeTriangle(pos0, pos1, pos2, &tri);
-
-		float temp_distance;
+		float temp_over_length;
 		Vector3 temp_inter;
 
-		//float dt = l_down.Dot(tri.Normal);
-		//// ポリゴンの向きが上か下方向から30度内なら、鉛直方向の当たりで処理するので、スキップする
-		//float theta = XMConvertToDegrees(acosf(dt));
-		//if (theta < 30.0f || 150.0f < theta) continue;
+		const Triangle& tri = m_pData->m_Triangles[i];
 
 		// 三角形と球の当たり判定
 		if (CheckSphere2Triangle(localsphere, tri, &temp_inter))
-		{
+		{// ヒットした
 			hit = true;
-			temp_distance = Vector3::Distance(localsphere.center, temp_inter);
-			if (temp_distance < distance)
+			// 衝突点と球の中心の距離を計算
+			//temp_distance = Vector3::Distance(localsphere.center, temp_inter);
+			// 衝突点から球の中心へのベクトル
+			Vector3 sub = localsphere.center - temp_inter;
+			// 球の中心が三角形にめりこんでいる距離を計算
+			temp_over_length = sub.Dot(-tri.Normal);
+
+			// めりこみ具合がここまでで最大なら
+			if (temp_over_length > over_length)
 			{
+				// ヒット座標、法線、めりこみ距離を記録
 				l_inter = temp_inter;
 				l_normal = tri.Normal;
-				distance = temp_distance;
+				over_length = temp_over_length;
 			}
 		}
 	}
 
 	if (hit)
 	{
-		// 距離をモデル座標系からワールド座標系に変換
-		distance *= scale;
+		// 距離をモデル座標系からワールド座標系での長さに変換
+		over_length *= scale;
 
 		// ワールド行列を取得
 		const Matrix& localworld = m_Obj.GetLocalWorld();
@@ -268,8 +272,8 @@ bool LandShape::IntersectSphere(const Sphere& sphere, /*Vector3* down*,*/ Vector
 			// 地形の法線方向をモデル座標系からワールド座標系に変換
 			*reject = Vector3::TransformNormal(l_normal, localworld);
 			reject->Normalize();
-			// めり込み分の長さに伸ばす
-			*reject = (*reject) * (sphere.radius - distance);
+			// めり込み分だけ押し出すベクトルを計算
+			*reject = (*reject) * (sphere.radius + over_length);
 		}
 	}
 
@@ -285,8 +289,6 @@ bool LandShape::IntersectSegment(const Segment& segment, Vector3* inter)
 {
 	if (m_pData == nullptr) return false;
 
-	// 三角形の数
-	int nTri = m_pData->m_Indices.size() / 3;
 	// ヒットフラグを初期化
 	bool hit = false;
 	// 大きい数字で初期化
@@ -304,41 +306,40 @@ bool LandShape::IntersectSegment(const Segment& segment, Vector3* inter)
 	Vector3 segmentNormal = localSegment.end - localSegment.start;
 	segmentNormal.Normalize();
 
+	// 三角形の数
+	int nTri = m_pData->m_Triangles.size();
+	// 全ての三角形について
 	for (int i = 0; i < nTri; i++)
 	{
-		// 三角形の各頂点のインデックスを取得
-		int index0 = m_pData->m_Indices[i * 3];
-		int index1 = m_pData->m_Indices[i * 3 + 1];
-		int index2 = m_pData->m_Indices[i * 3 + 2];
-		// 各頂点のローカル座標を取得
-		Vector3 pos0 = m_pData->m_Vertices[index0].Pos;
-		Vector3 pos1 = m_pData->m_Vertices[index1].Pos;
-		Vector3 pos2 = m_pData->m_Vertices[index2].Pos;
-
-		Triangle tri;
-
-		// 3点から三角形を構築（TODO:先に計算しておく）
-		ComputeTriangle(pos0, pos1, pos2, &tri);
-
 		float temp_distance;
 		Vector3 temp_inter;
 
 		// 上方向ベクトルと法線の内積
-		float dot = -segmentNormal.Dot(tri.Normal);
-		// 上方向との角度差を計算
-		float angle = acosf(dot);
-		// 上方向との角度が限界角より大きければ、地面とみなさず、スキップ
-		if ( angle > limit_angle ) continue;
+		// 長さが１のベクトル２同士の内積は、コサイン（ベクトルの内積の定義より）
+		float cosine = -segmentNormal.Dot(m_pData->m_Triangles[i].Normal);
+		//// コサイン値から、上方向との角度差を計算
+		//float angle = acosf(cosine);
+		//// 上方向との角度が限界角より大きければ、面の傾きが大きいので、地面とみなさずスキップ
+		//if ( angle > limit_angle ) continue;
+
+		//--高速版--
+		const float limit_cosine = cosf(limit_angle);
+		// コサインが１のときにベクトル間の角度は0度であり、ベクトルの角度差が大きいほど、コサインは小さいので、
+		// コサイン値のまま比較すると、角度の比較の場合と大小関係が逆である
+		// つまり、コサイン値が一定値より小さければ、面の傾きが大きいので、地面とみなさずスキップ
+		if (cosine < limit_cosine) continue;
+		//--高速版ここまで--
 
 		// 線分と三角形（ポリゴン）の交差判定
-		if (CheckSegment2Triangle(localSegment, tri, &temp_inter))
+		if (CheckSegment2Triangle(localSegment, m_pData->m_Triangles[i], &temp_inter))
 		{
 			hit = true;
-			// 衝突点までの距離を算出
+			// 線分の始点と衝突点の距離を計算（めりこみ距離）
 			temp_distance = Vector3::Distance(localSegment.start, temp_inter);
-			// 距離が一番近いものを記録
+			// めりこみ具合がここまでで最小なら
 			if (temp_distance < distance)
 			{
+				// 衝突点の座標、めりこみ距離を記録
 				l_inter = temp_inter;
 				distance = temp_distance;
 			}
@@ -347,7 +348,7 @@ bool LandShape::IntersectSegment(const Segment& segment, Vector3* inter)
 
 	if (hit && inter != nullptr)
 	{
-		// 交点をモデル座標系からワールド座標系に変換
+		// 衝突点の座標をモデル座標系からワールド座標系に変換
 		const Matrix& localworld = m_Obj.GetLocalWorld();
 		*inter = Vector3::Transform(l_inter, localworld);
 	}

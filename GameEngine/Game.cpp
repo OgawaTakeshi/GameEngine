@@ -100,6 +100,13 @@ void Game::Initialize(HWND window, int width, int height)
 		m_effectFactory.get(),
 		m_FollowCamera.get());
 
+	// LandShapeの静的な初期化
+	LandShapeCommonDef def;
+	def.pCamera = m_FollowCamera.get();
+	def.pDevice = m_d3dDevice.Get();
+	def.pDeviceContext = m_d3dContext.Get();
+	LandShape::InitializeCommon(def);
+
 	m_keyboard = std::make_unique<Keyboard>();
 
 	// プレイヤー作成
@@ -120,11 +127,11 @@ void Game::Initialize(HWND window, int width, int height)
 	
 	// モデルをファイルからロード
 	m_ObjSkydome = std::make_unique<Obj3D>();
-	m_ObjGround = std::make_unique<Obj3D>();
+	m_LandShapeGround = std::make_unique<LandShape>();
 	m_ObjSkydome->LoadModelFile(L"Resources/skydome.cmo");
-	m_ObjGround->LoadModelFile(L"Resources/ground200m.cmo");
+	m_LandShapeGround->Initialize(L"ground200m", L"ground200m");
 	m_ObjSkydome->DisableLighting();
-	m_ObjGround->DisableLighting();
+	m_LandShapeGround->DisableLighting();
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
 	m_debugText = std::make_unique<DebugText>(m_d3dDevice.Get(), m_spriteBatch.get());
@@ -228,6 +235,8 @@ void Game::Update(DX::StepTimer const& timer)
 	}
 
 	ModelEffectManager::getInstance()->Update();
+
+	m_LandShapeGround->Calc();
 }
 
 // Draws the scene.
@@ -254,46 +263,8 @@ void Game::Render()
 
 	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
 
-	m_batch->Begin();
-
-	Vector3 xaxis(20.f, 0.f, 0.f);
-	Vector3 yaxis(0.f, 0.f, 20.f);
-	Vector3 origin = Vector3::Zero;
-
-	size_t divisions = 20;
-
-	//for (size_t i = 0; i <= divisions; ++i)
-	//{
-	//	float fPercent = float(i) / float(divisions);
-	//	fPercent = (fPercent * 2.0f) - 1.0f;
-
-	//	Vector3 scale = xaxis * fPercent + origin;
-
-	//	VertexPositionColor v1(scale - yaxis, Colors::White);
-	//	VertexPositionColor v2(scale + yaxis, Colors::White);
-	//	m_batch->DrawLine(v1, v2);
-	//}
-
-	//for (size_t i = 0; i <= divisions; i++)
-	//{
-	//	float fPercent = float(i) / float(divisions);
-	//	fPercent = (fPercent * 2.0f) - 1.0f;
-
-	//	Vector3 scale = yaxis * fPercent + origin;
-
-	//	VertexPositionColor v1(scale - xaxis, Colors::White);
-	//	VertexPositionColor v2(scale + xaxis, Colors::White);
-	//	m_batch->DrawLine(v1, v2);
-	//}
-
-	VertexPositionColor v1(Vector3(0.f, 0.5f, 0.5f), Colors::Yellow);
-	VertexPositionColor v2(Vector3(0.5f, -0.5f, 0.5f), Colors::Yellow);
-	VertexPositionColor v3(Vector3(-0.5f, -0.5f, 0.5f), Colors::Yellow);
-
-	m_batch->DrawTriangle(v1, v2, v3);
-
 	m_ObjSkydome->Draw();
-	m_ObjGround->Draw();
+	m_LandShapeGround->Draw();
 
 	m_Player->Draw();
 
@@ -305,8 +276,6 @@ void Game::Render()
 	}
 
 	ModelEffectManager::getInstance()->Draw();
-
-	m_batch->End();
 
 	m_spriteBatch->Begin();
 	m_debugText->Draw();

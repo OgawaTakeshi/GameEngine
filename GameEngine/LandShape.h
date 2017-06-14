@@ -28,6 +28,13 @@ struct LandShapeCommonDef
 	ID3D11DeviceContext* pDeviceContext;
 	// カメラ
 	Camera* pCamera;
+
+	LandShapeCommonDef()
+	{
+		pDevice = nullptr;
+		pDeviceContext = nullptr;
+		pCamera = nullptr;
+	}
 };
 
 // 共用データ
@@ -36,6 +43,8 @@ class LandShapeCommon
 	// LandShapeクラスからメンバ変数にアクセスできるようにする
 	friend class LandShape;
 public:
+	// デバッグ表示用の最大頂点数
+	static const size_t BatchSize = 6144;
 	// コンストラクタ
 	LandShapeCommon(LandShapeCommonDef def);
 	// デストラクタ
@@ -68,11 +77,13 @@ public:
 	// コンストラクタ
 	LandShape();
 	// 初期化
-	void Initialize(const wchar_t* filename_mdl, const wchar_t* filename_cmo = nullptr);
+	void Initialize(const wstring& filename_bin, const wstring& filename_cmo);
 	// ワールド行列の計算
 	void Calc();
 	// デバッグ描画
 	void Draw();
+	// ライティングカット
+	void DisableLighting();
 
 	bool IntersectSphere(const Sphere& sphere, DirectX::SimpleMath::Vector3* reject);
 	bool IntersectSegment(const Segment& segment, DirectX::SimpleMath::Vector3* inter);
