@@ -22,6 +22,7 @@
     <ClInclude Include="CollisionNode.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="ModelEffect.h" />
+    <ClInclude Include="ParticleEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="CollisionNode.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="ModelEffect.cpp" />
+    <ClCompile Include="ParticleEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
