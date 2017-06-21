@@ -134,6 +134,9 @@ void Game::Initialize(HWND window, int width, int height)
 			stream >> rotation.z;
 			stream >> rotation.x;
 			stream >> rotation.y;
+			rotation.x = XMConvertToRadians(rotation.x);
+			rotation.y = XMConvertToRadians(rotation.y);
+			rotation.z = XMConvertToRadians(rotation.z);
 			landshape->SetRot(rotation);
 
 			// 座標の読み取り

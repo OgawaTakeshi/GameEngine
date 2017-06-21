@@ -40,7 +40,7 @@ void Player::Initialize()
 
 	m_FireFlag = false;
 
-	SetTrans(Vector3(0, 0, 7));
+	//SetTrans(Vector3(0, 0, 7));
 
 	m_CollisionNodeBody.Initialize();
 	m_CollisionNodeBody.SetParent(&m_Obj[PARTS_TANK]);
@@ -67,18 +67,18 @@ void Player::Update()
 	Keyboard::State keystate = m_pKeyboard->GetState();
 	m_KeyboardTracker.Update(keystate);
 
-	//if (m_KeyboardTracker.IsKeyPressed(Keyboard::Keys::Space))
-	//{
-	//	StartJump();
-	//}
-	//if (m_isJump)
-	//{
-	//	m_Velocity.y -= GRAVITY_ACC;
-	//	if (m_Velocity.y < -JUMP_SPEED_MAX)
-	//	{
-	//		m_Velocity.y = -JUMP_SPEED_MAX;
-	//	}
-	//}
+	if (m_KeyboardTracker.IsKeyPressed(Keyboard::Keys::Space))
+	{
+		StartJump();
+	}
+	if (m_isJump)
+	{
+		m_Velocity.y -= GRAVITY_ACC;
+		if (m_Velocity.y < -JUMP_SPEED_MAX)
+		{
+			m_Velocity.y = -JUMP_SPEED_MAX;
+		}
+	}
 
 	Vector3 pos = m_Obj[PARTS_TANK].GetTrans();
 	pos += m_Velocity;
@@ -369,58 +369,58 @@ void Player::Update()
 	}
 
 	// 垂直方向地形あたり判定
-	//{
-	//	const Vector3& vel = GetVelocity();
+	{
+		const Vector3& vel = GetVelocity();
 
-	//	if (vel.y <= 0.0f)
-	//	{
-	//		bool hit = false;
-	//		Segment player_segment;
-	//		Vector3 player_pos = GetTrans();
-	//		player_segment.start = player_pos + Vector3(0, 1.0f, 0);
-	//		player_segment.end = player_pos + Vector3(0, -0.5f, 0);
+		if (vel.y <= 0.0f)
+		{
+			bool hit = false;
+			Segment player_segment;
+			Vector3 player_pos = GetTrans();
+			player_segment.start = player_pos + Vector3(0, 1.0f, 0);
+			player_segment.end = player_pos + Vector3(0, -0.5f, 0);
 
-	//		// 大きい数字で初期化
-	//		float distance = 1.0e5;
-	//		Vector3 inter;
+			// 大きい数字で初期化
+			float distance = 1.0e5;
+			Vector3 inter;
 
-	//		for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray->begin();
-	//			it != m_pLandShapeArray->end();
-	//			it++)
-	//		{
-	//			LandShape* pLandShape = it->get();
-	//			float temp_distance;
-	//			Vector3 temp_inter;
+			for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray->begin();
+				it != m_pLandShapeArray->end();
+				it++)
+			{
+				LandShape* pLandShape = it->get();
+				float temp_distance;
+				Vector3 temp_inter;
 
-	//			// 床面との当たりを判定
-	//			if (pLandShape->IntersectSegment(player_segment, &temp_inter))
-	//			{
-	//				hit = true;
-	//				temp_distance = Vector3::Distance(player_segment.start, temp_inter);
-	//				if (temp_distance < distance)
-	//				{
-	//					inter = temp_inter;
-	//					distance = temp_distance;
-	//				}
-	//			}
-	//		}
+				// 床面との当たりを判定
+				if (pLandShape->IntersectSegment(player_segment, &temp_inter))
+				{
+					hit = true;
+					temp_distance = Vector3::Distance(player_segment.start, temp_inter);
+					if (temp_distance < distance)
+					{
+						inter = temp_inter;
+						distance = temp_distance;
+					}
+				}
+			}
 
-	//		if (hit)
-	//		{
-	//			Vector3 new_position = player_pos;
-	//			new_position.y = inter.y;
-	//			StopJump();
-	//			SetTrans(new_position);
-	//		}
+			if (hit)
+			{
+				Vector3 new_position = player_pos;
+				new_position.y = inter.y;
+				StopJump();
+				SetTrans(new_position);
+			}
 
-	//		if (!hit)
-	//		{// 落下開始
-	//			StartFall();
-	//		}
-	//	}
+			if (!hit)
+			{// 落下開始
+				StartFall();
+			}
+		}
 
-	//	Calc();
-	//}
+		Calc();
+	}
 
 }
 

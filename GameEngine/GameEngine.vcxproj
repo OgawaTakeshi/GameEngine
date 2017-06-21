@@ -258,6 +258,7 @@
     <MeshContentTask Include="Assets\head.FBX" />
     <MeshContentTask Include="Assets\HitEffect.FBX" />
     <MeshContentTask Include="Assets\launcher.FBX" />
+    <MeshContentTask Include="Assets\plane1m.FBX" />
     <MeshContentTask Include="Assets\shadow.FBX" />
     <MeshContentTask Include="Assets\shield.FBX" />
     <MeshContentTask Include="Assets\skydome.FBX" />
