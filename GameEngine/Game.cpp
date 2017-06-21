@@ -41,7 +41,7 @@ Game::Game() :
 
 Game::~Game()
 {
-	SAFE_DELETE(m_DebugCamera);
+
 }
 
 // Initialize the Direct3D resources required to run.
@@ -62,43 +62,26 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
 
-	{// デバッグカメラを生成
-		m_DebugCamera = new DebugCamera(width, height);
+	{
+		// デバッグカメラを生成
+		m_DebugCamera = std::make_unique<DebugCamera>(width, height);
+
+		// 追従カメラを生成
+		m_FollowCamera = std::make_unique<FollowCamera>();
+
+		// 追従カメラを有効に
+		m_CurrentCamera = m_FollowCamera.get();
 	}
 
-	// 追従カメラを生成
-	m_FollowCamera = std::make_unique<FollowCamera>();
-
-	m_CurrentCamera = m_FollowCamera.get();
-
-	m_states = std::make_unique<CommonStates>(m_d3dDevice.Get());
-
-	m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
-	m_effect->SetVertexColorEnabled(true);
-
-	void const* shaderByteCode;
-	size_t byteCodeLength;
-
-	m_effect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
-
-	DX::ThrowIfFailed(
-		m_d3dDevice->CreateInputLayout(VertexPositionColor::InputElements,
-			VertexPositionColor::InputElementCount,
-			shaderByteCode, byteCodeLength,
-			m_inputLayout.ReleaseAndGetAddressOf()));
-
-	m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(m_d3dContext.Get());
-
-	// エフェクトファクトリ生成
-	m_effectFactory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
-	m_effectFactory->SetDirectory(L"Resources");
-
 	// Obj3Dの静的な初期化
-	Obj3D::StaticInitialize(m_d3dDevice.Get(),
-		m_d3dContext.Get(),
-		m_states.get(),
-		m_effectFactory.get(),
-		m_FollowCamera.get());
+	{
+		Obj3D::Defs defs;
+		defs.pDevice = m_d3dDevice.Get();
+		defs.pDeviceContext = m_d3dContext.Get();
+		defs.pCamera = m_FollowCamera.get();
+
+		Obj3D::StaticInitialize(defs);
+	}
 
 	// LandShapeの静的な初期化
 	LandShapeCommonDef def;
@@ -118,12 +101,6 @@ void Game::Initialize(HWND window, int width, int height)
 		m_Enemies[i] = std::make_unique<Enemy>();
 		m_Enemies[i]->Initialize();
 	}
-		
-	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
-		Vector3::Zero, Vector3::UnitY);
-	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
-		float(m_outputWidth) / float(m_outputHeight), 0.1f, 1000.f);
-
 	
 	// モデルをファイルからロード
 	m_ObjSkydome = std::make_unique<Obj3D>();
@@ -171,9 +148,6 @@ void Game::Update(DX::StepTimer const& timer)
 	// 追従カメラ
 	m_FollowCamera->SetTarget(m_Player.get());
 	m_FollowCamera->Update();
-
-	m_view = m_CurrentCamera->GetViewmat();
-	m_proj = m_CurrentCamera->GetProjmat();
 
 	m_Player->Update();
 
@@ -249,19 +223,6 @@ void Game::Render()
     }
 
     Clear();
-
-	m_d3dContext->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-	m_d3dContext->OMSetDepthStencilState(m_states->DepthDefault(), 0);
-	m_d3dContext->RSSetState(m_states->CullNone());
-
-	m_effect->SetView(m_view);
-	m_effect->SetProjection(m_proj);
-
-	m_effect->SetWorld(Matrix::Identity);
-
-	m_effect->Apply(m_d3dContext.Get());
-
-	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
 
 	m_ObjSkydome->Draw();
 	m_LandShapeGround->Draw();

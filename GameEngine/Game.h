@@ -87,43 +87,33 @@ private:
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_renderTargetView;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
 
+	// Rendering loop timer.
+	DX::StepTimer                                   m_timer;
+
 	// スプライトバッチ
 	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
 	// デバッグテキスト
 	std::unique_ptr<DebugText> m_debugText;
-
-	// コモンステート
-	std::unique_ptr<DirectX::CommonStates> m_states;
-	// ポリゴン表示用エフェクトファクトリ
-	std::unique_ptr<DirectX::EffectFactory> m_effectFactory;
-	// ポリゴン表示用エフェクト
-	std::unique_ptr<DirectX::BasicEffect> m_effect;
-	// プリミティブバッチ
-	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_batch;
-	// ポリゴン表示用入力レイアウト
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
-
-	DirectX::SimpleMath::Matrix m_view;
-	DirectX::SimpleMath::Matrix m_proj;
-
-	std::unique_ptr<Obj3D> m_ObjSkydome;
-	//std::unique_ptr<Obj3D> m_ObjGround;
-	std::unique_ptr<LandShape> m_LandShapeGround;
-
+	// キーボード
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
 	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
 
-	// Rendering loop timer.
-    DX::StepTimer                                   m_timer;
+	// 天球
+	std::unique_ptr<Obj3D> m_ObjSkydome;
+	// 地面
+	std::unique_ptr<LandShape> m_LandShapeGround;
+
 	// デバッグ用カメラ
-	DebugCamera*	m_DebugCamera;
+	std::unique_ptr<DebugCamera> m_DebugCamera;
 	// 追従カメラ
 	std::unique_ptr<FollowCamera> m_FollowCamera;
 
 	// 現在のカメラ
 	Camera* m_CurrentCamera;
 
+	// 自機
 	std::unique_ptr<Player> m_Player;
 
+	// 敵
 	std::vector<std::unique_ptr<Enemy>> m_Enemies;
 };

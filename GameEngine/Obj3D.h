@@ -10,17 +10,27 @@
 class Obj3D
 {
 public:
+	// 設定
+	struct Defs
+	{
+		ID3D11Device* pDevice;
+		ID3D11DeviceContext* pDeviceContext;
+		Camera* pCamera;
+
+		Defs()
+		{
+			pDevice = nullptr;
+			pDeviceContext = nullptr;
+			pCamera = nullptr;
+		}
+	};
 	// 静的メンバ関数
 	// 静的初期化
-	static void StaticInitialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, DirectX::CommonStates* pStates, DirectX::EffectFactory* pfx, Camera* pCamera);
+	static void StaticInitialize(const Defs& def);
 	// デバイスのsetter
 	static void SetDevice(ID3D11Device* pDevice) { s_pDevice = pDevice; }
 	// デバイスコンテキストのsetter
 	static void SetDeviceContext(ID3D11DeviceContext* pDeviceContext) { s_pDeviceContext = pDeviceContext; }
-	// 描画ステートのsetter
-	static void SetStates(DirectX::CommonStates* pStates) { s_pStates = pStates; }
-	// エフェクトファクトリのsetter
-	static void SetEffectFactory(DirectX::EffectFactory* pfx) { s_pEffectFactory = pfx; }
 	// カメラのsetter
 	static void SetCamera(Camera* pCamera) { s_pCamera = pCamera; }
 
@@ -35,9 +45,9 @@ private:
 	// デバイスコンテキストへのポインタ
 	static ID3D11DeviceContext*	s_pDeviceContext;
 	// 描画ステートへのポインタ
-	static DirectX::CommonStates*	s_pStates;
+	static std::unique_ptr<DirectX::CommonStates>	s_pStates;
 	// 共用のエフェクトファクトリ
-	static DirectX::EffectFactory*	s_pEffectFactory;
+	static std::unique_ptr<DirectX::EffectFactory>	s_pEffectFactory;
 	// 共用のカメラ（描画時に使用）
 	static Camera* s_pCamera;
 	// 読み込み済みモデルコンテナ

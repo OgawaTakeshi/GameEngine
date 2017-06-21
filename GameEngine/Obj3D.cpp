@@ -8,19 +8,24 @@ using namespace DirectX::SimpleMath;
 // 静的メンバ変数の実体
 ID3D11Device* Obj3D::s_pDevice;
 ID3D11DeviceContext* Obj3D::s_pDeviceContext;
-DirectX::CommonStates*	Obj3D::s_pStates;
-DirectX::EffectFactory* Obj3D::s_pEffectFactory;
+std::unique_ptr<DirectX::CommonStates>	Obj3D::s_pStates;
+std::unique_ptr<DirectX::EffectFactory>	Obj3D::s_pEffectFactory;
 Camera* Obj3D::s_pCamera;
 std::map<std::wstring, std::unique_ptr<DirectX::Model>> Obj3D::s_modelarray;
 ID3D11BlendState* Obj3D::s_pBlendStateSubtract;
 
-void Obj3D::StaticInitialize(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, DirectX::CommonStates * pStates, DirectX::EffectFactory * pfx, Camera * pCamera)
+void Obj3D::StaticInitialize(const Defs& def)
 {
-	SetDevice(pDevice);
-	SetDeviceContext(pDeviceContext);
-	SetStates(pStates);
-	SetEffectFactory(pfx);
-	SetCamera(pCamera);
+	SetDevice(def.pDevice);
+	SetDeviceContext(def.pDeviceContext);
+	SetCamera(def.pCamera);
+
+	// エフェクトファクトリ生成
+	s_pEffectFactory = std::make_unique<EffectFactory>(def.pDevice);
+	s_pEffectFactory->SetDirectory(L"Resources");
+
+	// 汎用ステート生成
+	s_pStates = std::make_unique<CommonStates>(def.pDevice);
 
 	// 減算描画用のブレンドステートを作成
 	D3D11_BLEND_DESC desc;
