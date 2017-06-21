@@ -79,7 +79,7 @@ public:
 	// 初期化
 	void Initialize(const wstring& filename_bin, const wstring& filename_cmo);
 	// ワールド行列の計算
-	void Calc();
+	void Update();
 	// デバッグ描画
 	void Draw();
 	// ライティングカット

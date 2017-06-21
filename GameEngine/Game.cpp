@@ -5,6 +5,9 @@
 #include "pch.h"
 #include "Game.h"
 #include "ModelEffect.h"
+#include <fstream>
+#include <sstream>
+#include <algorithm>
 
 extern void ExitGame();
 
@@ -79,11 +82,83 @@ void Game::Initialize(HWND window, int width, int height)
 	
 	// モデルをファイルからロード
 	m_ObjSkydome = std::make_unique<Obj3D>();
-	m_LandShapeGround = std::make_unique<LandShape>();
-	m_ObjSkydome->LoadModelFile(L"Resources/skydome.cmo");
-	m_LandShapeGround->Initialize(L"testmap", L"testmap");
 	m_ObjSkydome->DisableLighting();
-	//m_LandShapeGround->DisableLighting();
+
+	{// 地形ロード
+		wifstream ifs("CSV/LandShape.csv");
+
+		wstring line;
+
+		// 1行目をスキップ
+		getline(ifs, line);
+
+		// 各行のデータを解析
+		while (getline(ifs, line)) {
+
+			wstring filename_landshape;
+			wstring filename_cmo;			
+
+			// 1行分を文字列ストリームに変換
+			wstringstream stream(line);
+
+			// 区切り記号
+			wchar_t delim = L',';
+
+			// ファイル名の文字列を読み込み
+			getline(stream, filename_landshape, delim);
+
+			// ファイル名の文字列を読み込み
+			getline(stream, filename_cmo, delim);
+
+			std::unique_ptr<LandShape> landshape = std::make_unique<LandShape>();
+			// 読み込む
+			landshape->Initialize(filename_landshape.c_str(), filename_cmo.c_str());
+
+			getline(stream, line);
+
+			// カンマを空白に置き換え
+			std::replace(line.begin(), line.end(), L',', L' ');
+
+			// 残りを文字列ストリームに再変換
+			stream.str(L"");
+			stream.clear(wstringstream::goodbit);
+			stream << line;
+
+			// スケーリングの読み取り
+			float scale;
+			stream >> scale;
+			landshape->SetScale(scale);
+
+			// 角度の読み取り
+			Vector3 rotation;
+			stream >> rotation.z;
+			stream >> rotation.x;
+			stream >> rotation.y;
+			landshape->SetRot(rotation);
+
+			// 座標の読み取り
+			Vector3 position;
+			stream >> position.x;
+			stream >> position.y;
+			stream >> position.z;
+			landshape->SetTrans(position);
+
+			// ライト無効
+			int light_cut;
+			stream >> light_cut;
+
+			if (light_cut)
+			{
+				landshape->DisableLighting();
+			}
+
+			// コンテナに追加
+			m_pLandShapeArray.push_back(std::move(landshape));
+		}
+	}
+	m_Player->SetLandShapeArray(&m_pLandShapeArray);
+
+	m_ObjSkydome->LoadModelFile(L"Resources/skydome.cmo");
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_deviceResources->GetD3DDeviceContext());
 	m_debugText = std::make_unique<DebugText>(m_deviceResources->GetD3DDevice(), m_spriteBatch.get());
@@ -116,22 +191,21 @@ void Game::Update(DX::StepTimer const& timer)
 
 	m_debugText->AddText(Vector2(0, 0), L"FPS:%d", m_timer.GetFramesPerSecond());
 
-    // TODO: Add your game logic here.
-	// カメラ更新
-	m_DebugCamera->Update();
-
-	// 追従カメラ
-	m_FollowCamera->SetTarget(m_Player.get());
-	m_FollowCamera->Update();
-
-	m_Player->Update();
-
 	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
 		it != m_Enemies.end();
 		it++)
 	{
 		(*it)->Update();
 	}
+	
+	for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray.begin();
+		it != m_pLandShapeArray.end();
+		it++)
+	{
+		(*it)->Update();
+	}
+
+	m_Player->Update();
 
 	// 攻撃当たり判定
 	{
@@ -183,9 +257,14 @@ void Game::Update(DX::StepTimer const& timer)
 		CollisionNode::SetDebugVisible(!CollisionNode::GetDebugVisible());
 	}
 
-	ModelEffectManager::getInstance()->Update();
+	// カメラ更新
+	m_DebugCamera->Update();
 
-	m_LandShapeGround->Calc();
+	// 追従カメラ
+	m_FollowCamera->SetTarget(m_Player.get());
+	m_FollowCamera->Update();
+
+	ModelEffectManager::getInstance()->Update();
 }
 
 // Draws the scene.
@@ -198,15 +277,19 @@ void Game::Render()
     }
 
     Clear();
-
-	m_ObjSkydome->Draw();
-	m_LandShapeGround->Draw();
     m_deviceResources->PIXBeginEvent(L"Render");
-    auto context = m_deviceResources->GetD3DDeviceContext();
+	
+    // TODO: Add your rendering code here.
+	m_ObjSkydome->Draw();
+	for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray.begin();
+		it != m_pLandShapeArray.end();
+		it++)
+	{
+		(*it)->Draw();
+	}
+	auto context = m_deviceResources->GetD3DDeviceContext();
 
 	m_Player->Draw();
-    // TODO: Add your rendering code here.
-    context;
 
 	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
 		it != m_Enemies.end();

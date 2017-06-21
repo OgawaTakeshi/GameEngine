@@ -245,6 +245,7 @@
     <MeshContentTask Include="Assets\ball.FBX" />
     <MeshContentTask Include="Assets\body.FBX" />
     <MeshContentTask Include="Assets\box1m.FBX" />
+    <MeshContentTask Include="Assets\box5m.FBX" />
     <MeshContentTask Include="Assets\breast.FBX" />
     <MeshContentTask Include="Assets\CapsuleNode.FBX" />
     <MeshContentTask Include="Assets\cockpit.FBX" />

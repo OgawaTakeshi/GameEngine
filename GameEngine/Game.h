@@ -88,8 +88,10 @@ private:
 
 	// 天球
 	std::unique_ptr<Obj3D> m_ObjSkydome;
-	// 地面
-	std::unique_ptr<LandShape> m_LandShapeGround;
+	//// 地面
+	//std::unique_ptr<LandShape> m_LandShapeGround;
+	// 地形
+	std::vector<std::unique_ptr<LandShape>>	m_pLandShapeArray;
 
 	// デバッグ用カメラ
 	std::unique_ptr<DebugCamera> m_DebugCamera;
@@ -103,5 +105,5 @@ private:
 	std::unique_ptr<Player> m_Player;
 
 	// 敵
-	std::vector<std::unique_ptr<Enemy>> m_Enemies;    
+	std::vector<std::unique_ptr<Enemy>> m_Enemies;
 };

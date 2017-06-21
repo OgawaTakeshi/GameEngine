@@ -137,7 +137,7 @@ void LandShape::Initialize(const wstring& filename_bin, const wstring& filename_
 //--------------------------------------------------------------------------------------
 // ワールド行列の計算
 //--------------------------------------------------------------------------------------
-void LandShape::Calc()
+void LandShape::Update()
 {
 	m_Obj.Calc();
 	// 逆行列を計算
@@ -251,15 +251,13 @@ bool LandShape::IntersectSphere(const Sphere& sphere, Vector3* reject)
 		if (CheckSphere2Triangle(localsphere, tri, &temp_inter))
 		{// ヒットした
 			hit = true;
-			// 衝突点と球の中心の距離を計算
-			//temp_distance = Vector3::Distance(localsphere.center, temp_inter);
 			// 衝突点から球の中心へのベクトル
 			Vector3 sub = localsphere.center - temp_inter;
 			// 球の中心が三角形にめりこんでいる距離を計算
 			temp_over_length = sub.Dot(-tri.Normal);
 
-			// めりこみ具合がここまでで最大なら
-			if (temp_over_length > over_length)
+			// めりこみ具合がここまでで最小なら
+			if (temp_over_length < over_length)
 			{
 				// ヒット座標、法線、めりこみ距離を記録
 				l_inter = temp_inter;
@@ -284,7 +282,9 @@ bool LandShape::IntersectSphere(const Sphere& sphere, Vector3* reject)
 			*reject = Vector3::TransformNormal(l_normal, localworld);
 			reject->Normalize();
 			// めり込み分だけ押し出すベクトルを計算
-			*reject = (*reject) * (sphere.radius + over_length);
+			const float extra = 0.05f;
+			float reject_distance = sphere.radius + over_length + extra;
+			*reject = (*reject) * reject_distance;
 		}
 	}
 

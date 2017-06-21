@@ -22,6 +22,7 @@ Player::Player(DirectX::Keyboard* keyboard)
 : m_cycle(0.0f)
 {
 	m_pKeyboard = keyboard;
+	m_pLandShapeArray = nullptr;
 
 	Initialize();
 }
@@ -38,6 +39,8 @@ void Player::Initialize()
 	Load();
 
 	m_FireFlag = false;
+
+	SetTrans(Vector3(0, 0, 7));
 
 	m_CollisionNodeBody.Initialize();
 	m_CollisionNodeBody.SetParent(&m_Obj[PARTS_TANK]);
@@ -327,30 +330,43 @@ void Player::Update()
 	Calc();
 
 	// 水平方向あたり判定
-	//{
-	//	Sphere sphere = GetCollisionNodeBody();
-	//	Vector3 trans = GetTrans();
-	//	Vector3 sphere2player = trans - sphere.center;
+	{
+		Sphere sphere = GetCollisionNodeBody();
+		Vector3 trans = GetTrans();
+		Vector3 sphere2player = trans - sphere.center;
 
-	//	for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray->begin();
-	//		it != m_pLandShapeArray->end();
-	//		it++)
-	//	{
-	//		LandShape* pLandShape = it->get();
+		const int REPEAT_LIMIT = 5;
 
-	//		Vector3 reject;	// 排斥ベクトルを入れるための変数
+		int rejectNum = 0;
 
-	//		if (pLandShape->IntersectSphere(sphere, &reject))
-	//		{
-	//			// めり込み分だけ、球を押し出すように移動
-	//			sphere.center = sphere.center + reject;
-	//		}
-	//	}
+		for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray->begin();
+			it != m_pLandShapeArray->end();
+			)
+		{
+			LandShape* pLandShape = it->get();
 
-	//	SetTrans(sphere.center + sphere2player);
+			Vector3 reject;	// 排斥ベクトルを入れるための変数
 
-	//	Calc();
-	//}
+			if (pLandShape->IntersectSphere(sphere, &reject))
+			{
+				// めり込み分だけ、球を押し出すように移動
+				sphere.center = sphere.center + reject;
+				if (++rejectNum >= REPEAT_LIMIT)
+				{
+					break;
+				}
+				it = m_pLandShapeArray->begin();
+			}
+			else
+			{
+				it++;
+			}
+		}
+
+		SetTrans(sphere.center + sphere2player);
+
+		Calc();
+	}
 
 	// 垂直方向地形あたり判定
 	//{
