@@ -5,6 +5,9 @@
       <UniqueIdentifier>935be020-9dd4-47e5-810a-86e550519978</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dds;dlg;fbx;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{4a3940f5-ba45-4211-9c04-f01593379a1a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -23,6 +26,9 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="ModelEffect.h" />
     <ClInclude Include="ParticleEffect.h" />
+    <ClInclude Include="DeviceResources.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -41,6 +47,9 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="ModelEffect.cpp" />
     <ClCompile Include="ParticleEffect.cpp" />
+    <ClCompile Include="DeviceResources.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
