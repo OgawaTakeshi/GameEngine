@@ -129,9 +129,9 @@ void Game::Initialize(HWND window, int width, int height)
 	m_ObjSkydome = std::make_unique<Obj3D>();
 	m_LandShapeGround = std::make_unique<LandShape>();
 	m_ObjSkydome->LoadModelFile(L"Resources/skydome.cmo");
-	m_LandShapeGround->Initialize(L"ground200m", L"ground200m");
+	m_LandShapeGround->Initialize(L"testmap", L"testmap");
 	m_ObjSkydome->DisableLighting();
-	m_LandShapeGround->DisableLighting();
+	//m_LandShapeGround->DisableLighting();
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
 	m_debugText = std::make_unique<DebugText>(m_d3dDevice.Get(), m_spriteBatch.get());

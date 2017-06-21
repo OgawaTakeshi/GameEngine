@@ -261,6 +261,7 @@
     <MeshContentTask Include="Assets\SphereNode.FBX" />
     <MeshContentTask Include="Assets\tank.FBX" />
     <MeshContentTask Include="Assets\teapot.FBX" />
+    <MeshContentTask Include="Assets\testmap.FBX" />
     <MeshContentTask Include="Assets\waist.FBX" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

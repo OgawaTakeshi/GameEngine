@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <algorithm>
+#include <DirectXColors.h>
 #include "LandShape.h"
 #include "CollisionNode.h"
 
@@ -39,11 +40,21 @@ LandShapeCommon::LandShapeCommon(LandShapeCommonDef def)
 	// ライト0（グリーン）
 	m_pEffect->SetLightEnabled(0, true);
 	m_pEffect->SetLightDiffuseColor(0, Vector3(0.1f, 0.6f, 0.1f));
-	m_pEffect->SetLightDirection(0, Vector3(1, -0.5f, 2));
+	m_pEffect->SetLightDirection(0, Vector3(0, -1.0f, 0));
 	// ライト1（ピンク）
 	m_pEffect->SetLightEnabled(1, true);
 	m_pEffect->SetLightDiffuseColor(1, Vector3(0.5f, 0.2f, 0.3f));
-	m_pEffect->SetLightDirection(1, Vector3(-1, -0.5f, -2));
+	m_pEffect->SetLightDirection(1, Vector3(-1, 0, -2));
+	// ライト2（水色）
+	m_pEffect->SetLightEnabled(2, true);
+	m_pEffect->SetLightDiffuseColor(2, Vector3(0.3f, 0.3f, 0.6f));
+	m_pEffect->SetLightDirection(2, Vector3(1, 0, 2));
+	// フォグ（灰色） ※遠近感を強調するために使う
+	m_pEffect->SetFogEnabled(true);
+	m_pEffect->SetFogColor(Colors::White);
+	m_pEffect->SetFogStart(2.f);
+	m_pEffect->SetFogEnd(10.f);
+
 
 	void const* shaderByteCode;
 	size_t byteCodeLength;
