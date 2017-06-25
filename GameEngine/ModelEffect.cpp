@@ -25,6 +25,7 @@ void ModelEffectManager::Entry(
 	Vector3 start_scale, Vector3 end_scale // 拡縮・開始倍率と終了倍率
 )
 {
+	// 一時オブジェクト
 	ModelEffect effect;
 
 	effect.obj.LoadModelFile(filename);
@@ -39,7 +40,8 @@ void ModelEffectManager::Entry(
 	effect.frame = 0;
 	effect.num_frame = frame;
 
-	modelEffects.push_back(effect);
+	// 一時オブジェクトをリストに移す
+	modelEffects.push_back(std::move(effect));
 
 }
 
