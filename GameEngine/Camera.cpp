@@ -60,8 +60,10 @@ bool Camera::Project(const Vector3& worldPos, Vector2* screenPos)
 	// ビューポートの取得
 	D3D11_VIEWPORT viewport = DX::DeviceResources::GetInstance()->GetScreenViewport();
 
+	// ニアクリップより前方にいなければ計算できない
 	if (clipPos.w <= 1.0e-5) return false;
 
+	// ビューポート変換
 	float ndcX = clipPos.x / clipPos.w;
 	float ndcY = -clipPos.y / clipPos.w;
 
