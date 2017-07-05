@@ -1,4 +1,4 @@
-#include "Camera.h"
+ï»¿#include "Camera.h"
 
 #include "DeviceResources.h"
 
@@ -6,7 +6,7 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 /**
-*	@brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+*	@brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 */
 Camera::Camera()
 {
@@ -23,41 +23,41 @@ Camera::Camera()
 }
 
 /**
-*	@brief ƒfƒXƒgƒ‰ƒNƒ^
+*	@brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 */
 Camera::~Camera()
 {
 }
 
 /**
-*	@brief XV
+*	@brief æ›´æ–°
 */
 void Camera::Update()
 {
-	// ƒrƒ…[s—ñ‚ğŒvZ
+	// ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã‚’è¨ˆç®—
 	m_Viewmat = Matrix::CreateLookAt(m_Eyepos, m_Refpos, m_Upvec);
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ğŒvZ
+	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã‚’è¨ˆç®—
 	m_Projmat = Matrix::CreatePerspectiveFieldOfView(m_FovY, m_Aspect, m_NearClip, m_FarClip);
 }
 
 /// <summary>
-/// ‚R‚c¨‚Q‚cÀ•W•ÏŠ·
-/// ƒ[ƒ‹ƒhÀ•W‚©‚çƒXƒNƒŠ[ƒ“À•W‚ğŒvZ‚·‚é
+/// ï¼“ï¼¤â†’ï¼’ï¼¤åº§æ¨™å¤‰æ›
+/// ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‹ã‚‰ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã‚’è¨ˆç®—ã™ã‚‹
 /// </summary>
 /// <param name="pos2d"></param>
-/// <returns>¬”Û</returns>
+/// <returns>æˆå¦</returns>
 bool Camera::Project(const Vector3& worldPos, Vector2* screenPos)
 {
 	Vector4 clipPos;
 	Vector4 worldPosV4(worldPos.x, worldPos.y, worldPos.z, 1.0f);
 
-	// ƒrƒ…[•ÏŠ·
+	// ãƒ“ãƒ¥ãƒ¼å¤‰æ›
 	clipPos = Vector4::Transform(worldPosV4, m_Viewmat);
 
-	// Ë‰e•ÏŠ·
+	// å°„å½±å¤‰æ›
 	clipPos = Vector4::Transform(clipPos, m_Projmat);
 
-	// ƒrƒ…[ƒ|[ƒg‚Ìæ“¾
+	// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®å–å¾—
 	D3D11_VIEWPORT viewport = DX::DeviceResources::GetInstance()->GetScreenViewport();
 
 	if (clipPos.w <= 1.0e-5) return false;

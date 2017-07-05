@@ -1,8 +1,8 @@
-//--------------------------------------------------------------------------------------
-// ƒtƒ@ƒCƒ‹–¼: Enemy.h
-// ì¬Ò:
-// ì¬“ú:
-// à–¾:
+ï»¿//--------------------------------------------------------------------------------------
+// ãƒ•ã‚¡ã‚¤ãƒ«å: Enemy.h
+// ä½œæˆè€…:
+// ä½œæˆæ—¥:
+// èª¬æ˜:
 //--------------------------------------------------------------------------------------
 
 #pragma once
@@ -16,8 +16,8 @@
 class Enemy
 {
 public:
-	// ƒp[ƒc
-	// ©‹@ƒp[ƒc
+	// ãƒ‘ãƒ¼ãƒ„
+	// è‡ªæ©Ÿãƒ‘ãƒ¼ãƒ„
 	enum PARTS
 	{
 		PARTS_BODY,
@@ -32,39 +32,39 @@ public:
 	Enemy();
 	~Enemy();
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize();
-	// –ˆƒtƒŒ[ƒ€XV
+	// æ¯ãƒ•ãƒ¬ãƒ¼ãƒ æ›´æ–°
 	void Update();
-	// s—ñ‚ÌŒvZ
+	// è¡Œåˆ—ã®è¨ˆç®—
 	void Calc();
-	// •`‰æ
+	// æç”»
 	void Draw();
 
-	// ’eŠÛ‚Ì“–‚½‚è”»’è‹…‚ğæ“¾
+	// å¼¾ä¸¸ã®å½“ãŸã‚Šåˆ¤å®šçƒã‚’å–å¾—
 	const SphereNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
 
-	// €–Sƒtƒ‰ƒO‚ğ—§‚Ä‚é
+	// æ­»äº¡ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹
 	void SetDeath()	{ m_Death = true; }
 	bool GetDeath() { return m_Death; }
 
 protected:
-	// ƒƒ“ƒo•Ï”
-	// ‚R‚cƒIƒuƒWƒFƒNƒg
+	// ãƒ¡ãƒ³ãƒå¤‰æ•°
+	// ï¼“ï¼¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	std::vector<Obj3D>	m_Obj;
 
 	Obj3D m_ObjShadow;
 
 	SphereNode m_CollisionNodeBody;
 
-	// Šp“x
+	// è§’åº¦
 	float m_angle;
-	// ƒ^ƒCƒ}[
+	// ã‚¿ã‚¤ãƒãƒ¼
 	int m_Timer;
 
-	// ƒMƒ~ƒbƒN‚Ì‰Ò“®ƒTƒCƒNƒ‹
+	// ã‚®ãƒŸãƒƒã‚¯ã®ç¨¼å‹•ã‚µã‚¤ã‚¯ãƒ«
 	float m_cycle;
-	// €–Sƒtƒ‰ƒO
+	// æ­»äº¡ãƒ•ãƒ©ã‚°
 	bool m_Death;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;

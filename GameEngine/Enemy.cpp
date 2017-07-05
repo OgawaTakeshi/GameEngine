@@ -1,8 +1,8 @@
-//--------------------------------------------------------------------------------------
-// ƒtƒ@ƒCƒ‹–¼: Enemy.h
-// ì¬Ò:
-// ì¬“ú:
-// à–¾:
+ï»¿//--------------------------------------------------------------------------------------
+// ãƒ•ã‚¡ã‚¤ãƒ«å: Enemy.h
+// ä½œæˆè€…:
+// ä½œæˆæ—¥:
+// èª¬æ˜:
 //--------------------------------------------------------------------------------------
 
 #include <WICTextureLoader.h>
@@ -14,21 +14,21 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 /*==================================
-–Ú“I‚ÌŠp“x‚Ö‚ÌÅ’ZŠp“x‚ğæ“¾iƒ‰ƒWƒAƒ“j
+ç›®çš„ã®è§’åº¦ã¸ã®æœ€çŸ­è§’åº¦ã‚’å–å¾—ï¼ˆãƒ©ã‚¸ã‚¢ãƒ³ï¼‰
 
-ˆø”	_angle0	ƒx[ƒX‚Æ‚È‚éŠp“x
-_angle1	–Ú•W‚Æ‚·‚éŠp“x
-–ß‚è’l	·•ªŠp“x
+å¼•æ•°	_angle0	ãƒ™ãƒ¼ã‚¹ã¨ãªã‚‹è§’åº¦
+_angle1	ç›®æ¨™ã¨ã™ã‚‹è§’åº¦
+æˆ»ã‚Šå€¤	å·®åˆ†è§’åº¦
 
-Šp“x‚O‚©‚çŠp“x‚P‚ÉÅ’ZƒR[ƒX‚ÅŒü‚©‚¤Û‚É‰ÁZ‚·‚éŠp“x‚ğæ“¾‚·‚é
+è§’åº¦ï¼ã‹ã‚‰è§’åº¦ï¼‘ã«æœ€çŸ­ã‚³ãƒ¼ã‚¹ã§å‘ã‹ã†éš›ã«åŠ ç®—ã™ã‚‹è§’åº¦ã‚’å–å¾—ã™ã‚‹
 ===================================*/
 static float GetShortAngleRad(float _angle0, float _angle1)
 {
 	float angle_sub;
 
-	angle_sub = _angle1 - _angle0;	// Šp“x‚Ì·
-	// ·‚ª‚P‚W‚O“x(ƒÎj‚æ‚è‘å‚«‚©‚Á‚½ê‡A‹t‰ñ“]‚Ì•û‚ª‹ß‚¢‚Ì‚ÅAƒ}ƒCƒiƒX‚É•ÏŠ·
-	// ÅI“I‚É-180`+180“x‚Ì”ÍˆÍ‚ÉB
+	angle_sub = _angle1 - _angle0;	// è§’åº¦ã®å·®
+	// å·®ãŒï¼‘ï¼˜ï¼åº¦(Ï€ï¼‰ã‚ˆã‚Šå¤§ãã‹ã£ãŸå ´åˆã€é€†å›è»¢ã®æ–¹ãŒè¿‘ã„ã®ã§ã€ãƒã‚¤ãƒŠã‚¹ã«å¤‰æ›
+	// æœ€çµ‚çš„ã«-180ï½+180åº¦ã®ç¯„å›²ã«ã€‚
 	if (angle_sub > XM_PI)
 	{
 		angle_sub -= XM_2PI;
@@ -42,7 +42,7 @@ static float GetShortAngleRad(float _angle0, float _angle1)
 }
 
 //-----------------------------------------------------------------------------
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 //-----------------------------------------------------------------------------
 Enemy::Enemy()
 : m_cycle(0.0f)
@@ -52,14 +52,14 @@ Enemy::Enemy()
 }
 
 //-----------------------------------------------------------------------------
-// ƒfƒXƒgƒ‰ƒNƒ^
+// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 //-----------------------------------------------------------------------------
 Enemy::~Enemy()
 {
 }
 
 //-----------------------------------------------------------------------------
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //-----------------------------------------------------------------------------
 void Enemy::Initialize()
 {
@@ -70,7 +70,7 @@ void Enemy::Initialize()
 	m_Obj[PARTS_SHIELD].LoadModelFile(L"Resources/shield.cmo");
 	m_Obj[PARTS_DRILL].LoadModelFile(L"Resources/drill.cmo");
 
-	// ƒp[ƒc‚ÌeqŠÖŒW‚ğƒZƒbƒg
+	// ãƒ‘ãƒ¼ãƒ„ã®è¦ªå­é–¢ä¿‚ã‚’ã‚»ãƒƒãƒˆ
 	m_Obj[PARTS_COCKPIT].SetParent(
 		&m_Obj[PARTS_BODY]);
 
@@ -83,7 +83,7 @@ void Enemy::Initialize()
 	m_Obj[PARTS_SHIELD].SetParent(
 		&m_Obj[PARTS_BODY]);
 
-	// e‚©‚ç‚ÌƒIƒtƒZƒbƒgiÀ•W‚Ì‚¸‚ç‚µ•ªj‚ğƒZƒbƒg
+	// è¦ªã‹ã‚‰ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆï¼ˆåº§æ¨™ã®ãšã‚‰ã—åˆ†ï¼‰ã‚’ã‚»ãƒƒãƒˆ
 	m_Obj[PARTS_COCKPIT].SetTrans(
 		Vector3(0, 0.37f, -0.4f));
 	m_Obj[PARTS_COCKPIT].SetRot(
@@ -102,7 +102,7 @@ void Enemy::Initialize()
 	m_Obj[PARTS_SHIELD].SetRot(
 		Vector3(0, 0, XM_PIDIV2));
 
-	// ‰Šú”z’uƒ‰ƒ“ƒ_ƒ€
+	// åˆæœŸé…ç½®ãƒ©ãƒ³ãƒ€ãƒ 
 	Vector3 pos;
 	pos.x = (float)rand() / RAND_MAX * 20.0f - 10.0f;
 	pos.y = 0.5f;
@@ -113,7 +113,7 @@ void Enemy::Initialize()
 
 	m_Obj[0].SetRot(Vector3(0, XMConvertToRadians(m_angle), 0));
 
-	// “–‚½‚è”»’è
+	// å½“ãŸã‚Šåˆ¤å®š
 	m_CollisionNodeBody.Initialize();
 	m_CollisionNodeBody.SetParent(&m_Obj[0]);
 	m_CollisionNodeBody.SetTrans(Vector3(0, 0.3f, 0));
@@ -125,14 +125,14 @@ void Enemy::Initialize()
 
 	Microsoft::WRL::ComPtr<ID3D11Resource> resTexture;
 
-	// ƒeƒNƒXƒ`ƒƒ‚Ìƒ[ƒh
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ­ãƒ¼ãƒ‰
 	CreateWICTextureFromFile(DX::DeviceResources::GetInstance()->GetD3DDevice(), L"PNG/mark_kiduna.png", resTexture.GetAddressOf(),
 		m_texture.ReleaseAndGetAddressOf());
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
 	resTexture.As(&texture);
 
-	// ƒeƒNƒXƒ`ƒƒ‚Ì’†S‚ğŠ„‚èo‚·
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ä¸­å¿ƒã‚’å‰²ã‚Šå‡ºã™
 	CD3D11_TEXTURE2D_DESC textureDesc;
 	texture->GetDesc(&textureDesc);
 
@@ -143,26 +143,26 @@ void Enemy::Initialize()
 }
 
 //-----------------------------------------------------------------------------
-// XV
+// æ›´æ–°
 //-----------------------------------------------------------------------------
 void Enemy::Update()
 {
-	// €‚ñ‚Å‚¢‚½‚ç‰½‚à‚µ‚È‚¢
+	// æ­»ã‚“ã§ã„ãŸã‚‰ä½•ã‚‚ã—ãªã„
 	if (m_Death) return;
 
-	// ’èŠú“I‚Éis•ûŒü‚ğ•Ï‚¦‚é
+	// å®šæœŸçš„ã«é€²è¡Œæ–¹å‘ã‚’å¤‰ãˆã‚‹
 	m_Timer--;
 	if (m_Timer < 0)
 	{
 		m_Timer = 60;
 
-		// Šp“x‚ğ•ÏX
+		// è§’åº¦ã‚’å¤‰æ›´
 		float rnd = (float)rand() / RAND_MAX - 0.5f;
 		rnd *= 180.0f;
 		m_angle += rnd;
 	}
 
-	// ‚¶‚í‚¶‚í‚ÆŠp“x‚ğ”½‰f
+	// ã˜ã‚ã˜ã‚ã¨è§’åº¦ã‚’åæ˜ 
 	{
 		Vector3 rotv = m_Obj[0].GetRot();
 		float angle = GetShortAngleRad(rotv.y, XMConvertToRadians(m_angle));
@@ -170,36 +170,36 @@ void Enemy::Update()
 		m_Obj[0].SetRot(rotv);
 	}
 
-	// ‹@‘Ì‚ÌŒü‚¢‚Ä‚¢‚é•ûŒü‚Éi‚Ş
+	// æ©Ÿä½“ã®å‘ã„ã¦ã„ã‚‹æ–¹å‘ã«é€²ã‚€
 	{
-		// ¡‚ÌÀ•W‚ğæ“¾
+		// ä»Šã®åº§æ¨™ã‚’å–å¾—
 		Vector3 trans = m_Obj[0].GetTrans();
 
 		Vector3 move(0, 0, -0.02f);
 		Vector3 rotv = m_Obj[0].GetRot();
 		Matrix rotm = Matrix::CreateRotationY(rotv.y);
 		move = Vector3::TransformNormal(move, rotm);
-		// À•W‚ğˆÚ“®
+		// åº§æ¨™ã‚’ç§»å‹•
 		trans += move;
-		// ˆÚ“®Œã‚ÌÀ•W‚ğƒZƒbƒg
+		// ç§»å‹•å¾Œã®åº§æ¨™ã‚’ã‚»ãƒƒãƒˆ
 		m_Obj[0].SetTrans(trans);
 	}
 
-	// ˆÚ“®‚ğ”½‰f‚µ‚Äs—ñXV
+	// ç§»å‹•ã‚’åæ˜ ã—ã¦è¡Œåˆ—æ›´æ–°
 	Calc();
 
 	m_CollisionNodeBody.Update();
 }
 
 //-----------------------------------------------------------------------------
-// s—ñXV
+// è¡Œåˆ—æ›´æ–°
 //-----------------------------------------------------------------------------
 void Enemy::Calc()
 {
-	// €‚ñ‚Å‚¢‚½‚ç‰½‚à‚µ‚È‚¢
+	// æ­»ã‚“ã§ã„ãŸã‚‰ä½•ã‚‚ã—ãªã„
 	if (m_Death) return;
 
-	// ‘Sƒp[ƒc•ªs—ñXV
+	// å…¨ãƒ‘ãƒ¼ãƒ„åˆ†è¡Œåˆ—æ›´æ–°
 	for (int i = 0; i < PARTS_NUM; i++)
 	{
 		m_Obj[i].Calc();
@@ -208,11 +208,11 @@ void Enemy::Calc()
 	m_ObjShadow.Calc();
 
 	m_InScreen = false;
-	// “G‚Ìƒ[ƒ‹ƒhÀ•W‚É‘Î‰‚·‚éƒXƒNƒŠ[ƒ“À•W‚ğ“¾‚é
+	// æ•µã®ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã«å¯¾å¿œã™ã‚‹ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã‚’å¾—ã‚‹
 	Vector2 screenPos;
 	if(Obj3D::GetCamera()->Project(m_Obj[0].GetTrans(), &screenPos))
 	{
-		// ƒrƒ…[ƒ|[ƒg‚Ìæ“¾
+		// ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆã®å–å¾—
 		D3D11_VIEWPORT viewport = DX::DeviceResources::GetInstance()->GetScreenViewport();
 
 		if (viewport.TopLeftX <= screenPos.x && screenPos.x <= viewport.TopLeftX + viewport.Width &&
@@ -225,14 +225,14 @@ void Enemy::Calc()
 }
 
 //-----------------------------------------------------------------------------
-// •`‰æ
+// æç”»
 //-----------------------------------------------------------------------------
 void Enemy::Draw()
 {
-	// €‚ñ‚Å‚¢‚½‚ç‰½‚à‚µ‚È‚¢
+	// æ­»ã‚“ã§ã„ãŸã‚‰ä½•ã‚‚ã—ãªã„
 	if (m_Death) return;
 
-	// ‘Sƒp[ƒc•ª•`‰æ
+	// å…¨ãƒ‘ãƒ¼ãƒ„åˆ†æç”»
 	for (int i = 0; i < PARTS_NUM; i++)
 	{
 		m_Obj[i].Draw();
@@ -240,10 +240,10 @@ void Enemy::Draw()
 
 	m_CollisionNodeBody.Draw();
 
-	// ‰e‚ğŒ¸Z•`‰æ
+	// å½±ã‚’æ¸›ç®—æç”»
 	m_ObjShadow.DrawSubtractive();
 
-	// ƒAƒCƒRƒ“•`‰æ
+	// ã‚¢ã‚¤ã‚³ãƒ³æç”»
 	if (m_InScreen)
 	{
 		DX::DeviceResources::GetInstance()->GetSpriteBatch()->Draw(m_texture.Get(), m_screenPos, nullptr, Colors::White,

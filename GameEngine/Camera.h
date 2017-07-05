@@ -1,42 +1,42 @@
-#pragma once
+ï»¿#pragma once
 
 #include	<d3d11.h>
 #include	<SimpleMath.h>
 
-// ƒJƒƒ‰
+// ã‚«ãƒ¡ãƒ©
 class Camera
 {
 public:
 	using Vector3 = DirectX::SimpleMath::Vector3;
 	using Vector2 = DirectX::SimpleMath::Vector2;
 protected:
-	// ƒrƒ…[s—ñ
+	// ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—
 	DirectX::SimpleMath::Matrix m_Viewmat;
-	// ƒJƒƒ‰À•W
+	// ã‚«ãƒ¡ãƒ©åº§æ¨™
 	DirectX::SimpleMath::Vector3 m_Eyepos;
-	// ƒ^[ƒQƒbƒgÀ•W
+	// ã‚¿ãƒ¼ã‚²ãƒƒãƒˆåº§æ¨™
 	DirectX::SimpleMath::Vector3 m_Refpos;
-	// ã•ûŒüƒxƒNƒgƒ‹
+	// ä¸Šæ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«
 	DirectX::SimpleMath::Vector3 m_Upvec;
 
-	// ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
+	// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—
 	DirectX::SimpleMath::Matrix m_Projmat;
-	// c•ûŒü‹–ìŠp
+	// ç¸¦æ–¹å‘è¦–é‡è§’
 	float m_FovY;
-	// ƒAƒXƒyƒNƒg”ä
+	// ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
 	float m_Aspect;
-	// ƒjƒAƒNƒŠƒbƒv
+	// ãƒ‹ã‚¢ã‚¯ãƒªãƒƒãƒ—
 	float m_NearClip;
-	// ƒtƒ@[ƒNƒŠƒbƒv
+	// ãƒ•ã‚¡ãƒ¼ã‚¯ãƒªãƒƒãƒ—
 	float m_FarClip;
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	Camera();
-	// ƒfƒXƒgƒ‰ƒNƒ^
+	// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	virtual ~Camera();
-	// XV
+	// æ›´æ–°
 	void Update();
-	// ƒAƒNƒZƒbƒT
+	// ã‚¢ã‚¯ã‚»ãƒƒã‚µ
 	void SetEyepos(const DirectX::SimpleMath::Vector3 pos) { m_Eyepos = pos; }
 	void SetRefpos(const DirectX::SimpleMath::Vector3 pos) { m_Refpos = pos; }
 	void SetUpvec(const DirectX::SimpleMath::Vector3 vec) { m_Upvec = vec; }
