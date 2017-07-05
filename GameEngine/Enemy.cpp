@@ -215,9 +215,11 @@ void Enemy::Calc()
 		// ビューポートの取得
 		D3D11_VIEWPORT viewport = DX::DeviceResources::GetInstance()->GetScreenViewport();
 
+		// 画面の範囲に収まっているか？
 		if (viewport.TopLeftX <= screenPos.x && screenPos.x <= viewport.TopLeftX + viewport.Width &&
 			viewport.TopLeftY <= screenPos.y && screenPos.y <= viewport.TopLeftY + viewport.Height)
 		{
+			// スクリーン座標を記録
 			m_screenPos = screenPos;
 			m_InScreen = true;
 		}
