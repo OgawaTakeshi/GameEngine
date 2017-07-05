@@ -300,19 +300,27 @@ void Game::Update(DX::StepTimer const& timer)
 			}
 		}
 
+		static int interval = 0;
+		interval--;
+
 		if (hit)
 		{
-			ModelEffectManager::getInstance()->Entry(
-				L"Resources/HitEffect.cmo",
-				5,
-				inter,	// 座標
-				Vector3(0, 0, 0),	// 速度
-				Vector3(0, 0, 0),	// 加速度
-				Vector3(0, 0, 0),	// 回転角（初期）
-				Vector3(0, 720, 0),	// 回転角（最終）
-				Vector3(0, 0, 0),	// スケール（初期）
-				Vector3(3, 3, 3)	// スケール（最終）
-			);
+			if (interval <= 0)
+			{
+				interval = 10;
+
+				ModelEffectManager::getInstance()->Entry(
+					L"Resources/HitEffect.cmo",
+					10,
+					inter,	// 座標
+					Vector3(0, 0, 0),	// 速度
+					Vector3(0, 0, 0),	// 加速度
+					Vector3(0, 0, 0),	// 回転角（初期）
+					Vector3(0, 70, 0),	// 回転角（最終）
+					Vector3(0, 0, 0),	// スケール（初期）
+					Vector3(3, 3, 3)	// スケール（最終）
+				);
+			}
 		}
 	}
 

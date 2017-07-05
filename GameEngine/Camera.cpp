@@ -88,24 +88,6 @@ void Camera::UnProject(const Vector2& screenPos, Segment* worldSegment)
 	// ビューポートの取得
 	D3D11_VIEWPORT viewport = DX::DeviceResources::GetInstance()->GetScreenViewport();
 
-	{
-		Vector4 np(0, 0, 10- m_NearClip, 1.0f);
-
-		np = Vector4::Transform(np, m_Viewmat);
-
-		np = Vector4::Transform(np, m_Projmat);
-		
-		np = np;
-
-		Vector4 fp(0, 0, 10 - m_FarClip, 1.0f);
-
-		fp = Vector4::Transform(fp, m_Viewmat);
-
-		fp = Vector4::Transform(fp, m_Projmat);
-
-		fp = fp;
-	}
-
 	// スクリーン座標→射影座標
 	clipPos.x = (screenPos.x - viewport.TopLeftX) / (viewport.Width/2.0f) - 1.0f;
 	clipPos.y = (screenPos.y - viewport.TopLeftY) / (viewport.Height/2.0f) - 1.0f;
@@ -131,8 +113,6 @@ void Camera::UnProject(const Vector2& screenPos, Segment* worldSegment)
 	Matrix invProj;
 	m_Projmat.Invert(invProj);
 
-	//Vector4 start = Vector4::Transform(clipPosNear, invMat);
-	//Vector4 end = Vector4::Transform(clipPosFar, invMat);
 	// 射影座標→ビュー座標
 	Vector4 viewStart = Vector4::Transform(clipPosNear, invProj);
 	Vector4 viewEnd = Vector4::Transform(clipPosFar, invProj);
