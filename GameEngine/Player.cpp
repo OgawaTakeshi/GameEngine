@@ -56,6 +56,8 @@ void Player::Initialize()
 	// 親行列からの位置
 	m_CollisionNodeBullet.SetTrans(Vector3(0, 0, 0));
 
+	this->SetTrans(Vector3(0, 5, 0));
+
 	m_isJump = false;
 }
 
@@ -66,18 +68,18 @@ void Player::Update()
 {
 	KeyboardUtil* key = DX::DeviceResources::GetInstance()->GetKeyboardUtil();
 
-	if (key->IsTriggered(Keyboard::Keys::Space))
-	{
-		StartJump();
-	}
-	if (m_isJump)
-	{
-		m_Velocity.y -= GRAVITY_ACC;
-		if (m_Velocity.y < -JUMP_SPEED_MAX)
-		{
-			m_Velocity.y = -JUMP_SPEED_MAX;
-		}
-	}
+	//if (key->IsTriggered(Keyboard::Keys::Space))
+	//{
+	//	StartJump();
+	//}
+	//if (m_isJump)
+	//{
+	//	m_Velocity.y -= GRAVITY_ACC;
+	//	if (m_Velocity.y < -JUMP_SPEED_MAX)
+	//	{
+	//		m_Velocity.y = -JUMP_SPEED_MAX;
+	//	}
+	//}
 
 	Vector3 pos = m_Obj[PARTS_TANK].GetTrans();
 	pos += m_Velocity;
@@ -90,51 +92,71 @@ void Player::Update()
 	if (key->IsPressed(Keyboard::Keys::A))
 	{
 		// 現在の角度を取得
-		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
-		rot.y += ROT_SPEED;
+		Quaternion rot = m_Obj[PARTS_TANK].GetRotQ();
+		Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitY, ROT_SPEED);
+		rot = rotadd * rot;
 		// 回転後の角度を反映
-		m_Obj[PARTS_TANK].SetRot(rot);
+		m_Obj[PARTS_TANK].SetRotQ(rot);
 	}
 	if (key->IsPressed(Keyboard::Keys::D))
 	{
 		// 現在の角度を取得
-		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
-		rot.y -= ROT_SPEED;
+		Quaternion rot = m_Obj[PARTS_TANK].GetRotQ();
+		Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitY, -ROT_SPEED);
+		rot = rotadd * rot;
 		// 回転後の角度を反映
-		m_Obj[PARTS_TANK].SetRot(rot);
+		m_Obj[PARTS_TANK].SetRotQ(rot);
 	}
 
-	// 前進/後退
+	// ←回転/→回転
 	if (key->IsPressed(Keyboard::Keys::W))
 	{
-		// 現在の座標・回転角を取得
-		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
-		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// 移動ベクトル(Z座標前進)
-		SimpleMath::Vector3 moveV(0, 0, -0.1f);
-		Matrix rotm = Matrix::CreateRotationY(rot_y);
-		// 移動ベクトルを回転する
-		moveV = Vector3::TransformNormal(moveV, rotm);
-		// 移動
-		trans += moveV;
-		// 移動した座標を反映
-		m_Obj[PARTS_TANK].SetTrans(trans);
+		// 現在の角度を取得
+		Quaternion rot = m_Obj[PARTS_TANK].GetRotQ();
+		Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitX, ROT_SPEED);
+		rot = rotadd * rot;
+		// 回転後の角度を反映
+		m_Obj[PARTS_TANK].SetRotQ(rot);
 	}
 	if (key->IsPressed(Keyboard::Keys::S))
 	{
+		// 現在の角度を取得
+		Quaternion rot = m_Obj[PARTS_TANK].GetRotQ();
+		Quaternion rotadd = Quaternion::CreateFromAxisAngle(Vector3::UnitX, -ROT_SPEED);
+		rot = rotadd * rot;
+		// 回転後の角度を反映
+		m_Obj[PARTS_TANK].SetRotQ(rot);
+	}
+
+	// 前進/後退
+	//if (key->IsPressed(Keyboard::Keys::W))
+	{
 		// 現在の座標・回転角を取得
 		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
-		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// 移動ベクトル(Z座標後退)
-		Vector3 moveV(0, 0, +0.1f);
-		Matrix rotm = Matrix::CreateRotationY(rot_y);
+		// 移動ベクトル(Z座標前進)
+		SimpleMath::Vector3 moveV(0, 0, -0.3f);
 		// 移動ベクトルを回転する
-		moveV = Vector3::TransformNormal(moveV, rotm);
+		moveV = Vector3::TransformNormal(moveV, m_Obj[PARTS_TANK].GetLocalWorld());
 		// 移動
 		trans += moveV;
 		// 移動した座標を反映
 		m_Obj[PARTS_TANK].SetTrans(trans);
 	}
+	//if (key->IsPressed(Keyboard::Keys::S))
+	//{
+	//	// 現在の座標・回転角を取得
+	//	Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
+	//	float rot_y = m_Obj[PARTS_TANK].GetRot().y;
+	//	// 移動ベクトル(Z座標後退)
+	//	Vector3 moveV(0, 0, +0.1f);
+	//	Matrix rotm = Matrix::CreateRotationY(rot_y);
+	//	// 移動ベクトルを回転する
+	//	moveV = Vector3::TransformNormal(moveV, rotm);
+	//	// 移動
+	//	trans += moveV;
+	//	// 移動した座標を反映
+	//	m_Obj[PARTS_TANK].SetTrans(trans);
+	//}
 
 	// 上昇/下降
 	//if (m_pInputManager->GetKeyboard()->IsKeyDown(VK_UP))
@@ -368,58 +390,58 @@ void Player::Update()
 	}
 
 	// 垂直方向地形あたり判定
-	{
-		const Vector3& vel = GetVelocity();
+	//{
+	//	const Vector3& vel = GetVelocity();
 
-		if (vel.y <= 0.0f)
-		{
-			bool hit = false;
-			Segment player_segment;
-			Vector3 player_pos = GetTrans();
-			player_segment.start = player_pos + Vector3(0, 1.0f, 0);
-			player_segment.end = player_pos + Vector3(0, -0.5f, 0);
+	//	if (vel.y <= 0.0f)
+	//	{
+	//		bool hit = false;
+	//		Segment player_segment;
+	//		Vector3 player_pos = GetTrans();
+	//		player_segment.start = player_pos + Vector3(0, 1.0f, 0);
+	//		player_segment.end = player_pos + Vector3(0, -0.5f, 0);
 
-			// 大きい数字で初期化
-			float distance = 1.0e5;
-			Vector3 inter;
+	//		// 大きい数字で初期化
+	//		float distance = 1.0e5;
+	//		Vector3 inter;
 
-			for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray->begin();
-				it != m_pLandShapeArray->end();
-				it++)
-			{
-				LandShape* pLandShape = it->get();
-				float temp_distance;
-				Vector3 temp_inter;
+	//		for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray->begin();
+	//			it != m_pLandShapeArray->end();
+	//			it++)
+	//		{
+	//			LandShape* pLandShape = it->get();
+	//			float temp_distance;
+	//			Vector3 temp_inter;
 
-				// 床面との当たりを判定
-				if (pLandShape->IntersectSegmentFloor(player_segment, &temp_inter))
-				{
-					hit = true;
-					temp_distance = Vector3::Distance(player_segment.start, temp_inter);
-					if (temp_distance < distance)
-					{
-						inter = temp_inter;
-						distance = temp_distance;
-					}
-				}
-			}
+	//			// 床面との当たりを判定
+	//			if (pLandShape->IntersectSegmentFloor(player_segment, &temp_inter))
+	//			{
+	//				hit = true;
+	//				temp_distance = Vector3::Distance(player_segment.start, temp_inter);
+	//				if (temp_distance < distance)
+	//				{
+	//					inter = temp_inter;
+	//					distance = temp_distance;
+	//				}
+	//			}
+	//		}
 
-			if (hit)
-			{
-				Vector3 new_position = player_pos;
-				new_position.y = inter.y;
-				StopJump();
-				SetTrans(new_position);
-			}
+	//		if (hit)
+	//		{
+	//			Vector3 new_position = player_pos;
+	//			new_position.y = inter.y;
+	//			StopJump();
+	//			SetTrans(new_position);
+	//		}
 
-			if (!hit)
-			{// 落下開始
-				StartFall();
-			}
-		}
+	//		if (!hit)
+	//		{// 落下開始
+	//			StartFall();
+	//		}
+	//	}
 
-		Calc();
-	}
+	//	Calc();
+	//}
 
 }
 

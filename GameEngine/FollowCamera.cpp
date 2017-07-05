@@ -41,13 +41,14 @@ void FollowCamera::Update()
 
 	// 追従カメラ
 	const float CAMERA_DISTANCE = 5.0f;
-	Vector3 eyepos, refpos;
+	Vector3 eyepos, refpos, upvec;
 
-	refpos = m_TargetPos + Vector3(0, 2, 0);
+	refpos = m_TargetPos + Vector3(0, 0, 0);
 	Vector3 cameraV(0, 0, CAMERA_DISTANCE);
 
 	//Matrix rotmat = Matrix::CreateRotationY(m_TargetAngle);
 	cameraV = Vector3::TransformNormal(cameraV, targetWorld);
+	upvec = Vector3::TransformNormal(Vector3::UnitY, targetWorld);
 
 	eyepos = refpos + cameraV;
 
@@ -59,6 +60,7 @@ void FollowCamera::Update()
 
 	SetEyepos(eyepos);
 	SetRefpos(refpos);
+	SetUpvec(upvec);
 
 	// カメラの更新
 	Camera::Update();
