@@ -224,6 +224,9 @@ void DX::DeviceResources::CreateDeviceResources()
     }
 
 	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
+
+	m_keyboardUtil = std::make_unique<KeyboardUtil>();
+	m_mouseUtil = std::make_unique<MouseUtil>(m_window);
 }
 
 // These resources need to be recreated every time the window size is changed.

@@ -10,7 +10,6 @@
 #include <Effects.h>
 #include <CommonStates.h>
 #include <Model.h>
-#include <Keyboard.h>
 
 #include "DeviceResources.h"
 #include "StepTimer.h"
@@ -21,6 +20,8 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "LandShape.h"
+#include "KeyboardUtil.h"
+#include "MouseUtil.h"
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
@@ -80,9 +81,6 @@ private:
 
 	// デバッグテキスト
 	std::unique_ptr<DebugText> m_debugText;
-	// キーボード
-	std::unique_ptr<DirectX::Keyboard> m_keyboard;
-	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
 
 	// 天球
 	std::unique_ptr<Obj3D> m_ObjSkydome;

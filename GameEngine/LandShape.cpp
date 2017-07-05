@@ -296,7 +296,7 @@ bool LandShape::IntersectSphere(const Sphere& sphere, Vector3* reject)
 // segment : 線分
 // （出力）inter : 交点（ポリゴンの平面上で、点との再接近点の座標を返す）
 //--------------------------------------------------------------------------------------
-bool LandShape::IntersectSegment(const Segment& segment, Vector3* inter)
+bool LandShape::IntersectSegmentFloor(const Segment& segment, Vector3* inter)
 {
 	if (m_pData == nullptr) return false;
 
@@ -340,6 +340,64 @@ bool LandShape::IntersectSegment(const Segment& segment, Vector3* inter)
 		// つまり、コサイン値が一定値より小さければ、面の傾きが大きいので、地面とみなさずスキップ
 		if (cosine < limit_cosine) continue;
 		//--高速版ここまで--
+
+		// 線分と三角形（ポリゴン）の交差判定
+		if (CheckSegment2Triangle(localSegment, m_pData->m_Triangles[i], &temp_inter))
+		{
+			hit = true;
+			// 線分の始点と衝突点の距離を計算（めりこみ距離）
+			temp_distance = Vector3::Distance(localSegment.start, temp_inter);
+			// めりこみ具合がここまでで最小なら
+			if (temp_distance < distance)
+			{
+				// 衝突点の座標、めりこみ距離を記録
+				l_inter = temp_inter;
+				distance = temp_distance;
+			}
+		}
+	}
+
+	if (hit && inter != nullptr)
+	{
+		// 衝突点の座標をモデル座標系からワールド座標系に変換
+		const Matrix& localworld = m_Obj.GetLocalWorld();
+		*inter = Vector3::Transform(l_inter, localworld);
+	}
+
+	return hit;
+}
+
+//--------------------------------------------------------------------------------------
+// 地形と線分の交差判定
+// segment : 線分
+// （出力）inter : 交点（ポリゴンの平面上で、点との再接近点の座標を返す）
+//--------------------------------------------------------------------------------------
+bool LandShape::IntersectSegment(const Segment& segment, Vector3* inter)
+{
+	if (m_pData == nullptr) return false;
+
+	// ヒットフラグを初期化
+	bool hit = false;
+	// 大きい数字で初期化
+	float distance = 1.0e5;
+	Vector3 l_inter;
+
+	// コピー
+	Segment localSegment = segment;
+	// 線分をワールド座標からモデル座標系に引き込む
+	localSegment.start = Vector3::Transform(localSegment.start, m_WorldLocal);
+	localSegment.end = Vector3::Transform(localSegment.end, m_WorldLocal);
+	// 線分の方向ベクトルを取得
+	Vector3 segmentNormal = localSegment.end - localSegment.start;
+	segmentNormal.Normalize();
+
+	// 三角形の数
+	int nTri = m_pData->m_Triangles.size();
+	// 全ての三角形について
+	for (int i = 0; i < nTri; i++)
+	{
+		float temp_distance;
+		Vector3 temp_inter;
 
 		// 線分と三角形（ポリゴン）の交差判定
 		if (CheckSegment2Triangle(localSegment, m_pData->m_Triangles[i], &temp_inter))

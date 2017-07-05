@@ -8,6 +8,8 @@
 #include <wrl/client.h>
 
 #include <SpriteBatch.h>
+#include "KeyboardUtil.h"
+#include "MouseUtil.h"
 
 namespace DX
 {
@@ -55,6 +57,8 @@ namespace DX
         D3D11_VIEWPORT          GetScreenViewport() const               { return m_screenViewport; }
         UINT                    GetBackBufferCount() const              { return m_backBufferCount; }
 		DirectX::SpriteBatch*	GetSpriteBatch() const					{ return m_spriteBatch.get(); }
+		KeyboardUtil*			GetKeyboardUtil() const					{ return m_keyboardUtil.get(); }
+		MouseUtil*				GetMouseUtil() const					{ return m_mouseUtil.get(); }
 
         // Performance events
         void PIXBeginEvent(_In_z_ const wchar_t* name)
@@ -121,5 +125,9 @@ namespace DX
 
 		// スプライトバッチ
 		std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+		// キーボード
+		std::unique_ptr<KeyboardUtil> m_keyboardUtil;
+		// マウス
+		std::unique_ptr<MouseUtil> m_mouseUtil;
     };
 }

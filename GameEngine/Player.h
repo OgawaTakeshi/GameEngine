@@ -11,7 +11,6 @@
 
 #include <d3d11_1.h>
 #include <SimpleMath.h>
-#include <Keyboard.h>
 #include <vector>
 #include "Obj3D.h"
 #include "CollisionNode.h"
@@ -42,7 +41,7 @@ public:
 	static const float GRAVITY_ACC;
 
 	// コンストラクタ
-	Player(DirectX::Keyboard* keyboard);
+	Player();
 	// デストラクタ
 	~Player();
 	// 初期化
@@ -85,9 +84,6 @@ protected:
 	// メンバ変数
 	// ロボットの構成パーツ
 	std::vector<Obj3D>	m_Obj;
-	// キーボード
-	DirectX::Keyboard* m_pKeyboard;
-	DirectX::Keyboard::KeyboardStateTracker m_KeyboardTracker;
 	// ギミックの稼動サイクル
 	float m_cycle;
 

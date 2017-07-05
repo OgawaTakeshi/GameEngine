@@ -173,6 +173,7 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="FollowCamera.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="KeyboardUtil.h" />
     <ClInclude Include="LandShape.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
@@ -186,6 +187,7 @@
       </ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="ModelEffect.h" />
+    <ClInclude Include="MouseUtil.h" />
     <ClInclude Include="Obj3D.h" />
     <ClInclude Include="ParticleEffect.h" />
     <ClInclude Include="pch.h" />
@@ -202,6 +204,7 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="FollowCamera.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="KeyboardUtil.cpp" />
     <ClCompile Include="LandShape.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
@@ -216,6 +219,7 @@
     </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ModelEffect.cpp" />
+    <ClCompile Include="MouseUtil.cpp" />
     <ClCompile Include="Obj3D.cpp" />
     <ClCompile Include="ParticleEffect.cpp" />
     <ClCompile Include="pch.cpp">

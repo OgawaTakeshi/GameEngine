@@ -1,5 +1,6 @@
 ﻿// デバッグ用カメラクラス
 #include "DebugCamera.h"
+#include "DeviceResources.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -15,10 +16,6 @@ DebugCamera::DebugCamera(int w, int h)
 	m_sx = 1.0f / (float)w;
 	m_sy = 1.0f / (float)h;
 	m_view = DirectX::SimpleMath::Matrix::Identity;
-
-	// マウスの初期化
-	mouse.reset(new Mouse);
-	mouseTracker.reset(new Mouse::ButtonStateTracker);
 }
 
 //--------------------------------------------------------------------------------------
@@ -27,34 +24,35 @@ DebugCamera::DebugCamera(int w, int h)
 void DebugCamera::Update()
 {
 	// マウス情報を取得
-	mouseState = mouse->GetState();
-	mouseTracker->Update(mouseState);
+	MouseUtil* mouse = DX::DeviceResources::GetInstance()->GetMouseUtil();
 
 	// マウスの左ボタンが押された
-	if (mouseTracker->leftButton == Mouse::ButtonStateTracker::ButtonState::PRESSED)
+	if (mouse->IsTriggered(MouseUtil::Button::Left))
 	{
+		XMINT2 pos = mouse->GetPos();
 		// マウスの座標を取得
-		m_x = mouseState.x;
-		m_y = mouseState.y;
+		m_x = pos.x;
+		m_y = pos.y;
 	}
-	else if (mouseTracker->leftButton == Mouse::ButtonStateTracker::ButtonState::RELEASED)
+	else if (mouse->IsReleased(MouseUtil::Button::Left))
 	{
 		// 現在の回転を保存
 		m_xAngle = m_xTmp;
 		m_yAngle = m_yTmp;
 	}
 	// マウスのボタンが押されていたらカメラを移動させる
-	if (mouseState.leftButton)
+	if (mouse->IsPressed(MouseUtil::Button::Left))
 	{
-		Motion(mouseState.x, mouseState.y);
+		XMINT2 pos = mouse->GetPos();
+		Motion(pos.x, pos.y);
 	}
 
 	// マウスのフォイール値を取得
-	m_scrollWheelValue = mouseState.scrollWheelValue;
+	m_scrollWheelValue = mouse->GetWheelValue();
 	if (m_scrollWheelValue > 0)
 	{
 		m_scrollWheelValue = 0;
-		mouse->ResetScrollWheelValue();
+		mouse->ResetWheelValue();
 	}
 
 	// ビュー行列を算出する

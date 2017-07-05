@@ -68,10 +68,8 @@ void Game::Initialize(HWND window, int width, int height)
 	def.pDeviceContext = m_deviceResources->GetD3DDeviceContext();
 	LandShape::InitializeCommon(def);
 
-	m_keyboard = std::make_unique<Keyboard>();
-
 	// プレイヤー作成
-	m_Player = std::make_unique<Player>(m_keyboard.get());
+	m_Player = std::make_unique<Player>();
 
 	m_Enemies.resize(ENEMY_NUM);
 	for (int i = 0; i < ENEMY_NUM; i++)
@@ -251,10 +249,13 @@ void Game::Update(DX::StepTimer const& timer)
 		}
 	}
 
-	Keyboard::State keystate = m_keyboard->GetState();
-	m_keyboardTracker.Update(keystate);
+	KeyboardUtil* key = DX::DeviceResources::GetInstance()->GetKeyboardUtil();
+	key->Update();
 
-	if (m_keyboardTracker.IsKeyPressed(Keyboard::D1))
+	MouseUtil* mouse = DX::DeviceResources::GetInstance()->GetMouseUtil();
+	mouse->Update();
+
+	if (key->IsTriggered(Keyboard::D1))
 	{
 		CollisionNode::SetDebugVisible(!CollisionNode::GetDebugVisible());
 	}
@@ -265,6 +266,55 @@ void Game::Update(DX::StepTimer const& timer)
 	// 追従カメラ
 	m_FollowCamera->SetTarget(m_Player.get());
 	m_FollowCamera->Update();
+
+	{
+		bool hit = false;
+
+		XMINT2 mousepos = mouse->GetPos();
+		Vector2 mousePos(mousepos.x, mousepos.y);
+		Segment segment;
+		m_CurrentCamera->UnProject(mousePos, &segment);
+
+		// 大きい数字で初期化
+		float distance = 1.0e5;
+		Vector3 inter;
+
+		for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray.begin();
+			it != m_pLandShapeArray.end();
+			it++)
+		{
+			LandShape* pLandShape = it->get();
+			float temp_distance;
+			Vector3 temp_inter;
+
+			// 床面との当たりを判定
+			if (pLandShape->IntersectSegment(segment, &temp_inter))
+			{
+				hit = true;
+				temp_distance = Vector3::Distance(segment.start, temp_inter);
+				if (temp_distance < distance)
+				{
+					inter = temp_inter;
+					distance = temp_distance;
+				}
+			}
+		}
+
+		if (hit)
+		{
+			ModelEffectManager::getInstance()->Entry(
+				L"Resources/HitEffect.cmo",
+				5,
+				inter,	// 座標
+				Vector3(0, 0, 0),	// 速度
+				Vector3(0, 0, 0),	// 加速度
+				Vector3(0, 0, 0),	// 回転角（初期）
+				Vector3(0, 720, 0),	// 回転角（最終）
+				Vector3(0, 0, 0),	// スケール（初期）
+				Vector3(3, 3, 3)	// スケール（最終）
+			);
+		}
+	}
 
 	ModelEffectManager::getInstance()->Update();
 }

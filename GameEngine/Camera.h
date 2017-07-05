@@ -3,6 +3,8 @@
 #include	<d3d11.h>
 #include	<SimpleMath.h>
 
+#include "Collision.h"
+
 // カメラ
 class Camera
 {
@@ -47,4 +49,5 @@ public:
 	const DirectX::SimpleMath::Matrix& GetProjmat() const { return m_Projmat; }
 
 	bool Project(const Vector3& worldPos, Vector2* screenPos);
+	void UnProject(const Vector2& screenPos, Segment* worldSegment);
 };

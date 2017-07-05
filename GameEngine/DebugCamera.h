@@ -2,18 +2,12 @@
 // デバッグ用カメラクラス
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include <Mouse.h>
 
 // デバッグ用カメラクラス
 class DebugCamera
 {
 	// カメラの距離
 	static const float DEFAULT_CAMERA_DISTANCE;
-
-	// マウス関係
-	DirectX::Mouse::State mouseState;
-	std::unique_ptr<DirectX::Mouse> mouse;
-	std::unique_ptr<DirectX::Mouse::ButtonStateTracker> mouseTracker;
 
 	// 横回転
 	float m_yAngle, m_yTmp;

@@ -86,6 +86,7 @@ public:
 	void DisableLighting();
 
 	bool IntersectSphere(const Sphere& sphere, DirectX::SimpleMath::Vector3* reject);
+	bool IntersectSegmentFloor(const Segment& segment, DirectX::SimpleMath::Vector3* inter);
 	bool IntersectSegment(const Segment& segment, DirectX::SimpleMath::Vector3* inter);
 
 	// アクセッサ

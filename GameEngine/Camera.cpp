@@ -72,3 +72,79 @@ bool Camera::Project(const Vector3& worldPos, Vector2* screenPos)
 
 	return true;
 }
+
+/// <summary>
+/// ３Ｄ→２Ｄ座標変換
+/// スクリーン座標を、ニアクリップ、ファークリップ間の線分に変換する
+/// </summary>
+/// <param name="screenPos"></param>
+/// <param name="worldSegment"></param>
+void Camera::UnProject(const Vector2& screenPos, Segment* worldSegment)
+{
+	Vector2 clipPos;
+	Vector4 clipPosNear;
+	Vector4 clipPosFar;
+
+	// ビューポートの取得
+	D3D11_VIEWPORT viewport = DX::DeviceResources::GetInstance()->GetScreenViewport();
+
+	{
+		Vector4 np(0, 0, 10- m_NearClip, 1.0f);
+
+		np = Vector4::Transform(np, m_Viewmat);
+
+		np = Vector4::Transform(np, m_Projmat);
+		
+		np = np;
+
+		Vector4 fp(0, 0, 10 - m_FarClip, 1.0f);
+
+		fp = Vector4::Transform(fp, m_Viewmat);
+
+		fp = Vector4::Transform(fp, m_Projmat);
+
+		fp = fp;
+	}
+
+	// スクリーン座標→射影座標
+	clipPos.x = (screenPos.x - viewport.TopLeftX) / (viewport.Width/2.0f) - 1.0f;
+	clipPos.y = (screenPos.y - viewport.TopLeftY) / (viewport.Height/2.0f) - 1.0f;
+	clipPos.y = -clipPos.y;
+
+	clipPosNear.x = m_NearClip * clipPos.x;
+	clipPosNear.y = m_NearClip * clipPos.y;
+	clipPosNear.z = 0;
+	clipPosNear.w = m_NearClip;
+
+	clipPosFar.x = m_FarClip * clipPos.x;
+	clipPosFar.y = m_FarClip * clipPos.y;
+	clipPosFar.z = m_FarClip;
+	clipPosFar.w = m_FarClip;
+
+	// プロジェクション、ビュー逆変換
+	Matrix invMat = m_Viewmat * m_Projmat;
+	invMat.Invert(invMat);
+
+	Matrix invView;
+	m_Viewmat.Invert(invView);
+
+	Matrix invProj;
+	m_Projmat.Invert(invProj);
+
+	//Vector4 start = Vector4::Transform(clipPosNear, invMat);
+	//Vector4 end = Vector4::Transform(clipPosFar, invMat);
+	// 射影座標→ビュー座標
+	Vector4 viewStart = Vector4::Transform(clipPosNear, invProj);
+	Vector4 viewEnd = Vector4::Transform(clipPosFar, invProj);
+	// ビュー座標→ワールド座標
+	Vector4 start = Vector4::Transform(viewStart, invView);
+	Vector4 end = Vector4::Transform(viewEnd, invView);
+
+	worldSegment->start.x = start.x;
+	worldSegment->start.y = start.y;
+	worldSegment->start.z = start.z;
+
+	worldSegment->end.x = end.x;
+	worldSegment->end.y = end.y;
+	worldSegment->end.z = end.z;
+}
