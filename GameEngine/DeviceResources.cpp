@@ -222,6 +222,8 @@ void DX::DeviceResources::CreateDeviceResources()
         (void) m_d3dContext.As(&m_d3dContext1);
         (void) m_d3dContext.As(&m_d3dAnnotation);
     }
+
+	m_spriteBatch = std::make_unique<SpriteBatch>(m_d3dContext.Get());
 }
 
 // These resources need to be recreated every time the window size is changed.

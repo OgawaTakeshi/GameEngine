@@ -35,6 +35,8 @@ public:
 	static void SetCamera(Camera* pCamera) { s_pCamera = pCamera; }
 
 	static ID3D11DeviceContext* GetDeviceContext() { return s_pDeviceContext; }
+	static Camera* GetCamera() { return s_pCamera; }
+
 	// Œ¸Z•`‰æİ’è‚ğƒZƒbƒg
 	static void SetSubtractive();
 

@@ -4,6 +4,11 @@
 
 #pragma once
 
+#include <windows.h>
+#include <wrl/client.h>
+
+#include <SpriteBatch.h>
+
 namespace DX
 {
     // Provides an interface for an application that owns DeviceResources to be notified of the device being lost or created.
@@ -49,6 +54,7 @@ namespace DX
         DXGI_FORMAT             GetDepthBufferFormat() const            { return m_depthBufferFormat; }
         D3D11_VIEWPORT          GetScreenViewport() const               { return m_screenViewport; }
         UINT                    GetBackBufferCount() const              { return m_backBufferCount; }
+		DirectX::SpriteBatch*	GetSpriteBatch() const					{ return m_spriteBatch.get(); }
 
         // Performance events
         void PIXBeginEvent(_In_z_ const wchar_t* name)
@@ -112,5 +118,8 @@ namespace DX
 
         // The IDeviceNotify can be held directly as it owns the DeviceResources.
         IDeviceNotify*                                  m_deviceNotify;
+
+		// スプライトバッチ
+		std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
     };
 }

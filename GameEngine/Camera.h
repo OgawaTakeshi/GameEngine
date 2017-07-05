@@ -6,6 +6,9 @@
 // カメラ
 class Camera
 {
+public:
+	using Vector3 = DirectX::SimpleMath::Vector3;
+	using Vector2 = DirectX::SimpleMath::Vector2;
 protected:
 	// ビュー行列
 	DirectX::SimpleMath::Matrix m_Viewmat;
@@ -42,4 +45,6 @@ public:
 	const DirectX::SimpleMath::Vector3& GetUpvec() const { return m_Upvec; }
 	const DirectX::SimpleMath::Matrix& GetViewmat() const { return m_Viewmat; }
 	const DirectX::SimpleMath::Matrix& GetProjmat() const { return m_Projmat; }
+
+	bool Project(const Vector3& worldPos, Vector2* screenPos);
 };

@@ -5,7 +5,10 @@
 // 説明:
 //--------------------------------------------------------------------------------------
 
+#include <WICTextureLoader.h>
+
 #include "Enemy.h"
+#include "DeviceResources.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -119,6 +122,24 @@ void Enemy::Initialize()
 	m_ObjShadow.LoadModelFile(L"Resources/shadow.cmo");
 	m_ObjShadow.SetTrans(Vector3(0, -0.4f, 0));
 	m_ObjShadow.SetParent(&m_Obj[0]);
+
+	Microsoft::WRL::ComPtr<ID3D11Resource> resTexture;
+
+	// テクスチャのロード
+	CreateWICTextureFromFile(DX::DeviceResources::GetInstance()->GetD3DDevice(), L"PNG/mark_kiduna.png", resTexture.GetAddressOf(),
+		m_texture.ReleaseAndGetAddressOf());
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+	resTexture.As(&texture);
+
+	// テクスチャの中心を割り出す
+	CD3D11_TEXTURE2D_DESC textureDesc;
+	texture->GetDesc(&textureDesc);
+
+	m_origin.x = float(textureDesc.Width / 2);
+	m_origin.y = float(textureDesc.Height / 2);
+
+	m_InScreen = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -185,6 +206,22 @@ void Enemy::Calc()
 	}
 	
 	m_ObjShadow.Calc();
+
+	m_InScreen = false;
+	// 敵のワールド座標に対応するスクリーン座標を得る
+	Vector2 screenPos;
+	if(Obj3D::GetCamera()->Project(m_Obj[0].GetTrans(), &screenPos))
+	{
+		// ビューポートの取得
+		D3D11_VIEWPORT viewport = DX::DeviceResources::GetInstance()->GetScreenViewport();
+
+		if (viewport.TopLeftX <= screenPos.x && screenPos.x <= viewport.TopLeftX + viewport.Width &&
+			viewport.TopLeftY <= screenPos.y && screenPos.y <= viewport.TopLeftY + viewport.Height)
+		{
+			m_screenPos = screenPos;
+			m_InScreen = true;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -205,4 +242,11 @@ void Enemy::Draw()
 
 	// 影を減算描画
 	m_ObjShadow.DrawSubtractive();
+
+	// アイコン描画
+	if (m_InScreen)
+	{
+		DX::DeviceResources::GetInstance()->GetSpriteBatch()->Draw(m_texture.Get(), m_screenPos, nullptr, Colors::White,
+			0.f, m_origin, 0.2f);
+	}
 }

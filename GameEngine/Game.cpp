@@ -163,8 +163,7 @@ void Game::Initialize(HWND window, int width, int height)
 
 	m_ObjSkydome->LoadModelFile(L"Resources/skydome.cmo");
 
-	m_spriteBatch = std::make_unique<SpriteBatch>(m_deviceResources->GetD3DDeviceContext());
-	m_debugText = std::make_unique<DebugText>(m_deviceResources->GetD3DDevice(), m_spriteBatch.get());
+	m_debugText = std::make_unique<DebugText>(m_deviceResources->GetD3DDevice(), m_deviceResources->GetSpriteBatch());
 
 	// 指定範囲をランダムで返すラムダ式
 	auto rand_value = [](float min, float max)
@@ -281,6 +280,9 @@ void Game::Render()
 
     Clear();
     m_deviceResources->PIXBeginEvent(L"Render");
+
+	SpriteBatch* spriteBatch = m_deviceResources->GetSpriteBatch();
+	spriteBatch->Begin();
 	
     // TODO: Add your rendering code here.
 	m_ObjSkydome->Draw();
@@ -304,9 +306,8 @@ void Game::Render()
 	ModelEffectManager::getInstance()->Draw();
     m_deviceResources->PIXEndEvent();
 
-	m_spriteBatch->Begin();
 	m_debugText->Draw();
-	m_spriteBatch->End();
+	spriteBatch->End();
     // Show the new frame.
     m_deviceResources->Present();
 }

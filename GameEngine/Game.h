@@ -78,8 +78,6 @@ private:
 	// Rendering loop timer.
 	DX::StepTimer                           m_timer;
 
-	// スプライトバッチ
-	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
 	// デバッグテキスト
 	std::unique_ptr<DebugText> m_debugText;
 	// キーボード

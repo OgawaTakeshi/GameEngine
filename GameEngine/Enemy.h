@@ -66,4 +66,9 @@ protected:
 	float m_cycle;
 	// Ž€–Sƒtƒ‰ƒO
 	bool m_Death;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;
+	DirectX::SimpleMath::Vector2 m_screenPos;
+	DirectX::SimpleMath::Vector2 m_origin;
+	bool m_InScreen;
 };
