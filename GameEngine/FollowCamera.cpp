@@ -40,7 +40,7 @@ void FollowCamera::Update(bool interpolate)
 	const Matrix& targetWorld = m_Target->GetLocalWorld();
 
 	// í«è]ÉJÉÅÉâ
-	const float CAMERA_DISTANCE = 5.0f;
+	const float CAMERA_DISTANCE = 7.0f;
 	Vector3 eyepos, refpos;
 
 	refpos = m_TargetPos + Vector3(0, 2, 0);
@@ -49,7 +49,7 @@ void FollowCamera::Update(bool interpolate)
 	//Matrix rotmat = Matrix::CreateRotationY(m_TargetAngle);
 	cameraV = Vector3::TransformNormal(cameraV, targetWorld);
 
-	eyepos = refpos + cameraV + Vector3(0,10,0);
+	eyepos = refpos + cameraV;
 
 	Vector3 eyeposPre = GetEyepos();
 	Vector3 refposPre = GetRefpos();

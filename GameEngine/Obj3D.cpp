@@ -124,6 +124,32 @@ void Obj3D::DisableLighting()
 	}
 }
 
+void Obj3D::EnableAlpha()
+{
+	if (m_pModel)
+	{
+		// モデル内の全メッシュ分回す
+		ModelMesh::Collection::const_iterator it_mesh = m_pModel->meshes.begin();
+		for (; it_mesh != m_pModel->meshes.end(); it_mesh++)
+		{
+			ModelMesh* modelmesh = it_mesh->get();
+			assert(modelmesh);
+
+			// メッシュ内の全メッシュパーツ分回す
+			std::vector<std::unique_ptr<ModelMeshPart>>::iterator it_meshpart = modelmesh->meshParts.begin();
+			for (; it_meshpart != modelmesh->meshParts.end(); it_meshpart++)
+			{
+				ModelMeshPart* meshpart = it_meshpart->get();
+				assert(meshpart);
+
+				// メッシュパーツにセットされたエフェクトをBasicEffectとして取得
+				std::shared_ptr<IEffect>& ieff = meshpart->effect;
+				meshpart->ModifyEffect(s_pDevice, ieff, true);
+			}
+		}
+	}
+}
+
 void Obj3D::Calc()
 {
 	Matrix scalem;
@@ -185,5 +211,27 @@ void Obj3D::DrawSubtractive()
 
 		// 減算描画用の設定関数を渡して描画
 		m_pModel->Draw(s_pDeviceContext, *s_pStates, m_LocalWorld, view, projection, false, Obj3D::SetSubtractive);
+	}
+}
+
+/// <summary>
+///  ビルボード描画
+/// </summary>
+void Obj3D::DrawBillboardConstrainY()
+{
+	if (m_pModel)
+	{
+		assert(s_pCamera);
+		const Matrix& view = s_pCamera->GetViewmat();
+		const Matrix& projection = s_pCamera->GetProjmat();
+
+		// ビルボード行列をワールド行列に合成
+		Matrix world = s_pCamera->GetBillboardConstrainY() * m_LocalWorld;
+
+		assert(s_pDeviceContext);
+		assert(s_pStates);
+
+		// 減算描画用の設定関数を渡して描画
+		m_pModel->Draw(s_pDeviceContext, *s_pStates, world, view, projection);
 	}
 }

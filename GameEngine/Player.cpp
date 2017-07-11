@@ -17,8 +17,8 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using namespace std;
 
-const float Player::GRAVITY_ACC = 0.02f;
-const float Player::JUMP_SPEED_FIRST = 0.8f;
+const float Player::GRAVITY_ACC = 0.03f;
+const float Player::JUMP_SPEED_FIRST = 0.5f;
 const float Player::JUMP_SPEED_MAX = 0.3f;
 
 Player::Player()
@@ -703,12 +703,12 @@ void Player::Load()
 	}
 
 	// 親子関係の組み立て
-	for (int i = 0; i < m_Obj.size(); i++)
+	for (unsigned int i = 0; i < m_Obj.size(); i++)
 	{
 		// 親の指定あり
 		if (parent_names[i].length() > 0)
 		{
-			for (int j = 0; j < m_Obj.size(); j++)
+			for (unsigned int j = 0; j < m_Obj.size(); j++)
 			{
 				if (j == i) continue;
 

@@ -1,4 +1,4 @@
-//
+﻿//
 // Game.cpp
 //
 
@@ -196,6 +196,19 @@ void Game::Initialize(HWND window, int width, int height)
 		return (max - min) * (float)rand() / RAND_MAX + min;
 	};
 
+	// 木の数
+	const int TREE_NUM = 50;
+	m_ObjTrees.resize(TREE_NUM);
+	for (unsigned int i = 0; i < m_ObjTrees.size(); i++)
+	{
+		m_ObjTrees[i].LoadModelFile(L"Resources/billboardGrass.cmo");
+		m_ObjTrees[i].EnableAlpha();
+		m_ObjTrees[i].DisableLighting();
+		m_ObjTrees[i].SetScale(Vector3(1,1,1));
+		float x = rand_value(-5.0f, 5.0f);
+		float z = rand_value(-5.0f, 5.0f);
+		m_ObjTrees[i].SetTrans(Vector3(x, 0, z));
+	}
 }
 
 // Executes the basic game loop.
@@ -214,9 +227,14 @@ void Game::Update(DX::StepTimer const& timer)
 {
     float elapsedTime = float(timer.GetElapsedSeconds());
 
-	float fps = m_timer.GetFramesPerSecond();
+	float fps = (float)m_timer.GetFramesPerSecond();
 
 	m_debugText->AddText(Vector2(0, 0), L"FPS:%d", m_timer.GetFramesPerSecond());
+
+	for (unsigned int i = 0; i < m_ObjTrees.size(); i++)
+	{
+		m_ObjTrees[i].Calc();
+	}
 
 	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
 		it != m_Enemies.end();
@@ -301,7 +319,7 @@ void Game::Update(DX::StepTimer const& timer)
 		bool hit = false;
 
 		XMINT2 mousepos = mouse->GetPos();
-		Vector2 mousePos(mousepos.x, mousepos.y);
+		Vector2 mousePos((float)mousepos.x, (float)mousepos.y);
 		Segment segment;
 		m_CurrentCamera->UnProject(mousePos, &segment);
 
@@ -380,6 +398,7 @@ void Game::Render()
 	{
 		(*it)->Draw();
 	}
+
 	auto context = m_deviceResources->GetD3DDeviceContext();
 
 	m_Player->Draw();
@@ -389,6 +408,11 @@ void Game::Render()
 		it++)
 	{
 		(*it)->Draw();
+	}
+
+	for (unsigned int i = 0; i < m_ObjTrees.size(); i++)
+	{
+		m_ObjTrees[i].DrawBillboardConstrainY();
 	}
 
 	ModelEffectManager::getInstance()->Draw();

@@ -251,6 +251,8 @@
   <ItemGroup>
     <MeshContentTask Include="Assets\arm.FBX" />
     <MeshContentTask Include="Assets\ball.FBX" />
+    <MeshContentTask Include="Assets\billboardGrass.FBX" />
+    <MeshContentTask Include="Assets\billboardTree.FBX" />
     <MeshContentTask Include="Assets\body.FBX" />
     <MeshContentTask Include="Assets\box1m.FBX" />
     <MeshContentTask Include="Assets\box5m.FBX" />

@@ -1,4 +1,4 @@
-//
+﻿//
 // Game.h
 //
 
@@ -116,4 +116,7 @@ private:
 
 	// 敵
 	std::vector<std::unique_ptr<Enemy>> m_Enemies;
+
+	// 木
+	std::vector<Obj3D> m_ObjTrees;
 };

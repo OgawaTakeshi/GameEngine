@@ -17,7 +17,7 @@ class LockOnCamera : public Camera
 	};
 public:
 	// 距離
-	const float CAMERA_DISTANCE = 5.0f;
+	const float CAMERA_DISTANCE = 7.0f;
 	// 切り替え時間
 	const int SHIFT_FRAME = 120;
 	// コンストラクタ

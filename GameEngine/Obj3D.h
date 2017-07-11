@@ -67,8 +67,11 @@ public:
 	void Draw();
 	// 減算描画での描画（影用）
 	void DrawSubtractive();
+	void DrawBillboardConstrainY();
 	// オブジェクトのライティングを無効にする
 	void DisableLighting();
+
+	void EnableAlpha();
 	
 	// アクセッサ
 	void SetTrans(const DirectX::SimpleMath::Vector3& trans) { m_Trans = trans; }

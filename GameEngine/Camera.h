@@ -31,6 +31,9 @@ protected:
 	float m_NearClip;
 	// ファークリップ
 	float m_FarClip;
+
+	// ビルボード行列(Y軸周り限定）
+	DirectX::SimpleMath::Matrix m_BillboardConstrainY;
 public:
 	// コンストラクタ
 	Camera();
@@ -47,7 +50,9 @@ public:
 	const DirectX::SimpleMath::Vector3& GetUpvec() const { return m_Upvec; }
 	const DirectX::SimpleMath::Matrix& GetViewmat() const { return m_Viewmat; }
 	const DirectX::SimpleMath::Matrix& GetProjmat() const { return m_Projmat; }
+	const DirectX::SimpleMath::Matrix& GetBillboardConstrainY() const { return m_BillboardConstrainY; }
 
 	bool Project(const Vector3& worldPos, Vector2* screenPos);
 	void UnProject(const Vector2& screenPos, Segment* worldSegment);
+	void CalcBillboard();
 };

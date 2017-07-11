@@ -38,6 +38,8 @@ void Camera::Update()
 	m_Viewmat = Matrix::CreateLookAt(m_Eyepos, m_Refpos, m_Upvec);
 	// プロジェクション行列を計算
 	m_Projmat = Matrix::CreatePerspectiveFieldOfView(m_FovY, m_Aspect, m_NearClip, m_FarClip);
+	// ビルボード行列を計算
+	CalcBillboard();
 }
 
 /// <summary>
@@ -127,4 +129,32 @@ void Camera::UnProject(const Vector2& screenPos, Segment* worldSegment)
 	worldSegment->end.x = end.x;
 	worldSegment->end.y = end.y;
 	worldSegment->end.z = end.z;
+}
+
+/// <summary>
+/// ビルボード行列の計算
+/// </summary>
+void Camera::CalcBillboard()
+{
+	// 視線方向（右手系の為）
+	Vector3 eyeDir = m_Refpos - m_Eyepos;
+	// Y軸
+	Vector3 Y = Vector3::UnitY;
+	// X軸
+	Vector3 X = Y.Cross(eyeDir);
+	X.Normalize();
+	// Z軸
+	Vector3 Z = X.Cross(Y);
+	Z.Normalize();
+	// Y軸周りビルボード行列
+	m_BillboardConstrainY = Matrix::Identity;
+	m_BillboardConstrainY.m[0][0] = X.x;
+	m_BillboardConstrainY.m[0][1] = X.y;
+	m_BillboardConstrainY.m[0][2] = X.z;
+	m_BillboardConstrainY.m[1][0] = Y.x;
+	m_BillboardConstrainY.m[1][1] = Y.y;
+	m_BillboardConstrainY.m[1][2] = Y.z;
+	m_BillboardConstrainY.m[2][0] = Z.x;
+	m_BillboardConstrainY.m[2][1] = Z.y;
+	m_BillboardConstrainY.m[2][2] = Z.z;
 }
