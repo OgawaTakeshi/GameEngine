@@ -63,14 +63,21 @@ void LockOnCamera::Update()
 			Vector3 eyepos;
 			Vector3 refpos;
 
+			const float CAMERA_UPOFFSET = 2.0f;
+
 			// 敵から自機の頭上への方向ベクトル
 			// 自機と敵が近づくほど、上から見下ろす状態になる
-			Vector3 cameraV = playerTrans + Vector3(0, 2, 0) - enemyTrans;
+			Vector3 cameraV = playerTrans + Vector3(0, CAMERA_UPOFFSET, 0) - enemyTrans;
 			cameraV.Normalize();
 			cameraV *= CAMERA_DISTANCE;
 
 			// 視点、参照点
 			eyepos = playerTrans + cameraV;
+			// 一定以上の高さの差を保証
+			if (eyepos.y - playerTrans.y < CAMERA_UPOFFSET)
+			{
+				eyepos.y = playerTrans.y + CAMERA_UPOFFSET;
+			}
 			refpos = enemyTrans;
 
 			// 移行期間
