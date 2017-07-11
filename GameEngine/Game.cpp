@@ -16,10 +16,27 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
+//static variable
+Game* Game::m_Instance;
+
+Game * Game::GetInstance()
+{
+	assert(m_Instance);
+
+	return m_Instance;
+}
+
 Game::Game()
 {
+	assert(m_Instance == nullptr);
+	m_Instance = this;
 	m_deviceResources = DX::DeviceResources::GetInstance();
     m_deviceResources->RegisterDeviceNotify(this);
+}
+
+Game::~Game()
+{
+	m_Instance = nullptr;
 }
 
 // Initialize the Direct3D resources required to run.
@@ -47,8 +64,11 @@ void Game::Initialize(HWND window, int width, int height)
 		// 追従カメラを生成
 		m_FollowCamera = std::make_unique<FollowCamera>();
 
-		// 追従カメラを有効に
-		m_CurrentCamera = m_FollowCamera.get();
+		// ロックオンカメラを生成
+		m_LockOnCamera = std::make_unique<LockOnCamera>();
+
+		// ロックオンカメラを有効に
+		m_CurrentCamera = m_LockOnCamera.get();
 	}
 
 	// Obj3Dの静的な初期化
@@ -56,14 +76,14 @@ void Game::Initialize(HWND window, int width, int height)
 		Obj3D::Defs defs;
 		defs.pDevice = m_deviceResources->GetD3DDevice();
 		defs.pDeviceContext = m_deviceResources->GetD3DDeviceContext();
-		defs.pCamera = m_FollowCamera.get();
+		defs.pCamera = m_CurrentCamera;
 
 		Obj3D::StaticInitialize(defs);
 	}
 
 	// LandShapeの静的な初期化
 	LandShapeCommonDef def;
-	def.pCamera = m_FollowCamera.get();
+	def.pCamera = m_CurrentCamera;
 	def.pDevice = m_deviceResources->GetD3DDevice();
 	def.pDeviceContext = m_deviceResources->GetD3DDeviceContext();
 	LandShape::InitializeCommon(def);
@@ -77,6 +97,13 @@ void Game::Initialize(HWND window, int width, int height)
 		m_Enemies[i] = std::make_unique<Enemy>();
 		m_Enemies[i]->Initialize();
 	}
+
+	// ロックオンを生成
+	m_LockOn = std::make_unique<LockOn>();
+	m_LockOn->SetPlayer(m_Player.get());
+	m_LockOn->SetEnemies(&m_Enemies);
+	// ロックオンカメラにロックオンをセット
+	m_LockOnCamera->SetLockOn(m_LockOn.get());
 	
 	// モデルをファイルからロード
 	m_ObjSkydome = std::make_unique<Obj3D>();
@@ -205,7 +232,7 @@ void Game::Update(DX::StepTimer const& timer)
 		(*it)->Update();
 	}
 
-	m_Player->Update();
+	m_Player->Update();	
 
 	// 攻撃当たり判定
 	{
@@ -266,6 +293,9 @@ void Game::Update(DX::StepTimer const& timer)
 	// 追従カメラ
 	m_FollowCamera->SetTarget(m_Player.get());
 	m_FollowCamera->Update();
+
+	// ロックオンカメラ
+	m_LockOnCamera->Update();
 
 	{
 		bool hit = false;

@@ -22,6 +22,7 @@
 #include "LandShape.h"
 #include "KeyboardUtil.h"
 #include "MouseUtil.h"
+#include "LockOnCamera.h"
 
 #ifndef SAFE_DELETE
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
@@ -39,9 +40,15 @@
 class Game : public DX::IDeviceNotify
 {
 public:
+	static Game* GetInstance();
+private:
+	static Game* m_Instance;
+public:
 	static const int ENEMY_NUM = 5;
 
     Game();
+
+	~Game();
 
     // Initialization and management
     void Initialize(HWND window, int width, int height);
@@ -62,6 +69,8 @@ public:
 
     // Properties
     void GetDefaultSize( int& width, int& height ) const;
+
+	LockOn* GetLockOn() { return m_LockOn.get(); }
 
 private:
 
@@ -89,10 +98,15 @@ private:
 	// 地形
 	std::vector<std::unique_ptr<LandShape>>	m_pLandShapeArray;
 
+	// ロックオン
+	std::unique_ptr<LockOn> m_LockOn;
+
 	// デバッグ用カメラ
 	std::unique_ptr<DebugCamera> m_DebugCamera;
 	// 追従カメラ
 	std::unique_ptr<FollowCamera> m_FollowCamera;
+	// ロックオンカメラ
+	std::unique_ptr<LockOnCamera> m_LockOnCamera;
 
 	// 現在のカメラ
 	Camera* m_CurrentCamera;

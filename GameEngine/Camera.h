@@ -37,7 +37,7 @@ public:
 	// デストラクタ
 	virtual ~Camera();
 	// 更新
-	void Update();
+	virtual void Update();
 	// アクセッサ
 	void SetEyepos(const DirectX::SimpleMath::Vector3 pos) { m_Eyepos = pos; }
 	void SetRefpos(const DirectX::SimpleMath::Vector3 pos) { m_Refpos = pos; }

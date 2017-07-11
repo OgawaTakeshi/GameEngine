@@ -31,6 +31,8 @@
     </ClInclude>
     <ClInclude Include="KeyboardUtil.h" />
     <ClInclude Include="MouseUtil.h" />
+    <ClInclude Include="LockOnCamera.h" />
+    <ClInclude Include="LockOn.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -54,6 +56,8 @@
     </ClCompile>
     <ClCompile Include="KeyboardUtil.cpp" />
     <ClCompile Include="MouseUtil.cpp" />
+    <ClCompile Include="LockOnCamera.cpp" />
+    <ClCompile Include="LockOn.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

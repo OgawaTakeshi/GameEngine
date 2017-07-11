@@ -21,7 +21,7 @@ public:
 	// デストラクタ
 	virtual ~FollowCamera();
 	// 更新
-	void Update();
+	void Update(bool interpolate = true);
 
 	void SetTarget(Player* target) { m_Target = target; }
 

@@ -10,6 +10,8 @@
 #include <sstream>
 #include <algorithm>
 #include "DeviceResources.h"
+#include "LockOnCamera.h"
+#include "Game.h"
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -57,31 +59,49 @@ void Player::Initialize()
 	m_CollisionNodeBullet.SetTrans(Vector3(0, 0, 0));
 
 	m_isJump = false;
+
+	m_ObjShadow.LoadModelFile(L"Resources/shadow.cmo");
+	m_ObjShadow.SetTrans(Vector3(0, -0.4f, 0));
 }
 
-//-----------------------------------------------------------------------------
-// 更新
-//-----------------------------------------------------------------------------
-void Player::Update()
+/// <summary>
+/// 通常カメラでの操作
+/// </summary>
+void Player::ControlNormal()
 {
 	KeyboardUtil* key = DX::DeviceResources::GetInstance()->GetKeyboardUtil();
 
-	if (key->IsTriggered(Keyboard::Keys::Space))
+	// 前進/後退
+	if (key->IsPressed(Keyboard::Keys::W))
 	{
-		StartJump();
+		// 現在の座標・回転角を取得
+		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
+		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
+		// 移動ベクトル(Z座標前進)
+		SimpleMath::Vector3 moveV(0, 0, -0.1f);
+		Matrix rotm = Matrix::CreateRotationY(rot_y);
+		// 移動ベクトルを回転する
+		moveV = Vector3::TransformNormal(moveV, rotm);
+		// 移動
+		trans += moveV;
+		// 移動した座標を反映
+		m_Obj[PARTS_TANK].SetTrans(trans);
 	}
-	if (m_isJump)
+	if (key->IsPressed(Keyboard::Keys::S))
 	{
-		m_Velocity.y -= GRAVITY_ACC;
-		if (m_Velocity.y < -JUMP_SPEED_MAX)
-		{
-			m_Velocity.y = -JUMP_SPEED_MAX;
-		}
+		// 現在の座標・回転角を取得
+		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
+		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
+		// 移動ベクトル(Z座標後退)
+		Vector3 moveV(0, 0, +0.1f);
+		Matrix rotm = Matrix::CreateRotationY(rot_y);
+		// 移動ベクトルを回転する
+		moveV = Vector3::TransformNormal(moveV, rotm);
+		// 移動
+		trans += moveV;
+		// 移動した座標を反映
+		m_Obj[PARTS_TANK].SetTrans(trans);
 	}
-
-	Vector3 pos = m_Obj[PARTS_TANK].GetTrans();
-	pos += m_Velocity;
-	m_Obj[PARTS_TANK].SetTrans(pos);
 
 	// １フレームでの旋回速度<ラジアン>
 	const float ROT_SPEED = 0.03f;
@@ -102,6 +122,30 @@ void Player::Update()
 		rot.y -= ROT_SPEED;
 		// 回転後の角度を反映
 		m_Obj[PARTS_TANK].SetRot(rot);
+	}
+}
+
+/// <summary>
+/// ロックオン時操作
+/// </summary>
+void Player::ControlLockOn()
+{
+	LockOn* lockOn = Game::GetInstance()->GetLockOn();
+	KeyboardUtil* key = DX::DeviceResources::GetInstance()->GetKeyboardUtil();
+
+	assert(lockOn);
+	assert(lockOn->IsLockOn());
+
+	Enemy* enemy = lockOn->SearchLockingEnemy();
+	if (enemy == nullptr) return;
+
+	// ロックオン対象方向を向く
+	{
+		Vector3 player2enemy = enemy->GetTrans() - this->GetTrans();
+
+		float rotY = atan2f(-player2enemy.x, -player2enemy.z);
+		// 回転後の角度を反映
+		m_Obj[PARTS_TANK].SetRot(Vector3(0, rotY, 0));
 	}
 
 	// 前進/後退
@@ -134,6 +178,89 @@ void Player::Update()
 		trans += moveV;
 		// 移動した座標を反映
 		m_Obj[PARTS_TANK].SetTrans(trans);
+	}
+
+	// 左右移動
+	if (key->IsPressed(Keyboard::Keys::A))
+	{
+		// 現在の座標・回転角を取得
+		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
+		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
+		// 移動ベクトル(Z座標前進)
+		SimpleMath::Vector3 moveV(-0.1f, 0, 0);
+		Matrix rotm = Matrix::CreateRotationY(rot_y);
+		// 移動ベクトルを回転する
+		moveV = Vector3::TransformNormal(moveV, rotm);
+		// 移動
+		trans += moveV;
+		// 移動した座標を反映
+		m_Obj[PARTS_TANK].SetTrans(trans);
+	}
+	if (key->IsPressed(Keyboard::Keys::D))
+	{
+		// 現在の座標・回転角を取得
+		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
+		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
+		// 移動ベクトル(Z座標前進)
+		SimpleMath::Vector3 moveV(0.1f, 0, 0);
+		Matrix rotm = Matrix::CreateRotationY(rot_y);
+		// 移動ベクトルを回転する
+		moveV = Vector3::TransformNormal(moveV, rotm);
+		// 移動
+		trans += moveV;
+		// 移動した座標を反映
+		m_Obj[PARTS_TANK].SetTrans(trans);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// 更新
+//-----------------------------------------------------------------------------
+void Player::Update()
+{
+	KeyboardUtil* key = DX::DeviceResources::GetInstance()->GetKeyboardUtil();
+
+	// ロックオン切り替えボタン
+	if (key->IsTriggered(Keyboard::Keys::Enter))
+	{
+		LockOn* lockOn = Game::GetInstance()->GetLockOn();
+		if (lockOn->IsLockOn())
+		{
+			// ロックオン終了
+			lockOn->End();
+		}
+		else
+		{
+			// ロックオン開始
+			lockOn->Start();
+		}
+	}
+
+	if (key->IsTriggered(Keyboard::Keys::Space))
+	{
+		StartJump();
+	}
+	if (m_isJump)
+	{
+		m_Velocity.y -= GRAVITY_ACC;
+		if (m_Velocity.y < -JUMP_SPEED_MAX)
+		{
+			m_Velocity.y = -JUMP_SPEED_MAX;
+		}
+	}
+
+	Vector3 pos = m_Obj[PARTS_TANK].GetTrans();
+	pos += m_Velocity;
+	m_Obj[PARTS_TANK].SetTrans(pos);
+
+	LockOn* lockOn = Game::GetInstance()->GetLockOn();
+	if (lockOn->IsLockOn())
+	{
+		ControlLockOn();
+	}
+	else
+	{
+		ControlNormal();
 	}
 
 	// 上昇/下降
@@ -434,6 +561,14 @@ void Player::Calc()
 		m_Obj[i].Calc();
 	}
 
+	// 影の更新
+	{
+		Vector3 pos = m_Obj[0].GetTrans();
+		pos.y = 0.4f;
+		m_ObjShadow.SetTrans(pos);
+		m_ObjShadow.Calc();
+	}
+
 	m_CollisionNodeBody.Update();
 	// 当たり判定の更新（親の行列更新後に行うこと）
 	m_CollisionNodeBullet.Update();
@@ -449,6 +584,9 @@ void Player::Draw()
 	{
 		m_Obj[i].Draw();
 	}
+
+	// 影を減算描画
+	m_ObjShadow.DrawSubtractive();
 
 	m_CollisionNodeBody.Draw();
 	// 当たり判定のデバッグ表示
@@ -572,8 +710,6 @@ void Player::FireBullet()
 	// 既に発射中
 	if (m_FireFlag)	return;
 
-	m_FireFlag = true;
-
 	// 親子関係を加味したワールド座標を取得
 	Matrix worldm = m_Obj[PARTS_GUN_R].GetLocalWorld();
 
@@ -605,13 +741,30 @@ void Player::FireBullet()
 	m_Obj[PARTS_GUN_R].SetRotQ(rotq);
 	m_Obj[PARTS_GUN_R].SetTrans(pos);
 
+	const float BULLET_SPEED = 0.5f;
+
 	// 発射する弾丸の速度ベクトル
-	m_BulletVel = Vector3(0, 0.0f,-0.1f);
-	// ベクトルをクォータニオンで回転
-	m_BulletVel = Vector3::Transform(m_BulletVel, rotq);
+	LockOn* lockOn = Game::GetInstance()->GetLockOn();
+	if (lockOn->IsLockOn())
+	{
+		Enemy* enemy = lockOn->SearchLockingEnemy();
+
+		if (enemy == nullptr) return;
+
+		m_BulletVel = enemy->GetTrans() - pos;
+		m_BulletVel.Normalize();
+		m_BulletVel *= BULLET_SPEED;
+	}
+	else
+	{
+		m_BulletVel = Vector3(0, 0.0f, -BULLET_SPEED);
+		// ベクトルをクォータニオンで回転
+		m_BulletVel = Vector3::Transform(m_BulletVel, rotq);
+	}
 
 	// 自動的に取り付けなおす為のカウントダウン
 	m_FireCount = 120;
+	m_FireFlag = true;
 }
 
 // 弾丸用のパーツをロボットに取り付けなおす

@@ -186,6 +186,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="LockOn.h" />
+    <ClInclude Include="LockOnCamera.h" />
     <ClInclude Include="ModelEffect.h" />
     <ClInclude Include="MouseUtil.h" />
     <ClInclude Include="Obj3D.h" />
@@ -217,6 +219,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="LockOn.cpp" />
+    <ClCompile Include="LockOnCamera.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ModelEffect.cpp" />
     <ClCompile Include="MouseUtil.cpp" />

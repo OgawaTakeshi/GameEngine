@@ -13,6 +13,8 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+unsigned int Enemy::s_SerialCount = 0;
+
 /*==================================
 目的の角度への最短角度を取得（ラジアン）
 
@@ -48,6 +50,9 @@ Enemy::Enemy()
 : m_cycle(0.0f)
 , m_Death(false)
 {
+	// 敵共通の通し番号を振る
+	m_Serial = s_SerialCount++;
+
 	m_Timer = 60;
 }
 
@@ -251,4 +256,16 @@ void Enemy::Draw()
 		DX::DeviceResources::GetInstance()->GetSpriteBatch()->Draw(m_texture.Get(), m_screenPos, nullptr, Colors::White,
 			0.f, m_origin, 0.2f);
 	}
+}
+
+const DirectX::SimpleMath::Vector3 & Enemy::GetTrans()
+{
+	// ベースパーツの座標を返す
+	return m_Obj[0].GetTrans();
+}
+
+void Enemy::SetTrans(const DirectX::SimpleMath::Vector3 & trans)
+{
+	// ベースパーツの座標を設定
+	m_Obj[0].SetTrans(trans);
 }

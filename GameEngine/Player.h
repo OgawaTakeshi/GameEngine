@@ -16,7 +16,6 @@
 #include "CollisionNode.h"
 #include "LandShape.h"
 
-
 // 自機
 class Player
 {
@@ -46,6 +45,8 @@ public:
 	~Player();
 	// 初期化
 	void Initialize();
+	void ControlNormal();
+	void ControlLockOn();
 	// 毎フレーム更新
 	void Update();
 	// 行列の計算
@@ -84,6 +85,9 @@ protected:
 	// メンバ変数
 	// ロボットの構成パーツ
 	std::vector<Obj3D>	m_Obj;
+
+	// 影
+	Obj3D m_ObjShadow;
 	// ギミックの稼動サイクル
 	float m_cycle;
 

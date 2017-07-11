@@ -15,6 +15,9 @@
 
 class Enemy
 {
+private:
+	// 通し番号カウント
+	static unsigned int s_SerialCount;
 public:
 	// パーツ
 	// 自機パーツ
@@ -41,6 +44,11 @@ public:
 	// 描画
 	void Draw();
 
+	// 座標を取得
+	const DirectX::SimpleMath::Vector3& GetTrans();
+	// 座標を設定
+	void SetTrans(const DirectX::SimpleMath::Vector3& trans);
+
 	// 弾丸の当たり判定球を取得
 	const SphereNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
 
@@ -48,8 +56,12 @@ public:
 	void SetDeath()	{ m_Death = true; }
 	bool GetDeath() { return m_Death; }
 
+	unsigned int GetSerial() { return m_Serial; }
+
 protected:
 	// メンバ変数
+	// シリアルナンバー
+	unsigned int m_Serial;
 	// ３Ｄオブジェクト
 	std::vector<Obj3D>	m_Obj;
 

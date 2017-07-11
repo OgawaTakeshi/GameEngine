@@ -34,7 +34,7 @@ FollowCamera::~FollowCamera()
 /**
 *	@brief XV
 */
-void FollowCamera::Update()
+void FollowCamera::Update(bool interpolate)
 {
 	SetTargetPos(m_Target->GetTrans());
 	const Matrix& targetWorld = m_Target->GetLocalWorld();
@@ -54,8 +54,11 @@ void FollowCamera::Update()
 	Vector3 eyeposPre = GetEyepos();
 	Vector3 refposPre = GetRefpos();
 
-	eyepos = eyeposPre + (eyepos - eyeposPre) * 0.05f;
-	refpos = refposPre + (refpos - refposPre) * 0.20f;
+	if (interpolate)
+	{
+		eyepos = eyeposPre + (eyepos - eyeposPre) * 0.05f;
+		refpos = refposPre + (refpos - refposPre) * 0.20f;
+	}
 
 	SetEyepos(eyepos);
 	SetRefpos(refpos);
