@@ -1,11 +1,11 @@
-/**
+ï»¿/**
 *	@file	Player.h
 *
-*	@brief	©‹@
+*	@brief	è‡ªæ©Ÿ
 *
 *	@date	2015/05/08
 *
-*	@author	“¡àV@L¡
+*	@author	è—¤æ¾¤ã€€ä¼¸æ²»
 */
 #pragma once
 
@@ -16,63 +16,71 @@
 #include "CollisionNode.h"
 #include "LandShape.h"
 
-// ©‹@
+// è‡ªæ©Ÿ
 class Player
 {
 public:
-	// ƒƒ{ƒbƒgƒp[ƒc
+	// ãƒ­ãƒœãƒƒãƒˆãƒ‘ãƒ¼ãƒ„
 	enum
 	{
-		PARTS_TANK,		// ƒLƒƒƒ^ƒsƒ‰
-		PARTS_WAIST,	// ˜
-		PARTS_BREAST,	// ‹¹
-		PARTS_HEAD,		// “ª
-		PARTS_ARM_R,	// ‰E˜r
-		PARTS_GUN_R,	// ‰E‚Ìe
+		PARTS_TANK,		// ã‚­ãƒ£ã‚¿ãƒ”ãƒ©
+		PARTS_WAIST,	// è…°
+		PARTS_BREAST,	// èƒ¸
+		PARTS_HEAD,		// é ­
+		PARTS_ARM_R,	// å³è…•
+		PARTS_GUN_R,	// å³ã®éŠƒ
 
 		PARTS_NUM
 	};
 
-	// ƒWƒƒƒ“ƒv‰‘¬
+	// ã‚¸ãƒ£ãƒ³ãƒ—åˆé€Ÿ
 	static const float JUMP_SPEED_FIRST;
 	static const float JUMP_SPEED_MAX;
-	// d—Í‰Á‘¬
+	// é‡åŠ›åŠ é€Ÿ
 	static const float GRAVITY_ACC;
+	// å½±ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ
+	const float SHADOW_OFFSET = 0.08f;
+	// è¶³å…ƒã‹ã‚‰å½±ã¾ã§ã®æœ€å¤§è·é›¢
+	const float SHADOW_DISTANCE = 30.0f;
+	// è¶³å…ƒã‹ã‚‰ä½•ãƒ¡ãƒ¼ãƒˆãƒ«ä¸Šã¾ã§å‚ç›´æ–¹å‘ã®å½“ãŸã‚Šã‚’ã¨ã‚‹ã‹
+	const float SEGMENT_LENGTH = 1.0f;
+	// è¶³å…ƒã‹ã‚‰ä½•ãƒ¡ãƒ¼ãƒˆãƒ«ä¸‹ã¾ã§å¸ç€ã‚’è¡Œã†ã‹
+	const float ADSORP_LENGTH = 0.5f;
 
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	Player();
-	// ƒfƒXƒgƒ‰ƒNƒ^
+	// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	~Player();
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize();
 	void ControlNormal();
 	void ControlLockOn();
-	// –ˆƒtƒŒ[ƒ€XV
+	// æ¯ãƒ•ãƒ¬ãƒ¼ãƒ æ›´æ–°
 	void Update();
-	// s—ñ‚ÌŒvZ
+	// è¡Œåˆ—ã®è¨ˆç®—
 	void Calc();
-	// •`‰æ
+	// æç”»
 	void Draw();
-	// À•W‚ğæ“¾
+	// åº§æ¨™ã‚’å–å¾—
 	const DirectX::SimpleMath::Vector3& GetTrans();
-	// À•W‚ğİ’è
+	// åº§æ¨™ã‚’è¨­å®š
 	void SetTrans(const DirectX::SimpleMath::Vector3& trans);
-	// ‰ñ“]‚ğİ’è
+	// å›è»¢ã‚’è¨­å®š
 	void SetRot(const DirectX::SimpleMath::Vector3& rot);
-	// ƒ[ƒ‹ƒhs—ñ‚ğæ“¾
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’å–å¾—
 	const DirectX::SimpleMath::Matrix& GetLocalWorld();
 	void Load();
-	// –{‘Ì‚Ì’nŒ`“–‚½‚è”»’è‹…‚ğæ“¾
+	// æœ¬ä½“ã®åœ°å½¢å½“ãŸã‚Šåˆ¤å®šçƒã‚’å–å¾—
 	const SphereNode& GetCollisionNodeBody() { return m_CollisionNodeBody; }
-	// ’eŠÛ‚Ì“–‚½‚è”»’èƒJƒvƒZƒ‹‚ğæ“¾
+	// å¼¾ä¸¸ã®å½“ãŸã‚Šåˆ¤å®šã‚«ãƒ—ã‚»ãƒ«ã‚’å–å¾—
 	const SphereNode& GetCollisionNodeBullet() { return m_CollisionNodeBullet; }
 
-	// ”­Ë
+	// ç™ºå°„
 	void FireBullet();
-	// –ß‚·
+	// æˆ»ã™
 	void ResetBullet();
 
-	// À•W‚ğæ“¾
+	// åº§æ¨™ã‚’å–å¾—
 	const DirectX::SimpleMath::Vector3& GetVelocity() { return m_Velocity; }
 
 	void StartJump();
@@ -82,29 +90,29 @@ public:
 	void SetLandShapeArray(std::vector<std::unique_ptr<LandShape>>*	pLandShapeArray) { m_pLandShapeArray = pLandShapeArray; }
 
 protected:
-	// ƒƒ“ƒo•Ï”
-	// ƒƒ{ƒbƒg‚Ì\¬ƒp[ƒc
+	// ãƒ¡ãƒ³ãƒå¤‰æ•°
+	// ãƒ­ãƒœãƒƒãƒˆã®æ§‹æˆãƒ‘ãƒ¼ãƒ„
 	std::vector<Obj3D>	m_Obj;
 
-	// ‰e
+	// å½±
 	Obj3D m_ObjShadow;
-	// ƒMƒ~ƒbƒN‚Ì‰Ò“®ƒTƒCƒNƒ‹
+	// ã‚®ãƒŸãƒƒã‚¯ã®ç¨¼å‹•ã‚µã‚¤ã‚¯ãƒ«
 	float m_cycle;
 
 	bool m_FireFlag;
 	int m_FireCount;
 	DirectX::SimpleMath::Vector3 m_BulletVel;
 
-	// –{‘Ì‚Ì’nŒ`“–‚½‚è”»’è‹…
+	// æœ¬ä½“ã®åœ°å½¢å½“ãŸã‚Šåˆ¤å®šçƒ
 	SphereNode m_CollisionNodeBody;
 
-	// ’eŠÛ‚Ì“–‚½‚è”»’è‹…
+	// å¼¾ä¸¸ã®å½“ãŸã‚Šåˆ¤å®šçƒ
 	SphereNode m_CollisionNodeBullet;
 
-	// ‘¬“x
+	// é€Ÿåº¦
 	DirectX::SimpleMath::Vector3 m_Velocity;
 
-	// ƒWƒƒƒ“ƒvi—‰ºj’†‚©H
+	// ã‚¸ãƒ£ãƒ³ãƒ—ï¼ˆè½ä¸‹ï¼‰ä¸­ã‹ï¼Ÿ
 	bool m_isJump;
 
 	std::vector<std::unique_ptr<LandShape>>*	m_pLandShapeArray;

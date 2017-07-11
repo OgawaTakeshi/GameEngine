@@ -49,7 +49,7 @@ void FollowCamera::Update(bool interpolate)
 	//Matrix rotmat = Matrix::CreateRotationY(m_TargetAngle);
 	cameraV = Vector3::TransformNormal(cameraV, targetWorld);
 
-	eyepos = refpos + cameraV;
+	eyepos = refpos + cameraV + Vector3(0,10,0);
 
 	Vector3 eyeposPre = GetEyepos();
 	Vector3 refposPre = GetRefpos();

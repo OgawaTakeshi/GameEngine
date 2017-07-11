@@ -1,8 +1,8 @@
-//--------------------------------------------------------------------------------------
-// ƒtƒ@ƒCƒ‹–¼: Player.cpp
-// ì¬Ò:
-// ì¬“ú:
-// à–¾:
+ï»¿//--------------------------------------------------------------------------------------
+// ãƒ•ã‚¡ã‚¤ãƒ«å: Player.cpp
+// ä½œæˆè€…:
+// ä½œæˆæ—¥:
+// èª¬æ˜:
 //--------------------------------------------------------------------------------------
 
 #include "Player.h"
@@ -17,8 +17,8 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 using namespace std;
 
-const float Player::GRAVITY_ACC = 0.03f;
-const float Player::JUMP_SPEED_FIRST = 0.5f;
+const float Player::GRAVITY_ACC = 0.02f;
+const float Player::JUMP_SPEED_FIRST = 0.8f;
 const float Player::JUMP_SPEED_MAX = 0.3f;
 
 Player::Player()
@@ -34,7 +34,7 @@ Player::~Player()
 }
 
 //-----------------------------------------------------------------------------
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //-----------------------------------------------------------------------------
 void Player::Initialize()
 {
@@ -49,84 +49,84 @@ void Player::Initialize()
 	m_CollisionNodeBody.SetLocalRadius(1.0f);
 	m_CollisionNodeBody.SetTrans(Vector3(0, 1.0f, 0));
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	m_CollisionNodeBullet.Initialize();
-	// es—ñ‚ğİ’è
+	// è¦ªè¡Œåˆ—ã‚’è¨­å®š
 	m_CollisionNodeBullet.SetParent(&m_Obj[PARTS_GUN_R]);
-	// ”¼Œa
+	// åŠå¾„
 	m_CollisionNodeBullet.SetLocalRadius(0.3f);
-	// es—ñ‚©‚ç‚ÌˆÊ’u
+	// è¦ªè¡Œåˆ—ã‹ã‚‰ã®ä½ç½®
 	m_CollisionNodeBullet.SetTrans(Vector3(0, 0, 0));
 
 	m_isJump = false;
 
 	m_ObjShadow.LoadModelFile(L"Resources/shadow.cmo");
-	m_ObjShadow.SetTrans(Vector3(0, -0.4f, 0));
+	m_ObjShadow.SetTrans(Vector3(0, SHADOW_OFFSET, 0));
 }
 
 /// <summary>
-/// ’ÊíƒJƒƒ‰‚Å‚Ì‘€ì
+/// é€šå¸¸ã‚«ãƒ¡ãƒ©ã§ã®æ“ä½œ
 /// </summary>
 void Player::ControlNormal()
 {
 	KeyboardUtil* key = DX::DeviceResources::GetInstance()->GetKeyboardUtil();
 
-	// ‘Oi/Œã‘Ş
+	// å‰é€²/å¾Œé€€
 	if (key->IsPressed(Keyboard::Keys::W))
 	{
-		// Œ»İ‚ÌÀ•WE‰ñ“]Šp‚ğæ“¾
+		// ç¾åœ¨ã®åº§æ¨™ãƒ»å›è»¢è§’ã‚’å–å¾—
 		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
 		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// ˆÚ“®ƒxƒNƒgƒ‹(ZÀ•W‘Oi)
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«(Zåº§æ¨™å‰é€²)
 		SimpleMath::Vector3 moveV(0, 0, -0.1f);
 		Matrix rotm = Matrix::CreateRotationY(rot_y);
-		// ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰ñ“]‚·‚é
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’å›è»¢ã™ã‚‹
 		moveV = Vector3::TransformNormal(moveV, rotm);
-		// ˆÚ“®
+		// ç§»å‹•
 		trans += moveV;
-		// ˆÚ“®‚µ‚½À•W‚ğ”½‰f
+		// ç§»å‹•ã—ãŸåº§æ¨™ã‚’åæ˜ 
 		m_Obj[PARTS_TANK].SetTrans(trans);
 	}
 	if (key->IsPressed(Keyboard::Keys::S))
 	{
-		// Œ»İ‚ÌÀ•WE‰ñ“]Šp‚ğæ“¾
+		// ç¾åœ¨ã®åº§æ¨™ãƒ»å›è»¢è§’ã‚’å–å¾—
 		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
 		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// ˆÚ“®ƒxƒNƒgƒ‹(ZÀ•WŒã‘Ş)
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«(Zåº§æ¨™å¾Œé€€)
 		Vector3 moveV(0, 0, +0.1f);
 		Matrix rotm = Matrix::CreateRotationY(rot_y);
-		// ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰ñ“]‚·‚é
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’å›è»¢ã™ã‚‹
 		moveV = Vector3::TransformNormal(moveV, rotm);
-		// ˆÚ“®
+		// ç§»å‹•
 		trans += moveV;
-		// ˆÚ“®‚µ‚½À•W‚ğ”½‰f
+		// ç§»å‹•ã—ãŸåº§æ¨™ã‚’åæ˜ 
 		m_Obj[PARTS_TANK].SetTrans(trans);
 	}
 
-	// ‚PƒtƒŒ[ƒ€‚Å‚Ìù‰ñ‘¬“x<ƒ‰ƒWƒAƒ“>
+	// ï¼‘ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã®æ—‹å›é€Ÿåº¦<ãƒ©ã‚¸ã‚¢ãƒ³>
 	const float ROT_SPEED = 0.03f;
 
-	// ©‰ñ“]/¨‰ñ“]
+	// â†å›è»¢/â†’å›è»¢
 	if (key->IsPressed(Keyboard::Keys::A))
 	{
-		// Œ»İ‚ÌŠp“x‚ğæ“¾
+		// ç¾åœ¨ã®è§’åº¦ã‚’å–å¾—
 		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
 		rot.y += ROT_SPEED;
-		// ‰ñ“]Œã‚ÌŠp“x‚ğ”½‰f
+		// å›è»¢å¾Œã®è§’åº¦ã‚’åæ˜ 
 		m_Obj[PARTS_TANK].SetRot(rot);
 	}
 	if (key->IsPressed(Keyboard::Keys::D))
 	{
-		// Œ»İ‚ÌŠp“x‚ğæ“¾
+		// ç¾åœ¨ã®è§’åº¦ã‚’å–å¾—
 		Vector3 rot = m_Obj[PARTS_TANK].GetRot();
 		rot.y -= ROT_SPEED;
-		// ‰ñ“]Œã‚ÌŠp“x‚ğ”½‰f
+		// å›è»¢å¾Œã®è§’åº¦ã‚’åæ˜ 
 		m_Obj[PARTS_TANK].SetRot(rot);
 	}
 }
 
 /// <summary>
-/// ƒƒbƒNƒIƒ“‘€ì
+/// ãƒ­ãƒƒã‚¯ã‚ªãƒ³æ™‚æ“ä½œ
 /// </summary>
 void Player::ControlLockOn()
 {
@@ -139,99 +139,99 @@ void Player::ControlLockOn()
 	Enemy* enemy = lockOn->SearchLockingEnemy();
 	if (enemy == nullptr) return;
 
-	// ƒƒbƒNƒIƒ“‘ÎÛ•ûŒü‚ğŒü‚­
+	// ãƒ­ãƒƒã‚¯ã‚ªãƒ³å¯¾è±¡æ–¹å‘ã‚’å‘ã
 	{
 		Vector3 player2enemy = enemy->GetTrans() - this->GetTrans();
 
 		float rotY = atan2f(-player2enemy.x, -player2enemy.z);
-		// ‰ñ“]Œã‚ÌŠp“x‚ğ”½‰f
+		// å›è»¢å¾Œã®è§’åº¦ã‚’åæ˜ 
 		m_Obj[PARTS_TANK].SetRot(Vector3(0, rotY, 0));
 	}
 
-	// ‘Oi/Œã‘Ş
+	// å‰é€²/å¾Œé€€
 	if (key->IsPressed(Keyboard::Keys::W))
 	{
-		// Œ»İ‚ÌÀ•WE‰ñ“]Šp‚ğæ“¾
+		// ç¾åœ¨ã®åº§æ¨™ãƒ»å›è»¢è§’ã‚’å–å¾—
 		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
 		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// ˆÚ“®ƒxƒNƒgƒ‹(ZÀ•W‘Oi)
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«(Zåº§æ¨™å‰é€²)
 		SimpleMath::Vector3 moveV(0, 0, -0.1f);
 		Matrix rotm = Matrix::CreateRotationY(rot_y);
-		// ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰ñ“]‚·‚é
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’å›è»¢ã™ã‚‹
 		moveV = Vector3::TransformNormal(moveV, rotm);
-		// ˆÚ“®
+		// ç§»å‹•
 		trans += moveV;
-		// ˆÚ“®‚µ‚½À•W‚ğ”½‰f
+		// ç§»å‹•ã—ãŸåº§æ¨™ã‚’åæ˜ 
 		m_Obj[PARTS_TANK].SetTrans(trans);
 	}
 	if (key->IsPressed(Keyboard::Keys::S))
 	{
-		// Œ»İ‚ÌÀ•WE‰ñ“]Šp‚ğæ“¾
+		// ç¾åœ¨ã®åº§æ¨™ãƒ»å›è»¢è§’ã‚’å–å¾—
 		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
 		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// ˆÚ“®ƒxƒNƒgƒ‹(ZÀ•WŒã‘Ş)
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«(Zåº§æ¨™å¾Œé€€)
 		Vector3 moveV(0, 0, +0.1f);
 		Matrix rotm = Matrix::CreateRotationY(rot_y);
-		// ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰ñ“]‚·‚é
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’å›è»¢ã™ã‚‹
 		moveV = Vector3::TransformNormal(moveV, rotm);
-		// ˆÚ“®
+		// ç§»å‹•
 		trans += moveV;
-		// ˆÚ“®‚µ‚½À•W‚ğ”½‰f
+		// ç§»å‹•ã—ãŸåº§æ¨™ã‚’åæ˜ 
 		m_Obj[PARTS_TANK].SetTrans(trans);
 	}
 
-	// ¶‰EˆÚ“®
+	// å·¦å³ç§»å‹•
 	if (key->IsPressed(Keyboard::Keys::A))
 	{
-		// Œ»İ‚ÌÀ•WE‰ñ“]Šp‚ğæ“¾
+		// ç¾åœ¨ã®åº§æ¨™ãƒ»å›è»¢è§’ã‚’å–å¾—
 		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
 		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// ˆÚ“®ƒxƒNƒgƒ‹(ZÀ•W‘Oi)
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«(Zåº§æ¨™å‰é€²)
 		SimpleMath::Vector3 moveV(-0.1f, 0, 0);
 		Matrix rotm = Matrix::CreateRotationY(rot_y);
-		// ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰ñ“]‚·‚é
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’å›è»¢ã™ã‚‹
 		moveV = Vector3::TransformNormal(moveV, rotm);
-		// ˆÚ“®
+		// ç§»å‹•
 		trans += moveV;
-		// ˆÚ“®‚µ‚½À•W‚ğ”½‰f
+		// ç§»å‹•ã—ãŸåº§æ¨™ã‚’åæ˜ 
 		m_Obj[PARTS_TANK].SetTrans(trans);
 	}
 	if (key->IsPressed(Keyboard::Keys::D))
 	{
-		// Œ»İ‚ÌÀ•WE‰ñ“]Šp‚ğæ“¾
+		// ç¾åœ¨ã®åº§æ¨™ãƒ»å›è»¢è§’ã‚’å–å¾—
 		Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
 		float rot_y = m_Obj[PARTS_TANK].GetRot().y;
-		// ˆÚ“®ƒxƒNƒgƒ‹(ZÀ•W‘Oi)
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«(Zåº§æ¨™å‰é€²)
 		SimpleMath::Vector3 moveV(0.1f, 0, 0);
 		Matrix rotm = Matrix::CreateRotationY(rot_y);
-		// ˆÚ“®ƒxƒNƒgƒ‹‚ğ‰ñ“]‚·‚é
+		// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«ã‚’å›è»¢ã™ã‚‹
 		moveV = Vector3::TransformNormal(moveV, rotm);
-		// ˆÚ“®
+		// ç§»å‹•
 		trans += moveV;
-		// ˆÚ“®‚µ‚½À•W‚ğ”½‰f
+		// ç§»å‹•ã—ãŸåº§æ¨™ã‚’åæ˜ 
 		m_Obj[PARTS_TANK].SetTrans(trans);
 	}
 }
 
 //-----------------------------------------------------------------------------
-// XV
+// æ›´æ–°
 //-----------------------------------------------------------------------------
 void Player::Update()
 {
 	KeyboardUtil* key = DX::DeviceResources::GetInstance()->GetKeyboardUtil();
 
-	// ƒƒbƒNƒIƒ“Ø‚è‘Ö‚¦ƒ{ƒ^ƒ“
+	// ãƒ­ãƒƒã‚¯ã‚ªãƒ³åˆ‡ã‚Šæ›¿ãˆãƒœã‚¿ãƒ³
 	if (key->IsTriggered(Keyboard::Keys::Enter))
 	{
 		LockOn* lockOn = Game::GetInstance()->GetLockOn();
 		if (lockOn->IsLockOn())
 		{
-			// ƒƒbƒNƒIƒ“I—¹
+			// ãƒ­ãƒƒã‚¯ã‚ªãƒ³çµ‚äº†
 			lockOn->End();
 		}
 		else
 		{
-			// ƒƒbƒNƒIƒ“ŠJn
+			// ãƒ­ãƒƒã‚¯ã‚ªãƒ³é–‹å§‹
 			lockOn->Start();
 		}
 	}
@@ -263,30 +263,30 @@ void Player::Update()
 		ControlNormal();
 	}
 
-	// ã¸/‰º~
+	// ä¸Šæ˜‡/ä¸‹é™
 	//if (m_pInputManager->GetKeyboard()->IsKeyDown(VK_UP))
 	//{
-	//	// Œ»İ‚ÌÀ•WE‰ñ“]Šp‚ğæ“¾
+	//	// ç¾åœ¨ã®åº§æ¨™ãƒ»å›è»¢è§’ã‚’å–å¾—
 	//	Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
-	//	// ˆÚ“®ƒxƒNƒgƒ‹(ã¸)
+	//	// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«(ä¸Šæ˜‡)
 	//	SimpleMath::Vector3 moveV(0, 0.1f, 0);
 	//	trans += moveV;
-	//	// ˆÚ“®‚µ‚½À•W‚ğ”½‰f
+	//	// ç§»å‹•ã—ãŸåº§æ¨™ã‚’åæ˜ 
 	//	m_Obj[PARTS_TANK].SetTrans(trans);
 	//}
 	//if (m_pInputManager->GetKeyboard()->IsKeyDown(VK_DOWN))
 	//{
-	//	// Œ»İ‚ÌÀ•WE‰ñ“]Šp‚ğæ“¾
+	//	// ç¾åœ¨ã®åº§æ¨™ãƒ»å›è»¢è§’ã‚’å–å¾—
 	//	Vector3 trans = m_Obj[PARTS_TANK].GetTrans();
-	//	// ˆÚ“®ƒxƒNƒgƒ‹(ZÀ•WŒã‘Ş)
+	//	// ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«(Zåº§æ¨™å¾Œé€€)
 	//	Vector3 moveV(0, -0.1f, 0);
-	//	// ˆÚ“®
+	//	// ç§»å‹•
 	//	trans += moveV;
-	//	// ˆÚ“®‚µ‚½À•W‚ğ”½‰f
+	//	// ç§»å‹•ã—ãŸåº§æ¨™ã‚’åæ˜ 
 	//	m_Obj[PARTS_TANK].SetTrans(trans);
 	//}
 
-	// ˜‰ñ“]
+	// è…°å›è»¢
 	if (key->IsPressed(Keyboard::Keys::Z))
 	{
 		Vector3 rot = m_Obj[PARTS_WAIST].GetRot();
@@ -300,7 +300,7 @@ void Player::Update()
 		m_Obj[PARTS_WAIST].SetRot(rot);
 	}
 
-	// ‹¹‰ñ“]
+	// èƒ¸å›è»¢
 	if (key->IsPressed(Keyboard::Keys::C))
 	{
 		Vector3 rot = m_Obj[PARTS_BREAST].GetRot();
@@ -314,7 +314,7 @@ void Player::Update()
 		m_Obj[PARTS_BREAST].SetRot(rot);
 	}
 
-	// “ª¶‰E‰ñ“]
+	// é ­å·¦å³å›è»¢
 	if (key->IsPressed(Keyboard::Keys::U))
 	{
 		Vector3 rot = m_Obj[PARTS_HEAD].GetRot();
@@ -328,7 +328,7 @@ void Player::Update()
 		m_Obj[PARTS_HEAD].SetRot(rot);
 	}
 
-	// “ªã‰º‰ñ“]
+	// é ­ä¸Šä¸‹å›è»¢
 	if (key->IsPressed(Keyboard::Keys::O))
 	{
 		Vector3 rot = m_Obj[PARTS_HEAD].GetRot();
@@ -350,7 +350,7 @@ void Player::Update()
 		m_Obj[PARTS_HEAD].SetRot(rot);
 	}
 
-	// ˜r¶‰E‰ñ“]
+	// è…•å·¦å³å›è»¢
 	if (key->IsPressed(Keyboard::Keys::D7))
 	{
 		Vector3 rot = m_Obj[PARTS_ARM_R].GetRot();
@@ -372,7 +372,7 @@ void Player::Update()
 		m_Obj[PARTS_ARM_R].SetRot(rot);
 	}
 
-	// ˜rã‰º‰ñ“]
+	// è…•ä¸Šä¸‹å›è»¢
 	if (key->IsPressed(Keyboard::Keys::D9))
 	{
 		Vector3 rot = m_Obj[PARTS_ARM_R].GetRot();
@@ -394,7 +394,7 @@ void Player::Update()
 		m_Obj[PARTS_ARM_R].SetRot(rot);
 	}
 
-	// e¶‰E‰ñ“]
+	// éŠƒå·¦å³å›è»¢
 	if (key->IsPressed(Keyboard::Keys::J))
 	{
 		Vector3 rot = m_Obj[PARTS_GUN_R].GetRot();
@@ -416,11 +416,11 @@ void Player::Update()
 		m_Obj[PARTS_GUN_R].SetRot(rot);
 	}
 
-	// ƒƒ“ƒo•Ï”‚ÅƒTƒCƒ“—p‚ÌŠp“x‚ğ‰ÁZ‚µ‘±‚¯‚é
+	// ãƒ¡ãƒ³ãƒå¤‰æ•°ã§ã‚µã‚¤ãƒ³ç”¨ã®è§’åº¦ã‚’åŠ ç®—ã—ç¶šã‘ã‚‹
 	m_cycle += 0.1f;
-	// 1 + (-1~+1)‚Ì”ÍˆÍ@‚Â‚Ü‚è(0~2)”{‚ÌƒXƒP[ƒŠƒ“ƒO‚Å•Ï“®
+	// 1 + (-1~+1)ã®ç¯„å›²ã€€ã¤ã¾ã‚Š(0~2)å€ã®ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã§å¤‰å‹•
 	float scale = 1.0f + sinf(m_cycle);
-	// ƒp[ƒc‚ÉƒXƒP[ƒŠƒ“ƒO‚Ì”’l‚ğİ’è‚·‚é
+	// ãƒ‘ãƒ¼ãƒ„ã«ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã®æ•°å€¤ã‚’è¨­å®šã™ã‚‹
 	m_Obj[PARTS_HEAD].SetScale(Vector3(scale));
 
 	if (key->IsTriggered(Keyboard::Keys::E))
@@ -431,19 +431,19 @@ void Player::Update()
 		}
 		else
 		{
-			// ”­Ë
+			// ç™ºå°„
 			FireBullet();
 		}
 	}
 
 	if (m_FireFlag)
 	{
-		// Œ»İ‚ÌÀ•W‚ğæ“¾
+		// ç¾åœ¨ã®åº§æ¨™ã‚’å–å¾—
 		Vector3 trans = m_Obj[PARTS_GUN_R].GetTrans();
 
 		trans += m_BulletVel;
 		
-		// ˆÚ“®‚µ‚½À•W‚ğ”½‰f
+		// ç§»å‹•ã—ãŸåº§æ¨™ã‚’åæ˜ 
 		m_Obj[PARTS_GUN_R].SetTrans(trans);
 
 		if (--m_FireCount < 0)
@@ -452,10 +452,10 @@ void Player::Update()
 		}
 	}
 
-	// ˆÚ“®‚ğ”½‰f‚µ‚Äs—ñXV
+	// ç§»å‹•ã‚’åæ˜ ã—ã¦è¡Œåˆ—æ›´æ–°
 	Calc();
 
-	// …•½•ûŒü‚ ‚½‚è”»’è
+	// æ°´å¹³æ–¹å‘ã‚ãŸã‚Šåˆ¤å®š
 	{
 		Sphere sphere = GetCollisionNodeBody();
 		Vector3 trans = GetTrans();
@@ -471,11 +471,11 @@ void Player::Update()
 		{
 			LandShape* pLandShape = it->get();
 
-			Vector3 reject;	// ”rËƒxƒNƒgƒ‹‚ğ“ü‚ê‚é‚½‚ß‚Ì•Ï”
+			Vector3 reject;	// æ’æ–¥ãƒ™ã‚¯ãƒˆãƒ«ã‚’å…¥ã‚Œã‚‹ãŸã‚ã®å¤‰æ•°
 
 			if (pLandShape->IntersectSphere(sphere, &reject))
 			{
-				// ‚ß‚è‚İ•ª‚¾‚¯A‹…‚ğ‰Ÿ‚µo‚·‚æ‚¤‚ÉˆÚ“®
+				// ã‚ã‚Šè¾¼ã¿åˆ†ã ã‘ã€çƒã‚’æŠ¼ã—å‡ºã™ã‚ˆã†ã«ç§»å‹•
 				sphere.center = sphere.center + reject;
 				if (++rejectNum >= REPEAT_LIMIT)
 				{
@@ -494,55 +494,78 @@ void Player::Update()
 		Calc();
 	}
 
-	// ‚’¼•ûŒü’nŒ`‚ ‚½‚è”»’è
+	// å½±ã®æ›´æ–°
+	{
+		Vector3 pos = m_Obj[0].GetTrans();
+		pos.y = SHADOW_OFFSET;
+		m_ObjShadow.SetTrans(pos);
+	}
+
+	// å‚ç›´æ–¹å‘åœ°å½¢ã‚ãŸã‚Šåˆ¤å®š
 	{
 		const Vector3& vel = GetVelocity();
+		
+		bool hit = false;
+		Segment player_segment;
+		Vector3 player_pos = GetTrans();
+		player_segment.start = player_pos + Vector3(0, SEGMENT_LENGTH, 0);
+		// å½±ã®ä½ç½®ã‚’æ¤œå‡ºã™ã‚‹ãŸã‚ã€è¶³å…ƒã‹ã‚‰ä¸‹æ–¹å‘ã«ä½™è£•ã‚’ã‚‚ã£ã¦åˆ¤å®šã‚’å–ã‚‹
+		player_segment.end = player_pos + Vector3(0, -SHADOW_DISTANCE, 0);
 
-		if (vel.y <= 0.0f)
+		// å¤§ãã„æ•°å­—ã§åˆæœŸåŒ–
+		float distance = 1.0e5;
+		Vector3 inter;
+
+		for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray->begin();
+			it != m_pLandShapeArray->end();
+			it++)
 		{
-			bool hit = false;
-			Segment player_segment;
-			Vector3 player_pos = GetTrans();
-			player_segment.start = player_pos + Vector3(0, 1.0f, 0);
-			player_segment.end = player_pos + Vector3(0, -0.5f, 0);
+			LandShape* pLandShape = it->get();
+			float temp_distance;
+			Vector3 temp_inter;
 
-			// ‘å‚«‚¢”š‚Å‰Šú‰»
-			float distance = 1.0e5;
-			Vector3 inter;
-
-			for (std::vector<std::unique_ptr<LandShape>>::iterator it = m_pLandShapeArray->begin();
-				it != m_pLandShapeArray->end();
-				it++)
+			// åºŠé¢ã¨ã®å½“ãŸã‚Šã‚’åˆ¤å®š
+			if (pLandShape->IntersectSegmentFloor(player_segment, &temp_inter))
 			{
-				LandShape* pLandShape = it->get();
-				float temp_distance;
-				Vector3 temp_inter;
-
-				// °–Ê‚Æ‚Ì“–‚½‚è‚ğ”»’è
-				if (pLandShape->IntersectSegmentFloor(player_segment, &temp_inter))
+				hit = true;
+				temp_distance = Vector3::Distance(player_segment.start, temp_inter);
+				if (temp_distance < distance)
 				{
-					hit = true;
-					temp_distance = Vector3::Distance(player_segment.start, temp_inter);
-					if (temp_distance < distance)
-					{
-						inter = temp_inter;
-						distance = temp_distance;
-					}
+					inter = temp_inter;
+					distance = temp_distance;
 				}
 			}
+		}
 
-			if (hit)
+		bool landing = false;
+		// ãƒ’ãƒƒãƒˆ
+		if (hit)
+		{
+			// é€Ÿåº¦ãŒä¸Šå‘ãã§ãªã„ï¼Ÿ
+			if (vel.y <= 0.0f)
 			{
-				Vector3 new_position = player_pos;
-				new_position.y = inter.y;
-				StopJump();
-				SetTrans(new_position);
+				// å¸ç€è·é›¢ã®ç¯„å›²å†…ã‹ï¼Ÿ
+				if (distance <= SEGMENT_LENGTH + ADSORP_LENGTH)
+				{
+					// ç€åœ°
+					landing = true;
+					Vector3 new_position = player_pos;
+					new_position.y = inter.y;
+					StopJump();
+					SetTrans(new_position);
+				}
 			}
+				
+			// å½±ã®ä½ç½®æ›´æ–°
+			Vector3 shadow_pos = player_pos;
+			shadow_pos.y = inter.y + SHADOW_OFFSET;
+			m_ObjShadow.SetTrans(shadow_pos);
+		}
 
-			if (!hit)
-			{// —‰ºŠJn
-				StartFall();
-			}
+		// ç€åœ°ã§ãªã‘ã‚Œã°
+		if (!landing)
+		{// è½ä¸‹é–‹å§‹
+			StartFall();
 		}
 
 		Calc();
@@ -551,69 +574,64 @@ void Player::Update()
 }
 
 //-----------------------------------------------------------------------------
-// s—ñXV
+// è¡Œåˆ—æ›´æ–°
 //-----------------------------------------------------------------------------
 void Player::Calc()
 {
-	// ‘Sƒp[ƒc•ªs—ñXV
+	// å…¨ãƒ‘ãƒ¼ãƒ„åˆ†è¡Œåˆ—æ›´æ–°
 	for (int i = 0; i < PARTS_NUM; i++)
 	{
 		m_Obj[i].Calc();
 	}
 
-	// ‰e‚ÌXV
-	{
-		Vector3 pos = m_Obj[0].GetTrans();
-		pos.y = 0.4f;
-		m_ObjShadow.SetTrans(pos);
-		m_ObjShadow.Calc();
-	}
+	// å½±ã®æ›´æ–°
+	m_ObjShadow.Calc();
 
 	m_CollisionNodeBody.Update();
-	// “–‚½‚è”»’è‚ÌXVie‚Ìs—ñXVŒã‚És‚¤‚±‚Æj
+	// å½“ãŸã‚Šåˆ¤å®šã®æ›´æ–°ï¼ˆè¦ªã®è¡Œåˆ—æ›´æ–°å¾Œã«è¡Œã†ã“ã¨ï¼‰
 	m_CollisionNodeBullet.Update();
 }
 
 //-----------------------------------------------------------------------------
-// •`‰æ
+// æç”»
 //-----------------------------------------------------------------------------
 void Player::Draw()
 {
-	// ‘Sƒp[ƒc•ª•`‰æ
+	// å½±ã‚’æ¸›ç®—æç”»
+	m_ObjShadow.DrawSubtractive();
+
+	// å…¨ãƒ‘ãƒ¼ãƒ„åˆ†æç”»
 	for (int i = 0; i < PARTS_NUM; i++)
 	{
 		m_Obj[i].Draw();
 	}
 
-	// ‰e‚ğŒ¸Z•`‰æ
-	m_ObjShadow.DrawSubtractive();
-
 	m_CollisionNodeBody.Draw();
-	// “–‚½‚è”»’è‚ÌƒfƒoƒbƒO•\¦
+	// å½“ãŸã‚Šåˆ¤å®šã®ãƒ‡ãƒãƒƒã‚°è¡¨ç¤º
 	m_CollisionNodeBullet.Draw();
 }
 
 const DirectX::SimpleMath::Vector3& Player::GetTrans()
 {
-	// ƒ^ƒ“ƒNƒp[ƒc‚ÌÀ•W‚ğ•Ô‚·
+	// ã‚¿ãƒ³ã‚¯ãƒ‘ãƒ¼ãƒ„ã®åº§æ¨™ã‚’è¿”ã™
 	return m_Obj[PARTS_TANK].GetTrans();
 }
 
 void Player::SetTrans(const DirectX::SimpleMath::Vector3& trans)
 {
-	// ƒ^ƒ“ƒNƒp[ƒc‚ÌÀ•W‚ğİ’è
+	// ã‚¿ãƒ³ã‚¯ãƒ‘ãƒ¼ãƒ„ã®åº§æ¨™ã‚’è¨­å®š
 	m_Obj[PARTS_TANK].SetTrans(trans);
 }
 
 void Player::SetRot(const DirectX::SimpleMath::Vector3& rot)
 {
-	// ƒ^ƒ“ƒNƒp[ƒc‚ÌÀ•W‚ğİ’è
+	// ã‚¿ãƒ³ã‚¯ãƒ‘ãƒ¼ãƒ„ã®åº§æ¨™ã‚’è¨­å®š
 	m_Obj[PARTS_TANK].SetRot(rot);
 }
 
 const DirectX::SimpleMath::Matrix& Player::GetLocalWorld()
 {
-	// ƒ^ƒ“ƒNƒp[ƒc‚Ìƒ[ƒ‹ƒhs—ñ‚ğ•Ô‚·
+	// ã‚¿ãƒ³ã‚¯ãƒ‘ãƒ¼ãƒ„ã®ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’è¿”ã™
 	return m_Obj[PARTS_TANK].GetLocalWorld();
 }
 
@@ -623,13 +641,13 @@ void Player::Load()
 
 	wstring line;
 
-	// 1s–Ú‚ğƒXƒLƒbƒv
+	// 1è¡Œç›®ã‚’ã‚¹ã‚­ãƒƒãƒ—
 	getline(ifs, line);
 
 	vector<wstring> part_names;
 	vector<wstring> parent_names;
 
-	// –¼•ë‚©‚çƒf[ƒ^‚ğ‰ğÍ
+	// åç°¿ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’è§£æ
 	while (getline(ifs, line)) {
 
 		wstring filepath;
@@ -637,36 +655,36 @@ void Player::Load()
 
 		wchar_t del = L',';
 
-		// ƒJƒ“ƒ}‚ğ‹ó”’‚É’u‚«Š·‚¦
+		// ã‚«ãƒ³ãƒã‚’ç©ºç™½ã«ç½®ãæ›ãˆ
 		std::replace(line.begin(), line.end(), L',', L' ');
 
-		// 1s•ª‚ğ•¶š—ñƒXƒgƒŠ[ƒ€‚É•ÏŠ·
+		// 1è¡Œåˆ†ã‚’æ–‡å­—åˆ—ã‚¹ãƒˆãƒªãƒ¼ãƒ ã«å¤‰æ›
 		wistringstream stream(line);
 
-		// ƒtƒ@ƒCƒ‹–¼‚Ì•¶š—ñ‚ğ“Ç‚İ‚İ
+		// ãƒ•ã‚¡ã‚¤ãƒ«åã®æ–‡å­—åˆ—ã‚’èª­ã¿è¾¼ã¿
 		stream >> filename;
-		// ƒvƒƒWƒFƒNƒg‚ÌŠî“_‚©‚ç‚Ì‘Š‘ÎƒpƒX‚Åƒtƒ@ƒCƒ‹–¼‚ğ•â‚¤
+		// ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã®åŸºç‚¹ã‹ã‚‰ã®ç›¸å¯¾ãƒ‘ã‚¹ã§ãƒ•ã‚¡ã‚¤ãƒ«åã‚’è£œã†
 		filepath = L"Resources/" + filename + L".cmo";
 
 		Obj3D obj;
-		// “Ç‚İ‚Ş
+		// èª­ã¿è¾¼ã‚€
 		obj.LoadModelFile(filepath.c_str());
 
-		// ƒXƒP[ƒŠƒ“ƒO‚Ì“Ç‚İæ‚è
+		// ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã®èª­ã¿å–ã‚Š
 		Vector3 scale;
 		stream >> scale.x;
 		stream >> scale.y;
 		stream >> scale.z;
 		obj.SetScale(scale);
 
-		// Šp“x‚Ì“Ç‚İæ‚è
+		// è§’åº¦ã®èª­ã¿å–ã‚Š
 		Vector3 rotation;
 		stream >> rotation.z;
 		stream >> rotation.x;
 		stream >> rotation.y;
 		obj.SetRot(rotation);
 
-		// À•W‚Ì“Ç‚İæ‚è
+		// åº§æ¨™ã®èª­ã¿å–ã‚Š
 		Vector3 position;
 		stream >> position.x;
 		stream >> position.y;
@@ -684,17 +702,17 @@ void Player::Load()
 		parent_names.push_back(parent_name);
 	}
 
-	// eqŠÖŒW‚Ì‘g‚İ—§‚Ä
+	// è¦ªå­é–¢ä¿‚ã®çµ„ã¿ç«‹ã¦
 	for (int i = 0; i < m_Obj.size(); i++)
 	{
-		// e‚Ìw’è‚ ‚è
+		// è¦ªã®æŒ‡å®šã‚ã‚Š
 		if (parent_names[i].length() > 0)
 		{
 			for (int j = 0; j < m_Obj.size(); j++)
 			{
 				if (j == i) continue;
 
-				// w’è‚Ìe”­Œ©
+				// æŒ‡å®šã®è¦ªç™ºè¦‹
 				if (part_names[j] == parent_names[i])
 				{
 					m_Obj[i].SetParent(&m_Obj[j]);
@@ -704,38 +722,38 @@ void Player::Load()
 	}
 }
 
-// ’eŠÛ—p‚Ìƒp[ƒc‚ğËo‚·‚é
+// å¼¾ä¸¸ç”¨ã®ãƒ‘ãƒ¼ãƒ„ã‚’å°„å‡ºã™ã‚‹
 void Player::FireBullet()
 {
-	// Šù‚É”­Ë’†
+	// æ—¢ã«ç™ºå°„ä¸­
 	if (m_FireFlag)	return;
 
-	// eqŠÖŒW‚ğ‰Á–¡‚µ‚½ƒ[ƒ‹ƒhÀ•W‚ğæ“¾
+	// è¦ªå­é–¢ä¿‚ã‚’åŠ å‘³ã—ãŸãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‚’å–å¾—
 	Matrix worldm = m_Obj[PARTS_GUN_R].GetLocalWorld();
 
 	Vector3 scale;
 	Quaternion rotq;
 	Vector3 pos;
-	// s—ñ‚Ì‚Ps‚¸‚Â‚ğAVector3‚Æ‚µ‚Äˆµ‚¤
+	// è¡Œåˆ—ã®ï¼‘è¡Œãšã¤ã‚’ã€Vector3ã¨ã—ã¦æ‰±ã†
 	Vector3* m0 = (Vector3*)&worldm.m[0];
 	Vector3* m1 = (Vector3*)&worldm.m[1];
 	Vector3* m2 = (Vector3*)&worldm.m[2];
 	Vector3* m3 = (Vector3*)&worldm.m[3];
-	// ƒ[ƒ‹ƒhÀ•W‚ğæ‚èo‚·
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‚’å–ã‚Šå‡ºã™
 	pos = *m3;
-	// ƒ[ƒ‹ƒhƒXƒP[ƒŠƒ“ƒO‚ğæ‚èo‚·
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã‚’å–ã‚Šå‡ºã™
 	scale = Vector3(m0->Length(), m1->Length(), m2->Length());
-	// ƒXƒP[ƒŠƒ“ƒO‚ğ‘Å‚¿Á‚·¦‚±‚ê‚ğ‚â‚ç‚È‚¢‚ÆAƒNƒH[ƒ^ƒjƒIƒ“‚ª³‚µ‚­æ‚ê‚È‚¢
+	// ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°ã‚’æ‰“ã¡æ¶ˆã™â€»ã“ã‚Œã‚’ã‚„ã‚‰ãªã„ã¨ã€ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ãŒæ­£ã—ãå–ã‚Œãªã„
 	m0->Normalize();
 	m1->Normalize();
 	m2->Normalize();
-	// ƒ[ƒ‹ƒh‰ñ“]‚ğæ‚èo‚·
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰å›è»¢ã‚’å–ã‚Šå‡ºã™
 	rotq = Quaternion::CreateFromRotationMatrix(worldm);
 
-	// ˆê”­‚Å‚â‚Á‚Ä‚­‚ê‚éŠÖ”
+	// ä¸€ç™ºã§ã‚„ã£ã¦ãã‚Œã‚‹é–¢æ•°
 	//worldm.Decompose(scale, rotq, pos);
 
-	// eqŠÖŒW‚ğ‰ğœ‚·‚é
+	// è¦ªå­é–¢ä¿‚ã‚’è§£é™¤ã™ã‚‹
 	m_Obj[PARTS_GUN_R].SetParent(nullptr);
 	m_Obj[PARTS_GUN_R].SetScale(scale);
 	m_Obj[PARTS_GUN_R].SetRotQ(rotq);
@@ -743,7 +761,7 @@ void Player::FireBullet()
 
 	const float BULLET_SPEED = 0.5f;
 
-	// ”­Ë‚·‚é’eŠÛ‚Ì‘¬“xƒxƒNƒgƒ‹
+	// ç™ºå°„ã™ã‚‹å¼¾ä¸¸ã®é€Ÿåº¦ãƒ™ã‚¯ãƒˆãƒ«
 	LockOn* lockOn = Game::GetInstance()->GetLockOn();
 	if (lockOn->IsLockOn())
 	{
@@ -758,19 +776,19 @@ void Player::FireBullet()
 	else
 	{
 		m_BulletVel = Vector3(0, 0.0f, -BULLET_SPEED);
-		// ƒxƒNƒgƒ‹‚ğƒNƒH[ƒ^ƒjƒIƒ“‚Å‰ñ“]
+		// ãƒ™ã‚¯ãƒˆãƒ«ã‚’ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ã§å›è»¢
 		m_BulletVel = Vector3::Transform(m_BulletVel, rotq);
 	}
 
-	// ©“®“I‚Éæ‚è•t‚¯‚È‚¨‚·ˆ×‚ÌƒJƒEƒ“ƒgƒ_ƒEƒ“
+	// è‡ªå‹•çš„ã«å–ã‚Šä»˜ã‘ãªãŠã™ç‚ºã®ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³
 	m_FireCount = 120;
 	m_FireFlag = true;
 }
 
-// ’eŠÛ—p‚Ìƒp[ƒc‚ğƒƒ{ƒbƒg‚Éæ‚è•t‚¯‚È‚¨‚·
+// å¼¾ä¸¸ç”¨ã®ãƒ‘ãƒ¼ãƒ„ã‚’ãƒ­ãƒœãƒƒãƒˆã«å–ã‚Šä»˜ã‘ãªãŠã™
 void Player::ResetBullet()
 {
-	// ”­Ë’†‚Å‚Í‚È‚¢
+	// ç™ºå°„ä¸­ã§ã¯ãªã„
 	if (!m_FireFlag)	return;
 	
 	m_Obj[PARTS_GUN_R].SetParent(&m_Obj[PARTS_ARM_R]);
@@ -782,37 +800,37 @@ void Player::ResetBullet()
 	m_FireFlag = false;
 }
 
-// ƒWƒƒƒ“ƒv‚ğŠJn‚·‚é
+// ã‚¸ãƒ£ãƒ³ãƒ—ã‚’é–‹å§‹ã™ã‚‹
 void Player::StartJump()
 {
-	// ƒWƒƒƒ“ƒv’†‚Å‚È‚¢‚©
+	// ã‚¸ãƒ£ãƒ³ãƒ—ä¸­ã§ãªã„ã‹
 	if (!m_isJump)
 	{
-		// ã•ûŒü‚Ì‰‘¬‚ğİ’è
+		// ä¸Šæ–¹å‘ã®åˆé€Ÿã‚’è¨­å®š
 		m_Velocity.y = JUMP_SPEED_FIRST;
-		// ƒWƒƒƒ“ƒvƒtƒ‰ƒO‚ğ—§‚Ä‚é
+		// ã‚¸ãƒ£ãƒ³ãƒ—ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹
 		m_isJump = true;
 	}
 }
 
-// —‰º‚ğŠJn‚·‚é
+// è½ä¸‹ã‚’é–‹å§‹ã™ã‚‹
 void Player::StartFall()
 {
-	// ƒWƒƒƒ“ƒv’†‚Å‚È‚¢‚©
+	// ã‚¸ãƒ£ãƒ³ãƒ—ä¸­ã§ãªã„ã‹
 	if (!m_isJump)
 	{
-		// ã•ûŒü‚Ì‰‘¬‚Í0
+		// ä¸Šæ–¹å‘ã®åˆé€Ÿã¯0
 		m_Velocity.y = 0.0f;
-		// ƒWƒƒƒ“ƒvƒtƒ‰ƒO‚ğ—§‚Ä‚é
+		// ã‚¸ãƒ£ãƒ³ãƒ—ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹
 		m_isJump = true;
 	}
 }
 
-// ƒWƒƒƒ“ƒv‚ğI—¹‚·‚é
+// ã‚¸ãƒ£ãƒ³ãƒ—ã‚’çµ‚äº†ã™ã‚‹
 void Player::StopJump()
 {
-	// ƒWƒƒƒ“ƒvƒtƒ‰ƒO‚ğ‰º‚ë‚·
+	// ã‚¸ãƒ£ãƒ³ãƒ—ãƒ•ãƒ©ã‚°ã‚’ä¸‹ã‚ã™
 	m_isJump = false;
-	// ƒfƒtƒHƒ‹ƒg’l‚Å‰Šú‰»
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã§åˆæœŸåŒ–
 	m_Velocity = Vector3();
 }
