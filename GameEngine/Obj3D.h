@@ -84,6 +84,7 @@ public:
 
 	const DirectX::SimpleMath::Vector3& GetTrans()	{ return m_Trans; }
 	const DirectX::SimpleMath::Vector3& GetRot()	{ return m_Rot; }
+	const DirectX::SimpleMath::Quaternion& GetRotQ()	{ return m_RotQ; }
 	const DirectX::SimpleMath::Vector3& GetScale()	{ return m_Scale; }
 	const DirectX::SimpleMath::Matrix& GetLocalWorld() { return m_LocalWorld; }
 

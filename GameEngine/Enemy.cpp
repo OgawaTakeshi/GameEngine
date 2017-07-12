@@ -109,10 +109,18 @@ void Enemy::Initialize()
 
 	// 初期配置ランダム
 	Vector3 pos;
-	pos.x = (float)rand() / RAND_MAX * 20.0f - 10.0f;
-	pos.y = 0.5f;
-	pos.z = (float)rand() / RAND_MAX * 20.0f - 10.0f;
-	m_Obj[0].SetTrans(pos);
+	//pos.x = (float)rand() / RAND_MAX * 20.0f - 10.0f;
+	//pos.y = 0.5f;
+	//pos.z = (float)rand() / RAND_MAX * 20.0f - 10.0f;
+	//m_Obj[0].SetTrans(pos);
+	float distance = (float)rand() / RAND_MAX * 100.0f;
+	float angle = (float)rand() / RAND_MAX * XM_2PI;
+	pos = Vector3::UnitX;
+	// ワールド原点からの距離
+	pos *= distance;
+	// 原点周りに回転した位置に配置
+	pos = Vector3::Transform(pos, Matrix::CreateRotationY(angle));
+	this->SetTrans(pos);
 
 	m_angle = (float)(rand() % 360);
 
@@ -250,12 +258,12 @@ void Enemy::Draw()
 	// 影を減算描画
 	m_ObjShadow.DrawSubtractive();
 
-	// アイコン描画
-	if (m_InScreen)
-	{
-		DX::DeviceResources::GetInstance()->GetSpriteBatch()->Draw(m_texture.Get(), m_screenPos, nullptr, Colors::White,
-			0.f, m_origin, 0.2f);
-	}
+	//// アイコン描画
+	//if (m_InScreen)
+	//{
+	//	DX::DeviceResources::GetInstance()->GetSpriteBatch()->Draw(m_texture.Get(), m_screenPos, nullptr, Colors::White,
+	//		0.f, m_origin, 0.2f);
+	//}
 }
 
 const DirectX::SimpleMath::Vector3 & Enemy::GetTrans()

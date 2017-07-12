@@ -252,6 +252,20 @@ void Game::Update(DX::StepTimer const& timer)
 
 	m_Player->Update();	
 
+	for (std::vector<std::unique_ptr<HomingBullet>>::iterator it = m_HomingBullets.begin();
+		it != m_HomingBullets.end();
+		)
+	{
+		if ((*it)->Update())
+		{
+			it = m_HomingBullets.erase(it);
+		}
+		else
+		{
+			it++;
+		}
+	}
+
 	// 攻撃当たり判定
 	{
 		// プレイヤーの攻撃当たり球
@@ -410,6 +424,13 @@ void Game::Render()
 		(*it)->Draw();
 	}
 
+	for (std::vector<std::unique_ptr<HomingBullet>>::iterator it = m_HomingBullets.begin();
+		it != m_HomingBullets.end();
+		it++)
+	{
+		(*it)->Draw();
+	}
+
 	for (unsigned int i = 0; i < m_ObjTrees.size(); i++)
 	{
 		if (i >= m_ObjTrees.size() / 2)
@@ -493,6 +514,24 @@ void Game::GetDefaultSize(int& width, int& height) const
     // TODO: Change to desired default window size (note minimum size is 320x200).
     width = 800;
     height = 600;
+}
+void Game::FireHomingBullets(const DirectX::SimpleMath::Vector3 pos)
+{
+	// 敵の数分だけ発射
+	unsigned int enemyNum = m_Enemies.size();
+	for (unsigned int i = 0; i < enemyNum; i++)
+	{
+		Enemy* enemy = m_Enemies[i].get();
+
+		// 弾生成
+		std::unique_ptr<HomingBullet> bullet = std::make_unique<HomingBullet>();
+		bullet->Initialize();
+		// 上に発射
+		bullet->Fire(pos, Vector3::UnitY);
+		bullet->SetTarget(enemy);
+
+		m_HomingBullets.push_back(std::move(bullet));
+	}
 }
 #pragma endregion
 

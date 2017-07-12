@@ -33,6 +33,7 @@
     <ClInclude Include="MouseUtil.h" />
     <ClInclude Include="LockOnCamera.h" />
     <ClInclude Include="LockOn.h" />
+    <ClInclude Include="HomingBullet.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -58,6 +59,7 @@
     <ClCompile Include="MouseUtil.cpp" />
     <ClCompile Include="LockOnCamera.cpp" />
     <ClCompile Include="LockOn.cpp" />
+    <ClCompile Include="HomingBullet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -149,6 +151,9 @@
       <Filter>Assets</Filter>
     </MeshContentTask>
     <MeshContentTask Include="Assets\billboardGrass.FBX">
+      <Filter>Assets</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="Assets\bullet.FBX">
       <Filter>Assets</Filter>
     </MeshContentTask>
   </ItemGroup>

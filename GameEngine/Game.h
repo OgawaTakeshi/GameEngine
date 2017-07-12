@@ -18,6 +18,7 @@
 #include "FollowCamera.h"
 #include "Obj3D.h"
 #include "Player.h"
+#include "HomingBullet.h"
 #include "Enemy.h"
 #include "LandShape.h"
 #include "KeyboardUtil.h"
@@ -44,7 +45,7 @@ public:
 private:
 	static Game* m_Instance;
 public:
-	static const int ENEMY_NUM = 5;
+	static const int ENEMY_NUM = 30;
 
     Game();
 
@@ -71,6 +72,8 @@ public:
     void GetDefaultSize( int& width, int& height ) const;
 
 	LockOn* GetLockOn() { return m_LockOn.get(); }
+
+	void FireHomingBullets(const DirectX::SimpleMath::Vector3 pos);
 
 private:
 
@@ -119,4 +122,7 @@ private:
 
 	// 木
 	std::vector<Obj3D> m_ObjTrees;
+
+	// ホーミング弾
+	std::vector<std::unique_ptr<HomingBullet>> m_HomingBullets;
 };

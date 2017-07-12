@@ -87,6 +87,8 @@ public:
 	void StartFall();
 	void StopJump();
 
+	void FireHomingBullets();
+
 	void SetLandShapeArray(std::vector<std::unique_ptr<LandShape>>*	pLandShapeArray) { m_pLandShapeArray = pLandShapeArray; }
 
 protected:

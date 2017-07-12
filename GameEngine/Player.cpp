@@ -423,6 +423,11 @@ void Player::Update()
 	// パーツにスケーリングの数値を設定する
 	m_Obj[PARTS_HEAD].SetScale(Vector3(scale));
 
+	if (key->IsTriggered(Keyboard::Keys::R))
+	{
+		FireHomingBullets();
+	}
+
 	if (key->IsTriggered(Keyboard::Keys::E))
 	{
 		if (m_FireFlag)
@@ -833,4 +838,10 @@ void Player::StopJump()
 	m_isJump = false;
 	// デフォルト値で初期化
 	m_Velocity = Vector3();
+}
+
+// ホーミング弾発射
+void Player::FireHomingBullets()
+{
+	Game::GetInstance()->FireHomingBullets(this->GetTrans());
 }
