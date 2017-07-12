@@ -642,7 +642,7 @@ const DirectX::SimpleMath::Matrix& Player::GetLocalWorld()
 
 void Player::Load()
 {
-	wifstream ifs("CSV/Player.csv");
+	wifstream ifs("Resources/CSV/Player.csv");
 
 	wstring line;
 

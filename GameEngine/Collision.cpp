@@ -852,10 +852,10 @@ bool CheckCapsule2Capsule(const Capsule& _capsule0, const Capsule& _capsule1, Ve
 //	Vector3 lt2;		// 直線の点0→三角形の頂点2
 //	float u,v,w;
 //
-//	LayV = _line.Point1 - _line.Point0;	// 直線の方向ベクトルを取得
-//	lt0 = _triangle.P0 - _line.Point0;
-//	lt1 = _triangle.P1 - _line.Point0;
-//	lt2 = _triangle.P2 - _line.Point0;
+//	LayV = _line.point1 - _line.point0;	// 直線の方向ベクトルを取得
+//	lt0 = _triangle.P0 - _line.point0;
+//	lt1 = _triangle.P1 - _line.point0;
+//	lt2 = _triangle.P2 - _line.point0;
 //	
 //	// 直線が３角形の三辺の内側を通るどうかを判定。
 //	// 判定はスカラー三重積を用いて計算する符号付の六面体の体積が

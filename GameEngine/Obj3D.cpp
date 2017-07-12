@@ -189,8 +189,8 @@ void Obj3D::Draw()
 	if ( m_pModel )
 	{
 		assert(s_Common.camera);
-		const Matrix& view = s_Common.camera->GetViewmat();
-		const Matrix& projection = s_Common.camera->GetProjmat();
+		const Matrix& view = s_Common.camera->GetView();
+		const Matrix& projection = s_Common.camera->GetProj();
 
 		assert(s_Common.deviceContext);
 		assert(s_Common.states);
@@ -204,8 +204,8 @@ void Obj3D::DrawSubtractive()
 	if (m_pModel)
 	{
 		assert(s_Common.camera);
-		const Matrix& view = s_Common.camera->GetViewmat();
-		const Matrix& projection = s_Common.camera->GetProjmat();
+		const Matrix& view = s_Common.camera->GetView();
+		const Matrix& projection = s_Common.camera->GetProj();
 
 		assert(s_Common.deviceContext);
 		assert(s_Common.states);
@@ -223,8 +223,8 @@ void Obj3D::DrawBillboard()
 	if (m_pModel)
 	{
 		assert(s_Common.camera);
-		const Matrix& view = s_Common.camera->GetViewmat();
-		const Matrix& projection = s_Common.camera->GetProjmat();
+		const Matrix& view = s_Common.camera->GetView();
+		const Matrix& projection = s_Common.camera->GetProj();
 
 		// ビルボード行列をワールド行列に合成
 		Matrix world = s_Common.camera->GetBillboard() * m_World;
@@ -245,8 +245,8 @@ void Obj3D::DrawBillboardConstrainY()
 	if (m_pModel)
 	{
 		assert(s_Common.camera);
-		const Matrix& view = s_Common.camera->GetViewmat();
-		const Matrix& projection = s_Common.camera->GetProjmat();
+		const Matrix& view = s_Common.camera->GetView();
+		const Matrix& projection = s_Common.camera->GetProj();
 
 		// ビルボード行列をワールド行列に合成
 		Matrix world = s_Common.camera->GetBillboardConstrainY() * m_World;

@@ -69,6 +69,8 @@ protected:
 class LandShape
 {
 public:
+	static const wstring RESOURCE_DIRECTORY;
+	static const wstring RESOURCE_EXT;
 	// エフェクトファクトリ生成
 	static void InitializeCommon(LandShapeCommon::Def def);
 

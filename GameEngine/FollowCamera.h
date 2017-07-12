@@ -1,12 +1,6 @@
-/**
-*	@file	FollowCamera.h
-*
-*	@brief	カメラ
-*
-*	@date	2012/04/23
-*
-*	@author	藤澤　伸治
-*/
+/// <summary>
+/// 追従カメラ
+/// </summary>
 #pragma once
 
 #include "Camera.h"
@@ -17,11 +11,12 @@ class FollowCamera : public Camera
 {
 public:
 	// コンストラクタ
-	FollowCamera();
+	FollowCamera(int width, int height);
 	// デストラクタ
 	virtual ~FollowCamera();
 	// 更新
-	void Update(bool interpolate = true);
+	void Update() override;
+	void Update(bool interpolate);
 
 	void SetTarget(Player* target) { m_Target = target; }
 

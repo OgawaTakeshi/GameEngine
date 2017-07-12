@@ -139,7 +139,7 @@ void Enemy::Initialize()
 	Microsoft::WRL::ComPtr<ID3D11Resource> resTexture;
 
 	// テクスチャのロード
-	CreateWICTextureFromFile(DX::DeviceResources::GetInstance()->GetD3DDevice(), L"PNG/mark_kiduna.png", resTexture.GetAddressOf(),
+	CreateWICTextureFromFile(DX::DeviceResources::GetInstance()->GetD3DDevice(), L"Resources/PNG/mark_kiduna.png", resTexture.GetAddressOf(),
 		m_texture.ReleaseAndGetAddressOf());
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;

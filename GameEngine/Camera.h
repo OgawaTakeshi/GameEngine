@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include	<d3d11.h>
+#include	<d3d11_1.h>
 #include	<SimpleMath.h>
 
 #include "Collision.h"
@@ -13,7 +13,7 @@ public:
 	using Vector2 = DirectX::SimpleMath::Vector2;
 protected:
 	// ビュー行列
-	DirectX::SimpleMath::Matrix m_Viewmat;
+	DirectX::SimpleMath::Matrix m_View;
 	// カメラ座標
 	DirectX::SimpleMath::Vector3 m_Eyepos;
 	// ターゲット座標
@@ -22,7 +22,7 @@ protected:
 	DirectX::SimpleMath::Vector3 m_Upvec;
 
 	// プロジェクション行列
-	DirectX::SimpleMath::Matrix m_Projmat;
+	DirectX::SimpleMath::Matrix m_Proj;
 	// 縦方向視野角
 	float m_FovY;
 	// アスペクト比
@@ -38,7 +38,7 @@ protected:
 	DirectX::SimpleMath::Matrix m_BillboardConstrainY;
 public:
 	// コンストラクタ
-	Camera();
+	Camera(int width, int height);
 	// デストラクタ
 	virtual ~Camera();
 	// 更新
@@ -50,8 +50,8 @@ public:
 	const DirectX::SimpleMath::Vector3& GetEyepos() const { return m_Eyepos; }
 	const DirectX::SimpleMath::Vector3& GetRefpos() const { return m_Refpos; }
 	const DirectX::SimpleMath::Vector3& GetUpvec() const { return m_Upvec; }
-	const DirectX::SimpleMath::Matrix& GetViewmat() const { return m_Viewmat; }
-	const DirectX::SimpleMath::Matrix& GetProjmat() const { return m_Projmat; }
+	const DirectX::SimpleMath::Matrix& GetView() const { return m_View; }
+	const DirectX::SimpleMath::Matrix& GetProj() const { return m_Proj; }
 	const DirectX::SimpleMath::Matrix& GetBillboard() const { return m_Billboard; }
 	const DirectX::SimpleMath::Matrix& GetBillboardConstrainY() const { return m_BillboardConstrainY; }
 

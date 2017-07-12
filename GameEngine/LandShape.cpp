@@ -15,6 +15,11 @@ using namespace std;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+// 定数
+// リソースディレクトリパス
+const wstring LandShape::RESOURCE_DIRECTORY = L"Resources/LandShape/";
+// ファイル拡張子
+const wstring LandShape::RESOURCE_EXT = L".landshape";
 
 // 静的メンバ変数の実体
 std::unique_ptr<LandShapeCommon> LandShape::s_pCommon;
@@ -111,7 +116,7 @@ void LandShape::Initialize(const wstring& filename_bin, const wstring& filename_
 	if (filename_bin.size() > 0)
 	{
 		// フルパスに補完
-		wstring fullpath_bin = L"LandShape/" + filename_bin + L".landshape";
+		wstring fullpath_bin = RESOURCE_DIRECTORY + filename_bin + RESOURCE_EXT;
 
 		std::map<std::wstring, std::unique_ptr<LandShapeData>>::iterator it;
 		it = s_dataarray.find(fullpath_bin);
@@ -156,8 +161,8 @@ void LandShape::Draw()
 	else if (m_pData)
 	{
 		// デバッグ描画
-		const Matrix& view = s_pCommon->m_pCamera->GetViewmat();
-		const Matrix& projection = s_pCommon->m_pCamera->GetProjmat();
+		const Matrix& view = s_pCommon->m_pCamera->GetView();
+		const Matrix& projection = s_pCommon->m_pCamera->GetProj();
 
 		// 作成した行列をエフェクトにセット
 		s_pCommon->m_pEffect->SetWorld(m_Obj.GetLocalWorld());

@@ -1,12 +1,6 @@
-﻿/**
-*	@file	Player.h
-*
-*	@brief	自機
-*
-*	@date	2015/05/08
-*
-*	@author	藤澤　伸治
-*/
+﻿/// <summary>
+/// 自機
+/// </summary>
 #pragma once
 
 #include <d3d11_1.h>
@@ -16,7 +10,6 @@
 #include "CollisionNode.h"
 #include "LandShape.h"
 
-// 自機
 class Player
 {
 public:

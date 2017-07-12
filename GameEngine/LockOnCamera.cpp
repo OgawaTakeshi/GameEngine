@@ -1,8 +1,9 @@
 ﻿#include "LockOnCamera.h"
 
-LockOnCamera::LockOnCamera()
+LockOnCamera::LockOnCamera(int width, int height)
+	: Camera(width, height)
 {
-	m_FollowCamera = std::make_unique<FollowCamera>();
+	m_FollowCamera = std::make_unique<FollowCamera>(width, height);
 	ShiftCount = 0;
 
 	m_State = State::FOLLOW;

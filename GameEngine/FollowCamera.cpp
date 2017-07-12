@@ -15,7 +15,8 @@ using namespace DirectX::SimpleMath;
 /**
 *	@brief コンストラクタ
 */
-FollowCamera::FollowCamera()
+FollowCamera::FollowCamera(int width, int height)
+	: Camera(width, height)
 {
 	m_TargetPos = Vector3::Zero;
 	m_TargetAngle = 0.0f;
@@ -29,6 +30,11 @@ FollowCamera::FollowCamera()
 FollowCamera::~FollowCamera()
 {
 
+}
+
+void FollowCamera::Update()
+{
+	Update(true);
 }
 
 /**

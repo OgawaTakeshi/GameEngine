@@ -1,10 +1,12 @@
-﻿#pragma once
+﻿/// <summary>
+/// ロックオンカメラ
+/// </summary>
+#pragma once
 
 #include "Camera.h"
 #include "LockOn.h"
 #include "FollowCamera.h"
 
-// ロックオンカメラ
 class LockOnCamera : public Camera
 {
 	// 状態
@@ -21,7 +23,7 @@ public:
 	// 切り替え時間
 	const int SHIFT_FRAME = 120;
 	// コンストラクタ
-	LockOnCamera();
+	LockOnCamera(int width, int height);
 	// 更新
 	void Update() override;
 	//setter

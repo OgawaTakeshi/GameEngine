@@ -1,10 +1,9 @@
 ﻿#pragma once
 // デバッグ用カメラクラス
-#include <d3d11.h>
-#include <SimpleMath.h>
+#include "Camera.h"
 
 // デバッグ用カメラクラス
-class DebugCamera
+class DebugCamera : public Camera
 {
 	// カメラの距離
 	static const float DEFAULT_CAMERA_DISTANCE;
@@ -35,11 +34,6 @@ public:
 	DebugCamera(int w, int h);
 
 	// 更新
-	void Update();
-
-	DirectX::SimpleMath::Matrix GetCameraMatrix()
-	{
-		return m_view;
-	}
+	void Update() override;
 };
 

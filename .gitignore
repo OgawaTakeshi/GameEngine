@@ -288,4 +288,4 @@ __pycache__/
 *.xsd.cs
 
 # Converted Resources
-Resources/
+**/Resources/CMO/

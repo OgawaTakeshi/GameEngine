@@ -10,7 +10,7 @@ const float DebugCamera::DEFAULT_CAMERA_DISTANCE = 5.0f;
 
 // コンストラクタ
 DebugCamera::DebugCamera(int w, int h)
-	: m_yAngle(0.0f), m_yTmp(0.0f), m_xAngle(0.0f), m_xTmp(0.0f), m_x(0), m_y(0), m_scrollWheelValue(0)
+	: Camera(w,h), m_yAngle(0.0f), m_yTmp(0.0f), m_xAngle(0.0f), m_xTmp(0.0f), m_x(0), m_y(0), m_scrollWheelValue(0)
 {
 	// 画面サイズに対する相対的なスケールに調整
 	m_sx = 1.0f / (float)w;

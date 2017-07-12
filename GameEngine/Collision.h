@@ -28,21 +28,16 @@ using namespace std;
 //----------------------------------------------
 //	class
 //----------------------------------------------
-//// 座標
-//typedef DirectX::SimpleMath::Vector3 Point;
-//// ベクトル
-//typedef DirectX::SimpleMath::Vector3 Vector;
-
 //// 円
 //class Circle
 //{
 //public:
-//	DirectX::SimpleMath::Vector3	Center;	// 中心座標
-//	float	Radius;	// 半径
+//	DirectX::SimpleMath::Vector3	center;	// 中心座標
+//	float	radius;	// 半径
 //	// コンストラクタ
 //	Circle()
 //	{
-//		Radius = 1.0f;
+//		radius = 1.0f;
 //	}
 //};
 
@@ -50,8 +45,8 @@ using namespace std;
 //class Line
 //{
 //public:
-//	DirectX::SimpleMath::Vector3	Point0;	// 点0
-//	DirectX::SimpleMath::Vector3	Point1;	// 点1
+//	DirectX::SimpleMath::Vector3	point0;	// 点0
+//	DirectX::SimpleMath::Vector3	point1;	// 点1
 //};
 
 // 線分
@@ -74,7 +69,7 @@ public:
 //class OBB
 //{
 //public:
-//	Point	Center;		// 中心座標
+//	Point	center;		// 中心座標
 //	Vector	Axis[3];	// ローカルX,Y,Z軸
 //	Vector	Size;		// 大きさ（X,Y,Zそれぞれ1辺の長さの半分）
 //};
@@ -174,9 +169,6 @@ void ComputeTriangle(const DirectX::SimpleMath::Vector3& _p0, const DirectX::Sim
 //bool CheckPoint2Triangle(const Point& _point, const Triangle& _triangle);	// 点が三角形の中にあるか判定
 bool CheckSegment2Triangle(const Segment& _segment, const Triangle& _triangle, DirectX::SimpleMath::Vector3 *_inter = nullptr);	// 線分と法線付き三角形
 bool CheckSphere2Triangle(const Sphere& _sphere, const Triangle& _triangle, DirectX::SimpleMath::Vector3 *_inter = nullptr); //球と法線付き三角形の当たりチェック
-
-//NS_COLLISION_END
-
 bool CheckSphere2Sphere(const Sphere& sphereA, const Sphere& sphereB, DirectX::SimpleMath::Vector3* _inter = nullptr);
 bool CheckCapsule2Capsule(const Capsule& _capsule0, const Capsule& _capsule1, DirectX::SimpleMath::Vector3* _inter = nullptr);
 bool CheckSphere2Capsule(const Sphere& _sphere, const Capsule& _capsule, DirectX::SimpleMath::Vector3* _inter = nullptr);

@@ -8,16 +8,16 @@ using namespace DirectX::SimpleMath;
 /**
 *	@brief コンストラクタ
 */
-Camera::Camera()
+Camera::Camera(int width, int height)
 {
-	m_Viewmat = Matrix::Identity;
+	m_View = Matrix::Identity;
 	m_Eyepos = Vector3(0.0f, 6.0f, 10.0f);
 	m_Refpos = Vector3(0.0f, 2.0f, 0.0f);
 	m_Upvec = Vector3(0.0f, 1.0f, 0.0f);
 
-	m_Projmat = Matrix::Identity;
+	m_Proj = Matrix::Identity;
 	m_FovY = XMConvertToRadians(60.0f);
-	m_Aspect = (640.0f / 480.0f);
+	m_Aspect = (float)width / height;
 	m_NearClip = 0.1f;
 	m_FarClip = 1000.0f;
 }
@@ -35,9 +35,9 @@ Camera::~Camera()
 void Camera::Update()
 {
 	// ビュー行列を計算
-	m_Viewmat = Matrix::CreateLookAt(m_Eyepos, m_Refpos, m_Upvec);
+	m_View = Matrix::CreateLookAt(m_Eyepos, m_Refpos, m_Upvec);
 	// プロジェクション行列を計算
-	m_Projmat = Matrix::CreatePerspectiveFieldOfView(m_FovY, m_Aspect, m_NearClip, m_FarClip);
+	m_Proj = Matrix::CreatePerspectiveFieldOfView(m_FovY, m_Aspect, m_NearClip, m_FarClip);
 	// ビルボード行列を計算
 	CalcBillboard();
 }
@@ -54,10 +54,10 @@ bool Camera::Project(const Vector3& worldPos, Vector2* screenPos)
 	Vector4 worldPosV4(worldPos.x, worldPos.y, worldPos.z, 1.0f);
 
 	// ビュー変換
-	clipPos = Vector4::Transform(worldPosV4, m_Viewmat);
+	clipPos = Vector4::Transform(worldPosV4, m_View);
 
 	// 射影変換
-	clipPos = Vector4::Transform(clipPos, m_Projmat);
+	clipPos = Vector4::Transform(clipPos, m_Proj);
 
 	// ビューポートの取得
 	D3D11_VIEWPORT viewport = DX::DeviceResources::GetInstance()->GetScreenViewport();
@@ -106,14 +106,14 @@ void Camera::UnProject(const Vector2& screenPos, Segment* worldSegment)
 	clipPosFar.w = m_FarClip;
 
 	// プロジェクション、ビュー逆変換
-	Matrix invMat = m_Viewmat * m_Projmat;
+	Matrix invMat = m_View * m_Proj;
 	invMat.Invert(invMat);
 
 	Matrix invView;
-	m_Viewmat.Invert(invView);
+	m_View.Invert(invView);
 
 	Matrix invProj;
-	m_Projmat.Invert(invProj);
+	m_Proj.Invert(invProj);
 
 	// 射影座標→ビュー座標
 	Vector4 viewStart = Vector4::Transform(clipPosNear, invProj);

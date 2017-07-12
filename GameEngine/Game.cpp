@@ -62,10 +62,10 @@ void Game::Initialize(HWND window, int width, int height)
 		m_DebugCamera = std::make_unique<DebugCamera>(width, height);
 
 		// 追従カメラを生成
-		m_FollowCamera = std::make_unique<FollowCamera>();
+		m_FollowCamera = std::make_unique<FollowCamera>(width, height);
 
 		// ロックオンカメラを生成
-		m_LockOnCamera = std::make_unique<LockOnCamera>();
+		m_LockOnCamera = std::make_unique<LockOnCamera>(width, height);
 
 		// ロックオンカメラを有効に
 		m_CurrentCamera = m_LockOnCamera.get();
@@ -85,6 +85,7 @@ void Game::Initialize(HWND window, int width, int height)
 		def.pCamera = m_CurrentCamera;
 		def.pDevice = m_deviceResources->GetD3DDevice();
 		def.pDeviceContext = m_deviceResources->GetD3DDeviceContext();
+
 		LandShape::InitializeCommon(def);
 	}
 
@@ -110,7 +111,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_ObjSkydome->DisableLighting();
 
 	{// 地形ロード
-		wifstream ifs("CSV/LandShape.csv");
+		wifstream ifs("Resources/CSV/LandShape.csv");
 
 		wstring line;
 
