@@ -412,7 +412,14 @@ void Game::Render()
 
 	for (unsigned int i = 0; i < m_ObjTrees.size(); i++)
 	{
-		m_ObjTrees[i].DrawBillboardConstrainY();
+		if (i >= m_ObjTrees.size() / 2)
+		{
+			m_ObjTrees[i].DrawBillboard();
+		}
+		else
+		{
+			m_ObjTrees[i].DrawBillboardConstrainY();
+		}
 	}
 
 	ModelEffectManager::getInstance()->Draw();

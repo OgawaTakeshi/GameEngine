@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Model.h>
 #include <Effects.h>
@@ -6,11 +6,11 @@
 #include "Camera.h"
 #include <map>
 
-// 3DƒIƒuƒWƒFƒNƒg
+// 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 class Obj3D
 {
 public:
-	// İ’è
+	// è¨­å®š
 	struct Defs
 	{
 		ID3D11Device* pDevice;
@@ -24,56 +24,57 @@ public:
 			pCamera = nullptr;
 		}
 	};
-	// Ã“Iƒƒ“ƒoŠÖ”
-	// Ã“I‰Šú‰»
+	// é™çš„ãƒ¡ãƒ³ãƒé–¢æ•°
+	// é™çš„åˆæœŸåŒ–
 	static void StaticInitialize(const Defs& def);
-	// ƒfƒoƒCƒX‚Ìsetter
+	// ãƒ‡ãƒã‚¤ã‚¹ã®setter
 	static void SetDevice(ID3D11Device* pDevice) { s_pDevice = pDevice; }
-	// ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg‚Ìsetter
+	// ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®setter
 	static void SetDeviceContext(ID3D11DeviceContext* pDeviceContext) { s_pDeviceContext = pDeviceContext; }
-	// ƒJƒƒ‰‚Ìsetter
+	// ã‚«ãƒ¡ãƒ©ã®setter
 	static void SetCamera(Camera* pCamera) { s_pCamera = pCamera; }
 
 	static ID3D11DeviceContext* GetDeviceContext() { return s_pDeviceContext; }
 	static Camera* GetCamera() { return s_pCamera; }
 
-	// Œ¸Z•`‰æİ’è‚ğƒZƒbƒg
+	// æ¸›ç®—æç”»è¨­å®šã‚’ã‚»ãƒƒãƒˆ
 	static void SetSubtractive();
 
 private:
-	// Ã“Iƒƒ“ƒo•Ï”i‘SƒIƒuƒWƒFƒNƒg‚Å‹¤—Lj
-	// ƒfƒoƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// é™çš„ãƒ¡ãƒ³ãƒå¤‰æ•°ï¼ˆå…¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã§å…±æœ‰ï¼‰
+	// ãƒ‡ãƒã‚¤ã‚¹ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	static ID3D11Device*	s_pDevice;
-	// ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	static ID3D11DeviceContext*	s_pDeviceContext;
-	// •`‰æƒXƒe[ƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// æç”»ã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	static std::unique_ptr<DirectX::CommonStates>	s_pStates;
-	// ‹¤—p‚ÌƒGƒtƒFƒNƒgƒtƒ@ƒNƒgƒŠ
+	// å…±ç”¨ã®ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¯ãƒˆãƒª
 	static std::unique_ptr<DirectX::EffectFactory>	s_pEffectFactory;
-	// ‹¤—p‚ÌƒJƒƒ‰i•`‰æ‚Ég—pj
+	// å…±ç”¨ã®ã‚«ãƒ¡ãƒ©ï¼ˆæç”»æ™‚ã«ä½¿ç”¨ï¼‰
 	static Camera* s_pCamera;
-	// “Ç‚İ‚İÏ‚İƒ‚ƒfƒ‹ƒRƒ“ƒeƒi
+	// èª­ã¿è¾¼ã¿æ¸ˆã¿ãƒ¢ãƒ‡ãƒ«ã‚³ãƒ³ãƒ†ãƒŠ
 	static std::map<std::wstring, std::unique_ptr<DirectX::Model>> s_modelarray;
 
 	static ID3D11BlendState* s_pBlendStateSubtract;
 public:
 	Obj3D();
 	virtual ~Obj3D();
-	// ƒtƒ@ƒCƒ‹‚©‚çƒ‚ƒfƒ‹‚ğ“Ç‚İ‚Ş
+	// ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«ã‚’èª­ã¿è¾¼ã‚€
 	void LoadModelFile(const wchar_t*filename=nullptr);
-	// s—ñ‚ÌŒvZ
+	// è¡Œåˆ—ã®è¨ˆç®—
 	void Calc();
-	// •`‰æ
+	// æç”»
 	void Draw();
-	// Œ¸Z•`‰æ‚Å‚Ì•`‰æi‰e—pj
+	// æ¸›ç®—æç”»ã§ã®æç”»ï¼ˆå½±ç”¨ï¼‰
 	void DrawSubtractive();
+	void DrawBillboard();
 	void DrawBillboardConstrainY();
-	// ƒIƒuƒWƒFƒNƒg‚Ìƒ‰ƒCƒeƒBƒ“ƒO‚ğ–³Œø‚É‚·‚é
+	// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°ã‚’ç„¡åŠ¹ã«ã™ã‚‹
 	void DisableLighting();
 
 	void EnableAlpha();
 	
-	// ƒAƒNƒZƒbƒT
+	// ã‚¢ã‚¯ã‚»ãƒƒã‚µ
 	void SetTrans(const DirectX::SimpleMath::Vector3& trans) { m_Trans = trans; }
 	void SetRot(const DirectX::SimpleMath::Vector3& rot)	 { m_Rot = rot; m_UseQuternion = false; }
 	void SetRotQ(const DirectX::SimpleMath::Quaternion& rotq)	 { m_RotQ = rotq; m_UseQuternion = true; }
@@ -87,18 +88,18 @@ public:
 	const DirectX::SimpleMath::Matrix& GetLocalWorld() { return m_LocalWorld; }
 
 private:
-	// ƒ‚ƒfƒ‹ƒf[ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// ãƒ¢ãƒ‡ãƒ«ãƒ‡ãƒ¼ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	const DirectX::Model* m_pModel;
-	// •½sˆÚ“®
+	// å¹³è¡Œç§»å‹•
 	DirectX::SimpleMath::Vector3 m_Trans;
-	// ‰ñ“]
+	// å›è»¢
 	bool m_UseQuternion;
 	DirectX::SimpleMath::Vector3 m_Rot;
 	DirectX::SimpleMath::Quaternion m_RotQ;
-	// ƒXƒP[ƒŠƒ“ƒO
+	// ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°
 	DirectX::SimpleMath::Vector3 m_Scale;
-	// ƒ[ƒ‹ƒhs—ñ
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—
 	DirectX::SimpleMath::Matrix m_LocalWorld;
-	// e‚Ìƒ[ƒ‹ƒhs—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// è¦ªã®ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	Obj3D* m_pParent;
 };

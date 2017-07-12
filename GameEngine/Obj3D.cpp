@@ -1,11 +1,11 @@
-#include "Obj3D.h"
+ï»¿#include "Obj3D.h"
 #include "VertexTypes.h"
 #include <CommonStates.h>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-// Ã“Iƒƒ“ƒo•Ï”‚ÌÀ‘Ì
+// é™çš„ãƒ¡ãƒ³ãƒå¤‰æ•°ã®å®Ÿä½“
 ID3D11Device* Obj3D::s_pDevice;
 ID3D11DeviceContext* Obj3D::s_pDeviceContext;
 std::unique_ptr<DirectX::CommonStates>	Obj3D::s_pStates;
@@ -20,14 +20,14 @@ void Obj3D::StaticInitialize(const Defs& def)
 	SetDeviceContext(def.pDeviceContext);
 	SetCamera(def.pCamera);
 
-	// ƒGƒtƒFƒNƒgƒtƒ@ƒNƒgƒŠ¶¬
+	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¯ãƒˆãƒªç”Ÿæˆ
 	s_pEffectFactory = std::make_unique<EffectFactory>(def.pDevice);
 	s_pEffectFactory->SetDirectory(L"Resources");
 
-	// ”Ä—pƒXƒe[ƒg¶¬
+	// æ±ç”¨ã‚¹ãƒ†ãƒ¼ãƒˆç”Ÿæˆ
 	s_pStates = std::make_unique<CommonStates>(def.pDevice);
 
-	// Œ¸Z•`‰æ—p‚ÌƒuƒŒƒ“ƒhƒXƒe[ƒg‚ğì¬
+	// æ¸›ç®—æç”»ç”¨ã®ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆã‚’ä½œæˆ
 	D3D11_BLEND_DESC desc;
 	desc.AlphaToCoverageEnable = false;
 	desc.IndependentBlendEnable = false;
@@ -44,78 +44,78 @@ void Obj3D::StaticInitialize(const Defs& def)
 
 void Obj3D::SetSubtractive()
 {
-	// Œ¸Z•`‰æ‚ğİ’è
+	// æ¸›ç®—æç”»ã‚’è¨­å®š
 	s_pDeviceContext->OMSetBlendState(s_pBlendStateSubtract, nullptr, 0xffffff);
 }
 
 /**
-*	@brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+*	@brief ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 */
 Obj3D::Obj3D()
 : m_pParent(nullptr)
 , m_pModel(nullptr)
 , m_UseQuternion(false)
 {
-	// ƒXƒP[ƒ‹‚Í1”{‚ªƒfƒtƒHƒ‹ƒg
+	// ã‚¹ã‚±ãƒ¼ãƒ«ã¯1å€ãŒãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
 	m_Scale = Vector3(1, 1, 1);
 }
 
 /**
-*	@brief ƒfƒXƒgƒ‰ƒNƒ^
+*	@brief ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 */
 Obj3D::~Obj3D()
 {
 }
 
 /**
-*	@brief ƒtƒ@ƒCƒ‹‚©‚çƒ‚ƒfƒ‹‚ğ“Ç‚İ‚Ş
+*	@brief ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«ã‚’èª­ã¿è¾¼ã‚€
 */
 void Obj3D::LoadModelFile(const wchar_t*filename)
 {
 	assert(s_pEffectFactory);
 
-	// “¯‚¶–¼‘O‚Ìƒ‚ƒfƒ‹‚ğ“Ç‚İ‚İÏ‚İ‚Å‚È‚¯‚ê‚Î‚Ğ‚”
+	// åŒã˜åå‰ã®ãƒ¢ãƒ‡ãƒ«ã‚’èª­ã¿è¾¼ã¿æ¸ˆã¿ã§ãªã‘ã‚Œã°ã²ï½”
 	if (s_modelarray.count(filename) == 0 )
 	{
-		// ƒ‚ƒfƒ‹‚ğ“Ç‚İ‚İAƒRƒ“ƒeƒi‚É“o˜^iƒL[‚Íƒtƒ@ƒCƒ‹–¼j
+		// ãƒ¢ãƒ‡ãƒ«ã‚’èª­ã¿è¾¼ã¿ã€ã‚³ãƒ³ãƒ†ãƒŠã«ç™»éŒ²ï¼ˆã‚­ãƒ¼ã¯ãƒ•ã‚¡ã‚¤ãƒ«åï¼‰
 		s_modelarray[filename] = Model::CreateFromCMO(s_pDevice, filename, *s_pEffectFactory);
 	}
 	m_pModel = s_modelarray[filename].get();
 }
 
 /**
-*	@brief ƒIƒuƒWƒFƒNƒg‚Ìƒ‰ƒCƒeƒBƒ“ƒO‚ğ–³Œø‚É‚·‚é
+*	@brief ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°ã‚’ç„¡åŠ¹ã«ã™ã‚‹
 */
 void Obj3D::DisableLighting()
 {
 	if (m_pModel)
 	{
-		// ƒ‚ƒfƒ‹“à‚Ì‘SƒƒbƒVƒ…•ª‰ñ‚·
+		// ãƒ¢ãƒ‡ãƒ«å†…ã®å…¨ãƒ¡ãƒƒã‚·ãƒ¥åˆ†å›ã™
 		ModelMesh::Collection::const_iterator it_mesh = m_pModel->meshes.begin();
 		for (; it_mesh != m_pModel->meshes.end(); it_mesh++)
 		{
 			ModelMesh* modelmesh = it_mesh->get();
 			assert(modelmesh);
 
-			// ƒƒbƒVƒ…“à‚Ì‘SƒƒbƒVƒ…ƒp[ƒc•ª‰ñ‚·
+			// ãƒ¡ãƒƒã‚·ãƒ¥å†…ã®å…¨ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‘ãƒ¼ãƒ„åˆ†å›ã™
 			std::vector<std::unique_ptr<ModelMeshPart>>::iterator it_meshpart = modelmesh->meshParts.begin();
 			for (; it_meshpart != modelmesh->meshParts.end(); it_meshpart++)
 			{
 				ModelMeshPart* meshpart = it_meshpart->get();
 				assert(meshpart);
 
-				// ƒƒbƒVƒ…ƒp[ƒc‚ÉƒZƒbƒg‚³‚ê‚½ƒGƒtƒFƒNƒg‚ğBasicEffect‚Æ‚µ‚Äæ“¾
+				// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‘ãƒ¼ãƒ„ã«ã‚»ãƒƒãƒˆã•ã‚ŒãŸã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’BasicEffectã¨ã—ã¦å–å¾—
 				std::shared_ptr<IEffect> ieff = meshpart->effect;
 				BasicEffect* eff = dynamic_cast<BasicEffect*>(ieff.get());
 				if (eff != nullptr)
 				{
-					// ©ŒÈ”­Œõ‚ğÅ‘å’l‚É
+					// è‡ªå·±ç™ºå…‰ã‚’æœ€å¤§å€¤ã«
 					eff->SetEmissiveColor(Vector3(1,1,1));
 
-					// ƒGƒtƒFƒNƒg‚ÉŠÜ‚Ş‘S‚Ä‚Ì•½sŒõŒ¹•ª‚É‚Â‚¢‚Äˆ—‚·‚é
+					// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã«å«ã‚€å…¨ã¦ã®å¹³è¡Œå…‰æºåˆ†ã«ã¤ã„ã¦å‡¦ç†ã™ã‚‹
 					for (int i = 0; i < BasicEffect::MaxDirectionalLights; i++)
 					{
-						// ƒ‰ƒCƒg‚ğ–³Œø‚É‚·‚é
+						// ãƒ©ã‚¤ãƒˆã‚’ç„¡åŠ¹ã«ã™ã‚‹
 						eff->SetLightEnabled(i, false);
 					}
 				}
@@ -128,21 +128,21 @@ void Obj3D::EnableAlpha()
 {
 	if (m_pModel)
 	{
-		// ƒ‚ƒfƒ‹“à‚Ì‘SƒƒbƒVƒ…•ª‰ñ‚·
+		// ãƒ¢ãƒ‡ãƒ«å†…ã®å…¨ãƒ¡ãƒƒã‚·ãƒ¥åˆ†å›ã™
 		ModelMesh::Collection::const_iterator it_mesh = m_pModel->meshes.begin();
 		for (; it_mesh != m_pModel->meshes.end(); it_mesh++)
 		{
 			ModelMesh* modelmesh = it_mesh->get();
 			assert(modelmesh);
 
-			// ƒƒbƒVƒ…“à‚Ì‘SƒƒbƒVƒ…ƒp[ƒc•ª‰ñ‚·
+			// ãƒ¡ãƒƒã‚·ãƒ¥å†…ã®å…¨ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‘ãƒ¼ãƒ„åˆ†å›ã™
 			std::vector<std::unique_ptr<ModelMeshPart>>::iterator it_meshpart = modelmesh->meshParts.begin();
 			for (; it_meshpart != modelmesh->meshParts.end(); it_meshpart++)
 			{
 				ModelMeshPart* meshpart = it_meshpart->get();
 				assert(meshpart);
 
-				// ƒƒbƒVƒ…ƒp[ƒc‚ÉƒZƒbƒg‚³‚ê‚½ƒGƒtƒFƒNƒg‚ğBasicEffect‚Æ‚µ‚Äæ“¾
+				// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‘ãƒ¼ãƒ„ã«ã‚»ãƒƒãƒˆã•ã‚ŒãŸã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’BasicEffectã¨ã—ã¦å–å¾—
 				std::shared_ptr<IEffect>& ieff = meshpart->effect;
 				meshpart->ModifyEffect(s_pDevice, ieff, true);
 			}
@@ -169,16 +169,16 @@ void Obj3D::Calc()
 	
 	transm = Matrix::CreateTranslation(m_Trans);
 
-	// ƒ[ƒ‹ƒhs—ñ‚ğSRT‚Ì‡‚É‡¬
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’SRTã®é †ã«åˆæˆ
 	m_LocalWorld = Matrix::Identity;
 	m_LocalWorld *= scalem;
 	m_LocalWorld *= rotm;
 	m_LocalWorld *= transm;
 
-	// es—ñ‚ª‚ ‚ê‚Î
+	// è¦ªè¡Œåˆ—ãŒã‚ã‚Œã°
 	if ( m_pParent )
 	{
-		// es—ñ‚ğŠ|‚¯‚é
+		// è¦ªè¡Œåˆ—ã‚’æ›ã‘ã‚‹
 		m_LocalWorld = m_LocalWorld * m_pParent->GetLocalWorld();
 	}
 }
@@ -209,13 +209,35 @@ void Obj3D::DrawSubtractive()
 		assert(s_pDeviceContext);
 		assert(s_pStates);
 
-		// Œ¸Z•`‰æ—p‚Ìİ’èŠÖ”‚ğ“n‚µ‚Ä•`‰æ
+		// æ¸›ç®—æç”»ç”¨ã®è¨­å®šé–¢æ•°ã‚’æ¸¡ã—ã¦æç”»
 		m_pModel->Draw(s_pDeviceContext, *s_pStates, m_LocalWorld, view, projection, false, Obj3D::SetSubtractive);
 	}
 }
 
 /// <summary>
-///  ƒrƒ‹ƒ{[ƒh•`‰æ
+///  ãƒ“ãƒ«ãƒœãƒ¼ãƒ‰æç”»
+/// </summary>
+void Obj3D::DrawBillboard()
+{
+	if (m_pModel)
+	{
+		assert(s_pCamera);
+		const Matrix& view = s_pCamera->GetViewmat();
+		const Matrix& projection = s_pCamera->GetProjmat();
+
+		// ãƒ“ãƒ«ãƒœãƒ¼ãƒ‰è¡Œåˆ—ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã«åˆæˆ
+		Matrix world = s_pCamera->GetBillboard() * m_LocalWorld;
+
+		assert(s_pDeviceContext);
+		assert(s_pStates);
+
+		// æ¸›ç®—æç”»ç”¨ã®è¨­å®šé–¢æ•°ã‚’æ¸¡ã—ã¦æç”»
+		m_pModel->Draw(s_pDeviceContext, *s_pStates, world, view, projection);
+	}
+}
+
+/// <summary>
+///  ãƒ“ãƒ«ãƒœãƒ¼ãƒ‰æç”»
 /// </summary>
 void Obj3D::DrawBillboardConstrainY()
 {
@@ -225,13 +247,13 @@ void Obj3D::DrawBillboardConstrainY()
 		const Matrix& view = s_pCamera->GetViewmat();
 		const Matrix& projection = s_pCamera->GetProjmat();
 
-		// ƒrƒ‹ƒ{[ƒhs—ñ‚ğƒ[ƒ‹ƒhs—ñ‚É‡¬
+		// ãƒ“ãƒ«ãƒœãƒ¼ãƒ‰è¡Œåˆ—ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã«åˆæˆ
 		Matrix world = s_pCamera->GetBillboardConstrainY() * m_LocalWorld;
 
 		assert(s_pDeviceContext);
 		assert(s_pStates);
 
-		// Œ¸Z•`‰æ—p‚Ìİ’èŠÖ”‚ğ“n‚µ‚Ä•`‰æ
+		// æ¸›ç®—æç”»ç”¨ã®è¨­å®šé–¢æ•°ã‚’æ¸¡ã—ã¦æç”»
 		m_pModel->Draw(s_pDeviceContext, *s_pStates, world, view, projection);
 	}
 }

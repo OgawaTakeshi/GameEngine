@@ -157,4 +157,19 @@ void Camera::CalcBillboard()
 	m_BillboardConstrainY.m[2][0] = Z.x;
 	m_BillboardConstrainY.m[2][1] = Z.y;
 	m_BillboardConstrainY.m[2][2] = Z.z;
+
+	Y = eyeDir.Cross(X);
+	Y.Normalize();
+	eyeDir.Normalize();
+	// ビルボード行列
+	m_Billboard = Matrix::Identity;
+	m_Billboard.m[0][0] = X.x;
+	m_Billboard.m[0][1] = X.y;
+	m_Billboard.m[0][2] = X.z;
+	m_Billboard.m[1][0] = Y.x;
+	m_Billboard.m[1][1] = Y.y;
+	m_Billboard.m[1][2] = Y.z;
+	m_Billboard.m[2][0] = eyeDir.x;
+	m_Billboard.m[2][1] = eyeDir.y;
+	m_Billboard.m[2][2] = eyeDir.z;
 }
