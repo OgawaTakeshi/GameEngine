@@ -70,23 +70,23 @@ void Game::Initialize(HWND window, int width, int height)
 		// ロックオンカメラを有効に
 		m_CurrentCamera = m_LockOnCamera.get();
 	}
+		
+	{// Obj3Dのシステム初期化
+		Obj3D::CommonDef def;
+		def.pDevice = m_deviceResources->GetD3DDevice();
+		def.pDeviceContext = m_deviceResources->GetD3DDeviceContext();
+		def.pCamera = m_CurrentCamera;
 
-	// Obj3Dの静的な初期化
-	{
-		Obj3D::Defs defs;
-		defs.pDevice = m_deviceResources->GetD3DDevice();
-		defs.pDeviceContext = m_deviceResources->GetD3DDeviceContext();
-		defs.pCamera = m_CurrentCamera;
-
-		Obj3D::StaticInitialize(defs);
+		Obj3D::InitializeCommon(def);
 	}
 
-	// LandShapeの静的な初期化
-	LandShapeCommonDef def;
-	def.pCamera = m_CurrentCamera;
-	def.pDevice = m_deviceResources->GetD3DDevice();
-	def.pDeviceContext = m_deviceResources->GetD3DDeviceContext();
-	LandShape::InitializeCommon(def);
+	{// LandShapeの静的な初期化
+		LandShapeCommon::Def def;
+		def.pCamera = m_CurrentCamera;
+		def.pDevice = m_deviceResources->GetD3DDevice();
+		def.pDeviceContext = m_deviceResources->GetD3DDeviceContext();
+		LandShape::InitializeCommon(def);
+	}
 
 	// プレイヤー作成
 	m_Player = std::make_unique<Player>();
@@ -186,7 +186,7 @@ void Game::Initialize(HWND window, int width, int height)
 	}
 	m_Player->SetLandShapeArray(&m_pLandShapeArray);
 
-	m_ObjSkydome->LoadModelFile(L"Resources/skydome.cmo");
+	m_ObjSkydome->LoadModel(L"skydome");
 
 	m_debugText = std::make_unique<DebugText>(m_deviceResources->GetD3DDevice(), m_deviceResources->GetSpriteBatch());
 
@@ -201,7 +201,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_ObjTrees.resize(TREE_NUM);
 	for (unsigned int i = 0; i < m_ObjTrees.size(); i++)
 	{
-		m_ObjTrees[i].LoadModelFile(L"Resources/billboardGrass.cmo");
+		m_ObjTrees[i].LoadModel(L"billboardGrass");
 		m_ObjTrees[i].EnableAlpha();
 		m_ObjTrees[i].DisableLighting();
 		m_ObjTrees[i].SetScale(Vector3(1,1,1));
@@ -233,7 +233,7 @@ void Game::Update(DX::StepTimer const& timer)
 
 	for (unsigned int i = 0; i < m_ObjTrees.size(); i++)
 	{
-		m_ObjTrees[i].Calc();
+		m_ObjTrees[i].Update();
 	}
 
 	for (std::vector<std::unique_ptr<Enemy>>::iterator it = m_Enemies.begin();
@@ -289,7 +289,7 @@ void Game::Update(DX::StepTimer const& timer)
 				m_Player->ResetBullet();
 
 				ModelEffectManager::getInstance()->Entry(
-					L"Resources/HitEffect.cmo",
+					L"HitEffect",
 					10,
 					inter,	// 座標
 					Vector3(0, 0, 0),	// 速度
@@ -372,7 +372,7 @@ void Game::Update(DX::StepTimer const& timer)
 				interval = 10;
 
 				ModelEffectManager::getInstance()->Entry(
-					L"Resources/HitEffect.cmo",
+					L"HitEffect",
 					10,
 					inter,	// 座標
 					Vector3(0, 0, 0),	// 速度

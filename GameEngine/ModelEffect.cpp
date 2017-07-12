@@ -28,7 +28,7 @@ void ModelEffectManager::Entry(
 	// 一時オブジェクト
 	ModelEffect effect;
 
-	effect.obj.LoadModelFile(filename);
+	effect.obj.LoadModel(filename);
 
 	effect.position = position;
 	effect.velocity = velocity;
@@ -109,7 +109,7 @@ bool ModelEffectManager::ModelEffect::Update(const Vector3& gravity)
 	obj.SetTrans(position);
 	obj.SetRot(rotation);
 	obj.SetScale(scale);
-	obj.Calc();
+	obj.Update();
 
 	return true;
 }

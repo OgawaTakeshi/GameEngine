@@ -1,8 +1,8 @@
-//--------------------------------------------------------------------------------------
-// ƒtƒ@ƒCƒ‹–¼: LandShape
-// ì¬Ò:
-// ì¬“ú:
-// à–¾:’nŒ`“–‚½‚è
+ï»¿//--------------------------------------------------------------------------------------
+// ãƒ•ã‚¡ã‚¤ãƒ«å: LandShape
+// ä½œæˆè€…:
+// ä½œæˆæ—¥:
+// èª¬æ˜:åœ°å½¢å½“ãŸã‚Š
 //--------------------------------------------------------------------------------------
 
 #include <fstream>
@@ -16,40 +16,40 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 
-// Ã“Iƒƒ“ƒo•Ï”‚ÌÀ‘Ì
+// é™çš„ãƒ¡ãƒ³ãƒå¤‰æ•°ã®å®Ÿä½“
 std::unique_ptr<LandShapeCommon> LandShape::s_pCommon;
 std::map<std::wstring, std::unique_ptr<LandShapeData>> LandShape::s_dataarray;
 
-LandShapeCommon::LandShapeCommon(LandShapeCommonDef def)
+LandShapeCommon::LandShapeCommon(Def def)
 {
-	// ƒJƒƒ‰
+	// ã‚«ãƒ¡ãƒ©
 	m_pCamera = def.pCamera;
-	// •`‰æƒXƒe[ƒg
+	// æç”»ã‚¹ãƒ†ãƒ¼ãƒˆ
 	m_pStates.reset(new CommonStates(def.pDevice));
-	// ƒGƒtƒFƒNƒgƒtƒ@ƒNƒgƒŠ
+	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¯ãƒˆãƒª
 	m_pEffectFactory.reset(new EffectFactory(def.pDevice));
-	// ƒvƒŠƒ~ƒeƒBƒuƒoƒbƒ`
+	// ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ãƒãƒƒãƒ
 	m_pPrimitiveBatch.reset(new PrimitiveBatch<VertexPositionNormal>(def.pDeviceContext, BatchSize * 3, BatchSize));
-	// ƒGƒtƒFƒNƒg
+	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
 	m_pEffect.reset(new BasicEffect(def.pDevice));
-	// ƒ‰ƒCƒeƒBƒ“ƒO—LŒø
+	// ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°æœ‰åŠ¹
 	m_pEffect->SetLightingEnabled(true);
-	// ƒ}ƒeƒŠƒAƒ‹ƒJƒ‰[İ’è
+	// ãƒãƒ†ãƒªã‚¢ãƒ«ã‚«ãƒ©ãƒ¼è¨­å®š
 	m_pEffect->SetAmbientLightColor(Vector3(0, 0.0f, 0));
 	m_pEffect->SetDiffuseColor(Vector3(1.0f, 1.0f, 1.0f));
-	// ƒ‰ƒCƒg0iƒOƒŠ[ƒ“j
+	// ãƒ©ã‚¤ãƒˆ0ï¼ˆã‚°ãƒªãƒ¼ãƒ³ï¼‰
 	m_pEffect->SetLightEnabled(0, true);
 	m_pEffect->SetLightDiffuseColor(0, Vector3(0.1f, 0.6f, 0.1f));
 	m_pEffect->SetLightDirection(0, Vector3(0, -1.0f, 0));
-	// ƒ‰ƒCƒg1iƒsƒ“ƒNj
+	// ãƒ©ã‚¤ãƒˆ1ï¼ˆãƒ”ãƒ³ã‚¯ï¼‰
 	m_pEffect->SetLightEnabled(1, true);
 	m_pEffect->SetLightDiffuseColor(1, Vector3(0.5f, 0.2f, 0.3f));
 	m_pEffect->SetLightDirection(1, Vector3(-1, 0, -2));
-	// ƒ‰ƒCƒg2i…Fj
+	// ãƒ©ã‚¤ãƒˆ2ï¼ˆæ°´è‰²ï¼‰
 	m_pEffect->SetLightEnabled(2, true);
 	m_pEffect->SetLightDiffuseColor(2, Vector3(0.3f, 0.3f, 0.6f));
 	m_pEffect->SetLightDirection(2, Vector3(1, 0, 2));
-	// ƒtƒHƒOiŠDFj ¦‰“‹ßŠ´‚ğ‹­’²‚·‚é‚½‚ß‚Ég‚¤
+	// ãƒ•ã‚©ã‚°ï¼ˆç°è‰²ï¼‰ â€»é è¿‘æ„Ÿã‚’å¼·èª¿ã™ã‚‹ãŸã‚ã«ä½¿ã†
 	m_pEffect->SetFogEnabled(true);
 	m_pEffect->SetFogColor(Colors::White);
 	m_pEffect->SetFogStart(2.f);
@@ -59,21 +59,21 @@ LandShapeCommon::LandShapeCommon(LandShapeCommonDef def)
 	void const* shaderByteCode;
 	size_t byteCodeLength;
 
-	// ƒVƒF[ƒ_[‚Ìæ“¾
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒ¼ã®å–å¾—
 	m_pEffect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
-	// “ü—ÍƒŒƒCƒAƒEƒg‚Ìì¬
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã®ä½œæˆ
 	def.pDevice->CreateInputLayout(VertexPositionNormal::InputElements,
 		VertexPositionNormal::InputElementCount,
 		shaderByteCode, byteCodeLength,
 		&m_pInputLayout);
-	// ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg
+	// ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
 	m_pDeviceContext = def.pDeviceContext;
 }
 
 LandShapeCommon::~LandShapeCommon()
 {
-	// “ü—ÍƒŒƒCƒAƒEƒg‚Ì‰ğ•ú
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã®è§£æ”¾
 	if (m_pInputLayout)
 	{
 		m_pInputLayout->Release();
@@ -82,19 +82,19 @@ LandShapeCommon::~LandShapeCommon()
 }
 
 /**
-*	@brief ƒGƒtƒFƒNƒgƒtƒ@ƒNƒgƒŠ[¶¬
+*	@brief ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¯ãƒˆãƒªãƒ¼ç”Ÿæˆ
 */
-void LandShape::InitializeCommon(LandShapeCommonDef def)
+void LandShape::InitializeCommon(LandShapeCommon::Def def)
 {
-	// Šù‚É‰Šú‰»Ï‚İ
+	// æ—¢ã«åˆæœŸåŒ–æ¸ˆã¿
 	if (s_pCommon)	return;
 
-	// ‹¤’Êƒf[ƒ^¶¬
+	// å…±é€šãƒ‡ãƒ¼ã‚¿ç”Ÿæˆ
 	s_pCommon.reset(new LandShapeCommon(def));
 }
 
 //--------------------------------------------------------------------------------------
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 //--------------------------------------------------------------------------------------
 LandShape::LandShape()
 	: m_pData(nullptr)
@@ -103,89 +103,87 @@ LandShape::LandShape()
 }
 
 //--------------------------------------------------------------------------------------
-// ‰Šú‰»
+// åˆæœŸåŒ–
 //--------------------------------------------------------------------------------------
 void LandShape::Initialize(const wstring& filename_bin, const wstring& filename_cmo)
 {
-	// ƒtƒ@ƒCƒ‹–¼‚ª‹ó”’‚Å‚È‚¯‚ê‚Î
+	// ãƒ•ã‚¡ã‚¤ãƒ«åãŒç©ºç™½ã§ãªã‘ã‚Œã°
 	if (filename_bin.size() > 0)
 	{
-		// ƒtƒ‹ƒpƒX‚É•âŠ®
+		// ãƒ•ãƒ«ãƒ‘ã‚¹ã«è£œå®Œ
 		wstring fullpath_bin = L"LandShape/" + filename_bin + L".landshape";
 
 		std::map<std::wstring, std::unique_ptr<LandShapeData>>::iterator it;
 		it = s_dataarray.find(fullpath_bin);
 		if (s_dataarray.count(fullpath_bin) == 0)
 		{
-			// ƒ‚ƒfƒ‹‚Ì“Ç‚İ‚İ
+			// ãƒ¢ãƒ‡ãƒ«ã®èª­ã¿è¾¼ã¿
 			s_dataarray[fullpath_bin] = LandShapeData::CreateFromFile(fullpath_bin.c_str());
 		}
-		// ’nŒ`ƒf[ƒ^‚ğƒZƒbƒg
+		// åœ°å½¢ãƒ‡ãƒ¼ã‚¿ã‚’ã‚»ãƒƒãƒˆ
 		m_pData = s_dataarray[fullpath_bin].get();
 	}
 
-	// ƒtƒ@ƒCƒ‹–¼‚ª‹ó”’‚Å‚È‚¯‚ê‚Î
+	// ãƒ•ã‚¡ã‚¤ãƒ«åãŒç©ºç™½ã§ãªã‘ã‚Œã°
 	if (filename_cmo.size() > 0)
 	{
-		// ƒtƒ‹ƒpƒX‚É•âŠ®
-		wstring fullpath_cmo = L"Resources/" + filename_cmo + L".cmo";
-		// ƒIƒuƒWƒFƒNƒg‰Šú‰»
-		m_Obj.LoadModelFile(fullpath_cmo.c_str());
+		// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåˆæœŸåŒ–
+		m_Obj.LoadModel(filename_cmo.c_str());
 	}
 }
 
 //--------------------------------------------------------------------------------------
-// ƒ[ƒ‹ƒhs—ñ‚ÌŒvZ
+// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã®è¨ˆç®—
 //--------------------------------------------------------------------------------------
 void LandShape::Update()
 {
-	m_Obj.Calc();
-	// ‹ts—ñ‚ğŒvZ
+	m_Obj.Update();
+	// é€†è¡Œåˆ—ã‚’è¨ˆç®—
 	const Matrix& localworld = m_Obj.GetLocalWorld();
 	m_WorldLocal = localworld.Invert();
 }
 
 //--------------------------------------------------------------------------------------
-// ’nŒ`ƒf[ƒ^‚Ì•`‰æ
+// åœ°å½¢ãƒ‡ãƒ¼ã‚¿ã®æç”»
 //--------------------------------------------------------------------------------------
 void LandShape::Draw()
 {
 	if (CollisionNode::GetDebugVisible() == false)
 	{
-		// ƒ‚ƒfƒ‹•`‰æ
+		// ãƒ¢ãƒ‡ãƒ«æç”»
 		m_Obj.Draw();
 	}
 	else if (m_pData)
 	{
-		// ƒfƒoƒbƒO•`‰æ
+		// ãƒ‡ãƒãƒƒã‚°æç”»
 		const Matrix& view = s_pCommon->m_pCamera->GetViewmat();
 		const Matrix& projection = s_pCommon->m_pCamera->GetProjmat();
 
-		// ì¬‚µ‚½s—ñ‚ğƒGƒtƒFƒNƒg‚ÉƒZƒbƒg
+		// ä½œæˆã—ãŸè¡Œåˆ—ã‚’ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã«ã‚»ãƒƒãƒˆ
 		s_pCommon->m_pEffect->SetWorld(m_Obj.GetLocalWorld());
 		s_pCommon->m_pEffect->SetView(view);
 		s_pCommon->m_pEffect->SetProjection(projection);
 
-		// ƒGƒtƒFƒNƒg‚Ìİ’èiŠes—ñ‚âƒeƒNƒXƒ`ƒƒ‚È‚Ç‚ğİ’è‚µ‚Ä‚¢‚éj
+		// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã®è¨­å®šï¼ˆå„è¡Œåˆ—ã‚„ãƒ†ã‚¯ã‚¹ãƒãƒ£ãªã©ã‚’è¨­å®šã—ã¦ã„ã‚‹ï¼‰
 		s_pCommon->m_pEffect->Apply(s_pCommon->m_pDeviceContext);
 
-		// [“xƒXƒeƒ“ƒVƒ‹ ƒXƒe[ƒg‚ğİ’è‚·‚é
+		// æ·±åº¦ã‚¹ãƒ†ãƒ³ã‚·ãƒ« ã‚¹ãƒ†ãƒ¼ãƒˆã‚’è¨­å®šã™ã‚‹
 		s_pCommon->m_pDeviceContext->OMSetDepthStencilState(s_pCommon->m_pStates->DepthDefault(), 0);
 
-		// ƒuƒŒƒ“ƒfƒBƒ“ƒO ƒXƒe[ƒg‚ğİ’è‚·‚é
+		// ãƒ–ãƒ¬ãƒ³ãƒ‡ã‚£ãƒ³ã‚° ã‚¹ãƒ†ãƒ¼ãƒˆã‚’è¨­å®šã™ã‚‹
 		s_pCommon->m_pDeviceContext->OMSetBlendState(s_pCommon->m_pStates->NonPremultiplied(), nullptr, 0xFFFFFFFF);
 
-		// ƒ‰ƒXƒ^ƒ‰ƒCƒU ƒXƒe[ƒg‚ğİ’è‚·‚é Œv‰ñ‚è‚ğ”ñ•\¦
+		// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¶ ã‚¹ãƒ†ãƒ¼ãƒˆã‚’è¨­å®šã™ã‚‹ æ™‚è¨ˆå›ã‚Šã‚’éè¡¨ç¤º
 		s_pCommon->m_pDeviceContext->RSSetState(s_pCommon->m_pStates->CullNone());
 
-		// ƒTƒ“ƒvƒ‰[ƒXƒe[ƒg‚ğİ’è‚·‚é
+		// ã‚µãƒ³ãƒ—ãƒ©ãƒ¼ã‚¹ãƒ†ãƒ¼ãƒˆã‚’è¨­å®šã™ã‚‹
 		auto samplerState = s_pCommon->m_pStates->PointWrap();
 		s_pCommon->m_pDeviceContext->PSSetSamplers(0, 1, &samplerState);
 
-		// “ü—ÍƒŒƒCƒAƒEƒg‚ğİ’è‚·‚é
+		// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã‚’è¨­å®šã™ã‚‹
 		s_pCommon->m_pDeviceContext->IASetInputLayout(s_pCommon->m_pInputLayout);
 
-		// •`‰æŠJn
+		// æç”»é–‹å§‹
 		s_pCommon->m_pPrimitiveBatch->Begin();
 
 		const uint16_t* pIndex = &m_pData->m_Indices[0];
@@ -194,10 +192,10 @@ void LandShape::Draw()
 		const VertexPositionNormal* pVertex = (VertexPositionNormal*)&m_pData->m_Vertices[0];
 		int numVertex = m_pData->m_Vertices.size();
 
-		// OŠpŒ`ƒvƒŠƒ~ƒeƒBƒu‚Ì•`‰æ
+		// ä¸‰è§’å½¢ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ã®æç”»
 		s_pCommon->m_pPrimitiveBatch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, pIndex, numIndex, pVertex, numVertex);
 
-		// •`‰æI—¹
+		// æç”»çµ‚äº†
 		s_pCommon->m_pPrimitiveBatch->End();
 	}
 }
@@ -208,38 +206,38 @@ void LandShape::DisableLighting()
 }
 
 //--------------------------------------------------------------------------------------
-// ’nŒ`‚Æ‹…‚ÌŒğ·”»’è
-// sphere : ”»’è‹…
-// reject : ‰Ÿ‚µo‚·ƒxƒNƒgƒ‹
+// åœ°å½¢ã¨çƒã®äº¤å·®åˆ¤å®š
+// sphere : åˆ¤å®šçƒ
+// reject : æŠ¼ã—å‡ºã™ãƒ™ã‚¯ãƒˆãƒ«
 //--------------------------------------------------------------------------------------
 bool LandShape::IntersectSphere(const Sphere& sphere, Vector3* reject)
 {
 	if (m_pData == nullptr) return false;
 
-	// ƒqƒbƒgƒtƒ‰ƒO‚ğ‰Šú‰»
+	// ãƒ’ãƒƒãƒˆãƒ•ãƒ©ã‚°ã‚’åˆæœŸåŒ–
 	bool hit = false;
-	// ‘å‚«‚¢”š‚Å‰Šú‰»
+	// å¤§ãã„æ•°å­—ã§åˆæœŸåŒ–
 	float over_length = 1.0e5;
 	Vector3 l_inter;
 	Vector3 l_normal;
 	Vector3 l_down;
-	// ƒXƒP[ƒ‹‚ğæ“¾
+	// ã‚¹ã‚±ãƒ¼ãƒ«ã‚’å–å¾—
 	float scale = GetScale();
 
-	// ‹…‚ğƒRƒs[
+	// çƒã‚’ã‚³ãƒ”ãƒ¼
 	Sphere localsphere = sphere;
 
-	// ƒXƒP[ƒ‹0‚Ìê‡A”»’è‚µ‚È‚¢
+	// ã‚¹ã‚±ãƒ¼ãƒ«0ã®å ´åˆã€åˆ¤å®šã—ãªã„
 	if (scale <= 1.0e-10) return false;
 
-	// ‹…‚Ì’†S“_‚ğƒ[ƒ‹ƒhÀ•W‚©‚çƒ‚ƒfƒ‹À•WŒn‚Éˆø‚«‚Ş
+	// çƒã®ä¸­å¿ƒç‚¹ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«åº§æ¨™ç³»ã«å¼•ãè¾¼ã‚€
 	localsphere.center = Vector3::Transform(sphere.center, m_WorldLocal);
-	// ”¼Œa‚ğƒ[ƒ‹ƒh‚ğƒ[ƒ‹ƒhÀ•WŒn‚©‚çƒ‚ƒfƒ‹À•WŒn‚É•ÏŠ·
+	// åŠå¾„ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ç³»ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«åº§æ¨™ç³»ã«å¤‰æ›
 	localsphere.radius = sphere.radius / scale;
 
-	// OŠpŒ`‚Ì”
+	// ä¸‰è§’å½¢ã®æ•°
 	int nTri = m_pData->m_Triangles.size();
-	// ‘S‚Ä‚ÌOŠpŒ`‚É‚Â‚¢‚Ä
+	// å…¨ã¦ã®ä¸‰è§’å½¢ã«ã¤ã„ã¦
 	for (int i = 0; i < nTri; i++)
 	{
 		float temp_over_length;
@@ -247,19 +245,19 @@ bool LandShape::IntersectSphere(const Sphere& sphere, Vector3* reject)
 
 		const Triangle& tri = m_pData->m_Triangles[i];
 
-		// OŠpŒ`‚Æ‹…‚Ì“–‚½‚è”»’è
+		// ä¸‰è§’å½¢ã¨çƒã®å½“ãŸã‚Šåˆ¤å®š
 		if (CheckSphere2Triangle(localsphere, tri, &temp_inter))
-		{// ƒqƒbƒg‚µ‚½
+		{// ãƒ’ãƒƒãƒˆã—ãŸ
 			hit = true;
-			// Õ“Ë“_‚©‚ç‹…‚Ì’†S‚Ö‚ÌƒxƒNƒgƒ‹
+			// è¡çªç‚¹ã‹ã‚‰çƒã®ä¸­å¿ƒã¸ã®ãƒ™ã‚¯ãƒˆãƒ«
 			Vector3 sub = localsphere.center - temp_inter;
-			// ‹…‚Ì’†S‚ªOŠpŒ`‚É‚ß‚è‚±‚ñ‚Å‚¢‚é‹——£‚ğŒvZ
+			// çƒã®ä¸­å¿ƒãŒä¸‰è§’å½¢ã«ã‚ã‚Šã“ã‚“ã§ã„ã‚‹è·é›¢ã‚’è¨ˆç®—
 			temp_over_length = sub.Dot(-tri.Normal);
 
-			// ‚ß‚è‚±‚İ‹ï‡‚ª‚±‚±‚Ü‚Å‚ÅÅ¬‚È‚ç
+			// ã‚ã‚Šã“ã¿å…·åˆãŒã“ã“ã¾ã§ã§æœ€å°ãªã‚‰
 			if (temp_over_length < over_length)
 			{
-				// ƒqƒbƒgÀ•WA–@üA‚ß‚è‚±‚İ‹——£‚ğ‹L˜^
+				// ãƒ’ãƒƒãƒˆåº§æ¨™ã€æ³•ç·šã€ã‚ã‚Šã“ã¿è·é›¢ã‚’è¨˜éŒ²
 				l_inter = temp_inter;
 				l_normal = tri.Normal;
 				over_length = temp_over_length;
@@ -269,19 +267,19 @@ bool LandShape::IntersectSphere(const Sphere& sphere, Vector3* reject)
 
 	if (hit)
 	{
-		// ‹——£‚ğƒ‚ƒfƒ‹À•WŒn‚©‚çƒ[ƒ‹ƒhÀ•WŒn‚Å‚Ì’·‚³‚É•ÏŠ·
+		// è·é›¢ã‚’ãƒ¢ãƒ‡ãƒ«åº§æ¨™ç³»ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ç³»ã§ã®é•·ã•ã«å¤‰æ›
 		over_length *= scale;
 
-		// ƒ[ƒ‹ƒhs—ñ‚ğæ“¾
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’å–å¾—
 		const Matrix& localworld = m_Obj.GetLocalWorld();
 
-		// ”rËƒxƒNƒgƒ‹‚ÌŒvZ
+		// æ’æ–¥ãƒ™ã‚¯ãƒˆãƒ«ã®è¨ˆç®—
 		if (reject != nullptr)
 		{
-			// ’nŒ`‚Ì–@ü•ûŒü‚ğƒ‚ƒfƒ‹À•WŒn‚©‚çƒ[ƒ‹ƒhÀ•WŒn‚É•ÏŠ·
+			// åœ°å½¢ã®æ³•ç·šæ–¹å‘ã‚’ãƒ¢ãƒ‡ãƒ«åº§æ¨™ç³»ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ç³»ã«å¤‰æ›
 			*reject = Vector3::TransformNormal(l_normal, localworld);
 			reject->Normalize();
-			// ‚ß‚è‚İ•ª‚¾‚¯‰Ÿ‚µo‚·ƒxƒNƒgƒ‹‚ğŒvZ
+			// ã‚ã‚Šè¾¼ã¿åˆ†ã ã‘æŠ¼ã—å‡ºã™ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¨ˆç®—
 			const float extra = 0.05f;
 			float reject_distance = sphere.radius + over_length + extra;
 			*reject = (*reject) * reject_distance;
@@ -292,65 +290,65 @@ bool LandShape::IntersectSphere(const Sphere& sphere, Vector3* reject)
 }
 
 //--------------------------------------------------------------------------------------
-// ’nŒ`‚Æü•ª‚ÌŒğ·”»’è
-// segment : ü•ª
-// io—Íjinter : Œğ“_iƒ|ƒŠƒSƒ“‚Ì•½–Êã‚ÅA“_‚Æ‚ÌÄÚ‹ß“_‚ÌÀ•W‚ğ•Ô‚·j
+// åœ°å½¢ã¨ç·šåˆ†ã®äº¤å·®åˆ¤å®š
+// segment : ç·šåˆ†
+// ï¼ˆå‡ºåŠ›ï¼‰inter : äº¤ç‚¹ï¼ˆãƒãƒªã‚´ãƒ³ã®å¹³é¢ä¸Šã§ã€ç‚¹ã¨ã®å†æ¥è¿‘ç‚¹ã®åº§æ¨™ã‚’è¿”ã™ï¼‰
 //--------------------------------------------------------------------------------------
 bool LandShape::IntersectSegmentFloor(const Segment& segment, Vector3* inter)
 {
 	if (m_pData == nullptr) return false;
 
-	// ƒqƒbƒgƒtƒ‰ƒO‚ğ‰Šú‰»
+	// ãƒ’ãƒƒãƒˆãƒ•ãƒ©ã‚°ã‚’åˆæœŸåŒ–
 	bool hit = false;
-	// ‘å‚«‚¢”š‚Å‰Šú‰»
+	// å¤§ãã„æ•°å­—ã§åˆæœŸåŒ–
 	float distance = 1.0e5;
-	// Šp“x”»’è—p‚É’n–Ê‚Æ‚İ‚È‚·Šp“x‚ÌŒÀŠE’l<“x>
+	// è§’åº¦åˆ¤å®šç”¨ã«åœ°é¢ã¨ã¿ãªã™è§’åº¦ã®é™ç•Œå€¤<åº¦>
 	const float limit_angle = XMConvertToRadians(30.0f);
 	Vector3 l_inter;
 
-	// ƒRƒs[
+	// ã‚³ãƒ”ãƒ¼
 	Segment localSegment = segment;
-	// ü•ª‚ğƒ[ƒ‹ƒhÀ•W‚©‚çƒ‚ƒfƒ‹À•WŒn‚Éˆø‚«‚Ş
+	// ç·šåˆ†ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«åº§æ¨™ç³»ã«å¼•ãè¾¼ã‚€
 	localSegment.start = Vector3::Transform(localSegment.start, m_WorldLocal);
 	localSegment.end = Vector3::Transform(localSegment.end, m_WorldLocal);
-	// ü•ª‚Ì•ûŒüƒxƒNƒgƒ‹‚ğæ“¾
+	// ç·šåˆ†ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’å–å¾—
 	Vector3 segmentNormal = localSegment.end - localSegment.start;
 	segmentNormal.Normalize();
 
-	// OŠpŒ`‚Ì”
+	// ä¸‰è§’å½¢ã®æ•°
 	int nTri = m_pData->m_Triangles.size();
-	// ‘S‚Ä‚ÌOŠpŒ`‚É‚Â‚¢‚Ä
+	// å…¨ã¦ã®ä¸‰è§’å½¢ã«ã¤ã„ã¦
 	for (int i = 0; i < nTri; i++)
 	{
 		float temp_distance;
 		Vector3 temp_inter;
 
-		// ã•ûŒüƒxƒNƒgƒ‹‚Æ–@ü‚Ì“àÏ
-		// ’·‚³‚ª‚P‚ÌƒxƒNƒgƒ‹‚Q“¯m‚Ì“àÏ‚ÍAƒRƒTƒCƒ“iƒxƒNƒgƒ‹‚Ì“àÏ‚Ì’è‹`‚æ‚èj
+		// ä¸Šæ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã¨æ³•ç·šã®å†…ç©
+		// é•·ã•ãŒï¼‘ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼’åŒå£«ã®å†…ç©ã¯ã€ã‚³ã‚µã‚¤ãƒ³ï¼ˆãƒ™ã‚¯ãƒˆãƒ«ã®å†…ç©ã®å®šç¾©ã‚ˆã‚Šï¼‰
 		float cosine = -segmentNormal.Dot(m_pData->m_Triangles[i].Normal);
-		//// ƒRƒTƒCƒ“’l‚©‚çAã•ûŒü‚Æ‚ÌŠp“x·‚ğŒvZ
+		//// ã‚³ã‚µã‚¤ãƒ³å€¤ã‹ã‚‰ã€ä¸Šæ–¹å‘ã¨ã®è§’åº¦å·®ã‚’è¨ˆç®—
 		//float angle = acosf(cosine);
-		//// ã•ûŒü‚Æ‚ÌŠp“x‚ªŒÀŠEŠp‚æ‚è‘å‚«‚¯‚ê‚ÎA–Ê‚ÌŒX‚«‚ª‘å‚«‚¢‚Ì‚ÅA’n–Ê‚Æ‚İ‚È‚³‚¸ƒXƒLƒbƒv
+		//// ä¸Šæ–¹å‘ã¨ã®è§’åº¦ãŒé™ç•Œè§’ã‚ˆã‚Šå¤§ãã‘ã‚Œã°ã€é¢ã®å‚¾ããŒå¤§ãã„ã®ã§ã€åœ°é¢ã¨ã¿ãªã•ãšã‚¹ã‚­ãƒƒãƒ—
 		//if ( angle > limit_angle ) continue;
 
-		//--‚‘¬”Å--
+		//--é«˜é€Ÿç‰ˆ--
 		const float limit_cosine = cosf(limit_angle);
-		// ƒRƒTƒCƒ“‚ª‚P‚Ì‚Æ‚«‚ÉƒxƒNƒgƒ‹ŠÔ‚ÌŠp“x‚Í0“x‚Å‚ ‚èAƒxƒNƒgƒ‹‚ÌŠp“x·‚ª‘å‚«‚¢‚Ù‚ÇAƒRƒTƒCƒ“‚Í¬‚³‚¢‚Ì‚ÅA
-		// ƒRƒTƒCƒ“’l‚Ì‚Ü‚Ü”äŠr‚·‚é‚ÆAŠp“x‚Ì”äŠr‚Ìê‡‚Æ‘å¬ŠÖŒW‚ª‹t‚Å‚ ‚é
-		// ‚Â‚Ü‚èAƒRƒTƒCƒ“’l‚ªˆê’è’l‚æ‚è¬‚³‚¯‚ê‚ÎA–Ê‚ÌŒX‚«‚ª‘å‚«‚¢‚Ì‚ÅA’n–Ê‚Æ‚İ‚È‚³‚¸ƒXƒLƒbƒv
+		// ã‚³ã‚µã‚¤ãƒ³ãŒï¼‘ã®ã¨ãã«ãƒ™ã‚¯ãƒˆãƒ«é–“ã®è§’åº¦ã¯0åº¦ã§ã‚ã‚Šã€ãƒ™ã‚¯ãƒˆãƒ«ã®è§’åº¦å·®ãŒå¤§ãã„ã»ã©ã€ã‚³ã‚µã‚¤ãƒ³ã¯å°ã•ã„ã®ã§ã€
+		// ã‚³ã‚µã‚¤ãƒ³å€¤ã®ã¾ã¾æ¯”è¼ƒã™ã‚‹ã¨ã€è§’åº¦ã®æ¯”è¼ƒã®å ´åˆã¨å¤§å°é–¢ä¿‚ãŒé€†ã§ã‚ã‚‹
+		// ã¤ã¾ã‚Šã€ã‚³ã‚µã‚¤ãƒ³å€¤ãŒä¸€å®šå€¤ã‚ˆã‚Šå°ã•ã‘ã‚Œã°ã€é¢ã®å‚¾ããŒå¤§ãã„ã®ã§ã€åœ°é¢ã¨ã¿ãªã•ãšã‚¹ã‚­ãƒƒãƒ—
 		if (cosine < limit_cosine) continue;
-		//--‚‘¬”Å‚±‚±‚Ü‚Å--
+		//--é«˜é€Ÿç‰ˆã“ã“ã¾ã§--
 
-		// ü•ª‚ÆOŠpŒ`iƒ|ƒŠƒSƒ“j‚ÌŒğ·”»’è
+		// ç·šåˆ†ã¨ä¸‰è§’å½¢ï¼ˆãƒãƒªã‚´ãƒ³ï¼‰ã®äº¤å·®åˆ¤å®š
 		if (CheckSegment2Triangle(localSegment, m_pData->m_Triangles[i], &temp_inter))
 		{
 			hit = true;
-			// ü•ª‚Ìn“_‚ÆÕ“Ë“_‚Ì‹——£‚ğŒvZi‚ß‚è‚±‚İ‹——£j
+			// ç·šåˆ†ã®å§‹ç‚¹ã¨è¡çªç‚¹ã®è·é›¢ã‚’è¨ˆç®—ï¼ˆã‚ã‚Šã“ã¿è·é›¢ï¼‰
 			temp_distance = Vector3::Distance(localSegment.start, temp_inter);
-			// ‚ß‚è‚±‚İ‹ï‡‚ª‚±‚±‚Ü‚Å‚ÅÅ¬‚È‚ç
+			// ã‚ã‚Šã“ã¿å…·åˆãŒã“ã“ã¾ã§ã§æœ€å°ãªã‚‰
 			if (temp_distance < distance)
 			{
-				// Õ“Ë“_‚ÌÀ•WA‚ß‚è‚±‚İ‹——£‚ğ‹L˜^
+				// è¡çªç‚¹ã®åº§æ¨™ã€ã‚ã‚Šã“ã¿è·é›¢ã‚’è¨˜éŒ²
 				l_inter = temp_inter;
 				distance = temp_distance;
 			}
@@ -359,7 +357,7 @@ bool LandShape::IntersectSegmentFloor(const Segment& segment, Vector3* inter)
 
 	if (hit && inter != nullptr)
 	{
-		// Õ“Ë“_‚ÌÀ•W‚ğƒ‚ƒfƒ‹À•WŒn‚©‚çƒ[ƒ‹ƒhÀ•WŒn‚É•ÏŠ·
+		// è¡çªç‚¹ã®åº§æ¨™ã‚’ãƒ¢ãƒ‡ãƒ«åº§æ¨™ç³»ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ç³»ã«å¤‰æ›
 		const Matrix& localworld = m_Obj.GetLocalWorld();
 		*inter = Vector3::Transform(l_inter, localworld);
 	}
@@ -368,47 +366,47 @@ bool LandShape::IntersectSegmentFloor(const Segment& segment, Vector3* inter)
 }
 
 //--------------------------------------------------------------------------------------
-// ’nŒ`‚Æü•ª‚ÌŒğ·”»’è
-// segment : ü•ª
-// io—Íjinter : Œğ“_iƒ|ƒŠƒSƒ“‚Ì•½–Êã‚ÅA“_‚Æ‚ÌÄÚ‹ß“_‚ÌÀ•W‚ğ•Ô‚·j
+// åœ°å½¢ã¨ç·šåˆ†ã®äº¤å·®åˆ¤å®š
+// segment : ç·šåˆ†
+// ï¼ˆå‡ºåŠ›ï¼‰inter : äº¤ç‚¹ï¼ˆãƒãƒªã‚´ãƒ³ã®å¹³é¢ä¸Šã§ã€ç‚¹ã¨ã®å†æ¥è¿‘ç‚¹ã®åº§æ¨™ã‚’è¿”ã™ï¼‰
 //--------------------------------------------------------------------------------------
 bool LandShape::IntersectSegment(const Segment& segment, Vector3* inter)
 {
 	if (m_pData == nullptr) return false;
 
-	// ƒqƒbƒgƒtƒ‰ƒO‚ğ‰Šú‰»
+	// ãƒ’ãƒƒãƒˆãƒ•ãƒ©ã‚°ã‚’åˆæœŸåŒ–
 	bool hit = false;
-	// ‘å‚«‚¢”š‚Å‰Šú‰»
+	// å¤§ãã„æ•°å­—ã§åˆæœŸåŒ–
 	float distance = 1.0e5;
 	Vector3 l_inter;
 
-	// ƒRƒs[
+	// ã‚³ãƒ”ãƒ¼
 	Segment localSegment = segment;
-	// ü•ª‚ğƒ[ƒ‹ƒhÀ•W‚©‚çƒ‚ƒfƒ‹À•WŒn‚Éˆø‚«‚Ş
+	// ç·šåˆ†ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã‹ã‚‰ãƒ¢ãƒ‡ãƒ«åº§æ¨™ç³»ã«å¼•ãè¾¼ã‚€
 	localSegment.start = Vector3::Transform(localSegment.start, m_WorldLocal);
 	localSegment.end = Vector3::Transform(localSegment.end, m_WorldLocal);
-	// ü•ª‚Ì•ûŒüƒxƒNƒgƒ‹‚ğæ“¾
+	// ç·šåˆ†ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’å–å¾—
 	Vector3 segmentNormal = localSegment.end - localSegment.start;
 	segmentNormal.Normalize();
 
-	// OŠpŒ`‚Ì”
+	// ä¸‰è§’å½¢ã®æ•°
 	int nTri = m_pData->m_Triangles.size();
-	// ‘S‚Ä‚ÌOŠpŒ`‚É‚Â‚¢‚Ä
+	// å…¨ã¦ã®ä¸‰è§’å½¢ã«ã¤ã„ã¦
 	for (int i = 0; i < nTri; i++)
 	{
 		float temp_distance;
 		Vector3 temp_inter;
 
-		// ü•ª‚ÆOŠpŒ`iƒ|ƒŠƒSƒ“j‚ÌŒğ·”»’è
+		// ç·šåˆ†ã¨ä¸‰è§’å½¢ï¼ˆãƒãƒªã‚´ãƒ³ï¼‰ã®äº¤å·®åˆ¤å®š
 		if (CheckSegment2Triangle(localSegment, m_pData->m_Triangles[i], &temp_inter))
 		{
 			hit = true;
-			// ü•ª‚Ìn“_‚ÆÕ“Ë“_‚Ì‹——£‚ğŒvZi‚ß‚è‚±‚İ‹——£j
+			// ç·šåˆ†ã®å§‹ç‚¹ã¨è¡çªç‚¹ã®è·é›¢ã‚’è¨ˆç®—ï¼ˆã‚ã‚Šã“ã¿è·é›¢ï¼‰
 			temp_distance = Vector3::Distance(localSegment.start, temp_inter);
-			// ‚ß‚è‚±‚İ‹ï‡‚ª‚±‚±‚Ü‚Å‚ÅÅ¬‚È‚ç
+			// ã‚ã‚Šã“ã¿å…·åˆãŒã“ã“ã¾ã§ã§æœ€å°ãªã‚‰
 			if (temp_distance < distance)
 			{
-				// Õ“Ë“_‚ÌÀ•WA‚ß‚è‚±‚İ‹——£‚ğ‹L˜^
+				// è¡çªç‚¹ã®åº§æ¨™ã€ã‚ã‚Šã“ã¿è·é›¢ã‚’è¨˜éŒ²
 				l_inter = temp_inter;
 				distance = temp_distance;
 			}
@@ -417,7 +415,7 @@ bool LandShape::IntersectSegment(const Segment& segment, Vector3* inter)
 
 	if (hit && inter != nullptr)
 	{
-		// Õ“Ë“_‚ÌÀ•W‚ğƒ‚ƒfƒ‹À•WŒn‚©‚çƒ[ƒ‹ƒhÀ•WŒn‚É•ÏŠ·
+		// è¡çªç‚¹ã®åº§æ¨™ã‚’ãƒ¢ãƒ‡ãƒ«åº§æ¨™ç³»ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ç³»ã«å¤‰æ›
 		const Matrix& localworld = m_Obj.GetLocalWorld();
 		*inter = Vector3::Transform(l_inter, localworld);
 	}

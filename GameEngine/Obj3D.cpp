@@ -5,27 +5,27 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+// 定数
+// リソースディレクトリパス
+const wstring Obj3D::RESOURCE_DIRECTORY = L"Resources/CMO/";
+// ファイル拡張子
+const wstring Obj3D::RESOURCE_EXT = L".cmo";
 // 静的メンバ変数の実体
-ID3D11Device* Obj3D::s_pDevice;
-ID3D11DeviceContext* Obj3D::s_pDeviceContext;
-std::unique_ptr<DirectX::CommonStates>	Obj3D::s_pStates;
-std::unique_ptr<DirectX::EffectFactory>	Obj3D::s_pEffectFactory;
-Camera* Obj3D::s_pCamera;
-std::map<std::wstring, std::unique_ptr<DirectX::Model>> Obj3D::s_modelarray;
-ID3D11BlendState* Obj3D::s_pBlendStateSubtract;
+Obj3D::Common Obj3D::s_Common;
 
-void Obj3D::StaticInitialize(const Defs& def)
+void Obj3D::InitializeCommon(CommonDef def)
 {
-	SetDevice(def.pDevice);
-	SetDeviceContext(def.pDeviceContext);
-	SetCamera(def.pCamera);
+	s_Common.device = def.pDevice;
+	s_Common.deviceContext = def.pDeviceContext;
+	s_Common.camera = def.pCamera;
 
 	// エフェクトファクトリ生成
-	s_pEffectFactory = std::make_unique<EffectFactory>(def.pDevice);
-	s_pEffectFactory->SetDirectory(L"Resources");
+	s_Common.effectFactory = std::make_unique<EffectFactory>(def.pDevice);
+	// テクスチャ読み込みパス指定
+	s_Common.effectFactory->SetDirectory(RESOURCE_DIRECTORY.c_str());
 
 	// 汎用ステート生成
-	s_pStates = std::make_unique<CommonStates>(def.pDevice);
+	s_Common.states = std::make_unique<CommonStates>(def.pDevice);
 
 	// 減算描画用のブレンドステートを作成
 	D3D11_BLEND_DESC desc;
@@ -39,18 +39,23 @@ void Obj3D::StaticInitialize(const Defs& def)
 	desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 	desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_REV_SUBTRACT;
 	desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	HRESULT ret = s_pDevice->CreateBlendState(&desc, &s_pBlendStateSubtract);
+	HRESULT ret = def.pDevice->CreateBlendState(&desc, &s_Common.blendStateSubtract);
+}
+
+void Obj3D::UnloadAll()
+{
+	s_Common.modelarray.clear();
 }
 
 void Obj3D::SetSubtractive()
 {
 	// 減算描画を設定
-	s_pDeviceContext->OMSetBlendState(s_pBlendStateSubtract, nullptr, 0xffffff);
+	s_Common.deviceContext->OMSetBlendState(s_Common.blendStateSubtract, nullptr, 0xffffff);
 }
 
-/**
-*	@brief コンストラクタ
-*/
+/// <summary>
+/// コンストラクタ
+/// </summary>
 Obj3D::Obj3D()
 : m_pParent(nullptr)
 , m_pModel(nullptr)
@@ -60,27 +65,23 @@ Obj3D::Obj3D()
 	m_Scale = Vector3(1, 1, 1);
 }
 
-/**
-*	@brief デストラクタ
-*/
-Obj3D::~Obj3D()
+/// <summary>
+/// ファイルからモデルを読み込む
+/// </summary>
+/// <param name="filename">CMOファイル名</param>
+void Obj3D::LoadModel(const wchar_t*filename)
 {
-}
+	assert(s_Common.effectFactory);
 
-/**
-*	@brief ファイルからモデルを読み込む
-*/
-void Obj3D::LoadModelFile(const wchar_t*filename)
-{
-	assert(s_pEffectFactory);
-
-	// 同じ名前のモデルを読み込み済みでなければひｔ
-	if (s_modelarray.count(filename) == 0 )
+	// 指定ファイルを読み込み済みでないか？
+	if (s_Common.modelarray.count(filename) == 0 )
 	{
+		// フルパスに補完
+		wstring fullpath_bin = RESOURCE_DIRECTORY + filename + RESOURCE_EXT;
 		// モデルを読み込み、コンテナに登録（キーはファイル名）
-		s_modelarray[filename] = Model::CreateFromCMO(s_pDevice, filename, *s_pEffectFactory);
+		s_Common.modelarray[filename] = Model::CreateFromCMO(s_Common.device, fullpath_bin.c_str(), *s_Common.effectFactory);
 	}
-	m_pModel = s_modelarray[filename].get();
+	m_pModel = s_Common.modelarray[filename].get();
 }
 
 /**
@@ -144,13 +145,13 @@ void Obj3D::EnableAlpha()
 
 				// メッシュパーツにセットされたエフェクトをBasicEffectとして取得
 				std::shared_ptr<IEffect>& ieff = meshpart->effect;
-				meshpart->ModifyEffect(s_pDevice, ieff, true);
+				meshpart->ModifyEffect(s_Common.device, ieff, true);
 			}
 		}
 	}
 }
 
-void Obj3D::Calc()
+void Obj3D::Update()
 {
 	Matrix scalem;
 	Matrix rotm;
@@ -170,16 +171,16 @@ void Obj3D::Calc()
 	transm = Matrix::CreateTranslation(m_Trans);
 
 	// ワールド行列をSRTの順に合成
-	m_LocalWorld = Matrix::Identity;
-	m_LocalWorld *= scalem;
-	m_LocalWorld *= rotm;
-	m_LocalWorld *= transm;
+	m_World = Matrix::Identity;
+	m_World *= scalem;
+	m_World *= rotm;
+	m_World *= transm;
 
 	// 親行列があれば
 	if ( m_pParent )
 	{
 		// 親行列を掛ける
-		m_LocalWorld = m_LocalWorld * m_pParent->GetLocalWorld();
+		m_World = m_World * m_pParent->GetLocalWorld();
 	}
 }
 
@@ -187,14 +188,14 @@ void Obj3D::Draw()
 {
 	if ( m_pModel )
 	{
-		assert(s_pCamera);
-		const Matrix& view = s_pCamera->GetViewmat();
-		const Matrix& projection = s_pCamera->GetProjmat();
+		assert(s_Common.camera);
+		const Matrix& view = s_Common.camera->GetViewmat();
+		const Matrix& projection = s_Common.camera->GetProjmat();
 
-		assert(s_pDeviceContext);
-		assert(s_pStates);
+		assert(s_Common.deviceContext);
+		assert(s_Common.states);
 
-		m_pModel->Draw(s_pDeviceContext, *s_pStates, m_LocalWorld, view, projection);
+		m_pModel->Draw(s_Common.deviceContext, *s_Common.states, m_World, view, projection);
 	}
 }
 
@@ -202,15 +203,15 @@ void Obj3D::DrawSubtractive()
 {
 	if (m_pModel)
 	{
-		assert(s_pCamera);
-		const Matrix& view = s_pCamera->GetViewmat();
-		const Matrix& projection = s_pCamera->GetProjmat();
+		assert(s_Common.camera);
+		const Matrix& view = s_Common.camera->GetViewmat();
+		const Matrix& projection = s_Common.camera->GetProjmat();
 
-		assert(s_pDeviceContext);
-		assert(s_pStates);
+		assert(s_Common.deviceContext);
+		assert(s_Common.states);
 
 		// 減算描画用の設定関数を渡して描画
-		m_pModel->Draw(s_pDeviceContext, *s_pStates, m_LocalWorld, view, projection, false, Obj3D::SetSubtractive);
+		m_pModel->Draw(s_Common.deviceContext, *s_Common.states, m_World, view, projection, false, Obj3D::SetSubtractive);
 	}
 }
 
@@ -221,18 +222,18 @@ void Obj3D::DrawBillboard()
 {
 	if (m_pModel)
 	{
-		assert(s_pCamera);
-		const Matrix& view = s_pCamera->GetViewmat();
-		const Matrix& projection = s_pCamera->GetProjmat();
+		assert(s_Common.camera);
+		const Matrix& view = s_Common.camera->GetViewmat();
+		const Matrix& projection = s_Common.camera->GetProjmat();
 
 		// ビルボード行列をワールド行列に合成
-		Matrix world = s_pCamera->GetBillboard() * m_LocalWorld;
+		Matrix world = s_Common.camera->GetBillboard() * m_World;
 
-		assert(s_pDeviceContext);
-		assert(s_pStates);
+		assert(s_Common.deviceContext);
+		assert(s_Common.states);
 
 		// 減算描画用の設定関数を渡して描画
-		m_pModel->Draw(s_pDeviceContext, *s_pStates, world, view, projection);
+		m_pModel->Draw(s_Common.deviceContext, *s_Common.states, world, view, projection);
 	}
 }
 
@@ -243,17 +244,17 @@ void Obj3D::DrawBillboardConstrainY()
 {
 	if (m_pModel)
 	{
-		assert(s_pCamera);
-		const Matrix& view = s_pCamera->GetViewmat();
-		const Matrix& projection = s_pCamera->GetProjmat();
+		assert(s_Common.camera);
+		const Matrix& view = s_Common.camera->GetViewmat();
+		const Matrix& projection = s_Common.camera->GetProjmat();
 
 		// ビルボード行列をワールド行列に合成
-		Matrix world = s_pCamera->GetBillboardConstrainY() * m_LocalWorld;
+		Matrix world = s_Common.camera->GetBillboardConstrainY() * m_World;
 
-		assert(s_pDeviceContext);
-		assert(s_pStates);
+		assert(s_Common.deviceContext);
+		assert(s_Common.states);
 
 		// 減算描画用の設定関数を渡して描画
-		m_pModel->Draw(s_pDeviceContext, *s_pStates, world, view, projection);
+		m_pModel->Draw(s_Common.deviceContext, *s_Common.states, world, view, projection);
 	}
 }

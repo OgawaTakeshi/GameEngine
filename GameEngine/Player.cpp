@@ -60,7 +60,7 @@ void Player::Initialize()
 
 	m_isJump = false;
 
-	m_ObjShadow.LoadModelFile(L"Resources/shadow.cmo");
+	m_ObjShadow.LoadModel(L"shadow");
 	m_ObjShadow.SetTrans(Vector3(0, SHADOW_OFFSET, 0));
 }
 
@@ -586,11 +586,11 @@ void Player::Calc()
 	// 全パーツ分行列更新
 	for (int i = 0; i < PARTS_NUM; i++)
 	{
-		m_Obj[i].Calc();
+		m_Obj[i].Update();
 	}
 
 	// 影の更新
-	m_ObjShadow.Calc();
+	m_ObjShadow.Update();
 
 	m_CollisionNodeBody.Update();
 	// 当たり判定の更新（親の行列更新後に行うこと）
@@ -668,12 +668,10 @@ void Player::Load()
 
 		// ファイル名の文字列を読み込み
 		stream >> filename;
-		// プロジェクトの基点からの相対パスでファイル名を補う
-		filepath = L"Resources/" + filename + L".cmo";
 
 		Obj3D obj;
 		// 読み込む
-		obj.LoadModelFile(filepath.c_str());
+		obj.LoadModel(filename.c_str());
 
 		// スケーリングの読み取り
 		Vector3 scale;

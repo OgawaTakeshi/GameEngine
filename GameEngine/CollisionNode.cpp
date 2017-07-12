@@ -25,9 +25,9 @@ SphereNode::SphereNode()
 
 void SphereNode::Initialize()
 {
-	// デバッグ表示用モデルの読み込み
+	// デバッグ表示用CMOモデルの読み込み
 	// モデルは半径1mで作成すること。
-	m_Obj.LoadModelFile(L"Resources/SphereNode.cmo");
+	m_Obj.LoadModel(L"SphereNode");
 }
 
 void SphereNode::Update()
@@ -43,7 +43,7 @@ void SphereNode::Update()
 		local_scale.z = m_LocalRadius;
 		m_Obj.SetScale(local_scale);
 		// 親子関係も含めた行列計算
-		m_Obj.Calc();
+		m_Obj.Update();
 	}
 
 	// ワールド座標系での当たり判定球を計算
@@ -88,7 +88,7 @@ void CapsuleNode::Initialize()
 {
 	// デバッグ表示用モデルの読み込み
 	// モデルは半径1m、軸長さ1mの円柱で作成すること。
-	m_Obj.LoadModelFile(L"Resources/CapsuleNode.cmo");
+	m_Obj.LoadModel(L"CapsuleNode");
 }
 
 void CapsuleNode::Update()
@@ -105,7 +105,7 @@ void CapsuleNode::Update()
 		local_scale.y = m_LocalLength;
 		m_Obj.SetScale(local_scale);
 		// 親子関係も含めた行列計算
-		m_Obj.Calc();
+		m_Obj.Update();
 	}
 
 	// ワールド座標系での当たり判定カプセルを計算

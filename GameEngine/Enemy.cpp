@@ -69,11 +69,11 @@ Enemy::~Enemy()
 void Enemy::Initialize()
 {
 	m_Obj.resize(PARTS_NUM);
-	m_Obj[PARTS_BODY].LoadModelFile(L"Resources/body.cmo");
-	m_Obj[PARTS_COCKPIT].LoadModelFile(L"Resources/cockpit.cmo");
-	m_Obj[PARTS_LAUNCHER].LoadModelFile(L"Resources/launcher.cmo");
-	m_Obj[PARTS_SHIELD].LoadModelFile(L"Resources/shield.cmo");
-	m_Obj[PARTS_DRILL].LoadModelFile(L"Resources/drill.cmo");
+	m_Obj[PARTS_BODY].LoadModel(L"body");
+	m_Obj[PARTS_COCKPIT].LoadModel(L"cockpit");
+	m_Obj[PARTS_LAUNCHER].LoadModel(L"launcher");
+	m_Obj[PARTS_SHIELD].LoadModel(L"shield");
+	m_Obj[PARTS_DRILL].LoadModel(L"drill");
 
 	// パーツの親子関係をセット
 	m_Obj[PARTS_COCKPIT].SetParent(
@@ -132,7 +132,7 @@ void Enemy::Initialize()
 	m_CollisionNodeBody.SetTrans(Vector3(0, 0.3f, 0));
 	m_CollisionNodeBody.SetLocalRadius(1.0f);
 
-	m_ObjShadow.LoadModelFile(L"Resources/shadow.cmo");
+	m_ObjShadow.LoadModel(L"shadow");
 	m_ObjShadow.SetTrans(Vector3(0, -0.4f, 0));
 	m_ObjShadow.SetParent(&m_Obj[0]);
 
@@ -215,10 +215,10 @@ void Enemy::Calc()
 	// 全パーツ分行列更新
 	for (int i = 0; i < PARTS_NUM; i++)
 	{
-		m_Obj[i].Calc();
+		m_Obj[i].Update();
 	}
 	
-	m_ObjShadow.Calc();
+	m_ObjShadow.Update();
 
 	m_InScreen = false;
 	// 敵のワールド座標に対応するスクリーン座標を得る

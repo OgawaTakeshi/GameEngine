@@ -22,7 +22,7 @@ HomingBullet::HomingBullet()
 void HomingBullet::Initialize()
 {
 	m_Velocity = Vector3(0, 0, -SPEED);
-	m_Obj.LoadModelFile(L"Resources/bullet.cmo");
+	m_Obj.LoadModel(L"bullet");
 }
 
 /// <summary>
@@ -98,7 +98,7 @@ bool HomingBullet::Update()
 	{
 		// 追跡終了（本来なら衝突して弾が消える）
 		ModelEffectManager::getInstance()->Entry(
-			L"Resources/HitEffect.cmo",
+			L"HitEffect",
 			10,
 			m_Obj.GetTrans(),	// 座標
 			Vector3(0, 0, 0),	// 速度
@@ -118,7 +118,7 @@ bool HomingBullet::Update()
 	}
 
 	// 行列更新
-	m_Obj.Calc();
+	m_Obj.Update();
 
 	return false;
 }

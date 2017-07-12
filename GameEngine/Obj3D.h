@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/// <summary>
+/// ３Ｄオブジェクトクラス
+/// </summary>
+#pragma once
 
 #include <Model.h>
 #include <Effects.h>
@@ -9,60 +12,69 @@
 // 3Dオブジェクト
 class Obj3D
 {
+	/// <summary>
+	/// static member
+	/// </summary>
 public:
+	static const wstring RESOURCE_DIRECTORY;
+	static const wstring RESOURCE_EXT;
+
 	// 設定
-	struct Defs
+	struct CommonDef
 	{
 		ID3D11Device* pDevice;
 		ID3D11DeviceContext* pDeviceContext;
 		Camera* pCamera;
 
-		Defs()
+		CommonDef()
 		{
 			pDevice = nullptr;
 			pDeviceContext = nullptr;
 			pCamera = nullptr;
 		}
 	};
+	// 共用データ
+	struct Common
+	{
+		ID3D11Device*	device;
+		// デバイスコンテキストへのポインタ
+		ID3D11DeviceContext*	deviceContext;
+		// 描画ステートへのポインタ
+		std::unique_ptr<DirectX::CommonStates>	states;
+		// 共用のエフェクトファクトリ
+		std::unique_ptr<DirectX::EffectFactory>	effectFactory;
+		// 共用のカメラ（描画時に使用）
+		Camera* camera;
+		// 読み込み済みモデルコンテナ
+		std::map<std::wstring, std::unique_ptr<DirectX::Model>> modelarray;
+		// 減算描画ステート
+		ID3D11BlendState* blendStateSubtract;
+	};
 	// 静的メンバ関数
-	// 静的初期化
-	static void StaticInitialize(const Defs& def);
-	// デバイスのsetter
-	static void SetDevice(ID3D11Device* pDevice) { s_pDevice = pDevice; }
-	// デバイスコンテキストのsetter
-	static void SetDeviceContext(ID3D11DeviceContext* pDeviceContext) { s_pDeviceContext = pDeviceContext; }
-	// カメラのsetter
-	static void SetCamera(Camera* pCamera) { s_pCamera = pCamera; }
-
-	static ID3D11DeviceContext* GetDeviceContext() { return s_pDeviceContext; }
-	static Camera* GetCamera() { return s_pCamera; }
+	// システム初期化
+	static void InitializeCommon(CommonDef def);
+	// 全モデル破棄
+	static void UnloadAll();
 
 	// 減算描画設定をセット
 	static void SetSubtractive();
 
+	//getter
+	static Camera* GetCamera() { return s_Common.camera; }
+
 private:
 	// 静的メンバ変数（全オブジェクトで共有）
-	// デバイスへのポインタ
-	static ID3D11Device*	s_pDevice;
-	// デバイスコンテキストへのポインタ
-	static ID3D11DeviceContext*	s_pDeviceContext;
-	// 描画ステートへのポインタ
-	static std::unique_ptr<DirectX::CommonStates>	s_pStates;
-	// 共用のエフェクトファクトリ
-	static std::unique_ptr<DirectX::EffectFactory>	s_pEffectFactory;
-	// 共用のカメラ（描画時に使用）
-	static Camera* s_pCamera;
-	// 読み込み済みモデルコンテナ
-	static std::map<std::wstring, std::unique_ptr<DirectX::Model>> s_modelarray;
+	static Common s_Common;
 
-	static ID3D11BlendState* s_pBlendStateSubtract;
+	/// <summary>
+	/// non-static member
+	/// </summary>
 public:
 	Obj3D();
-	virtual ~Obj3D();
 	// ファイルからモデルを読み込む
-	void LoadModelFile(const wchar_t*filename=nullptr);
-	// 行列の計算
-	void Calc();
+	void LoadModel(const wchar_t*filename=nullptr);
+	// 行列の更新
+	void Update();
 	// 描画
 	void Draw();
 	// 減算描画での描画（影用）
@@ -74,19 +86,19 @@ public:
 
 	void EnableAlpha();
 	
-	// アクセッサ
+	//setter
 	void SetTrans(const DirectX::SimpleMath::Vector3& trans) { m_Trans = trans; }
 	void SetRot(const DirectX::SimpleMath::Vector3& rot)	 { m_Rot = rot; m_UseQuternion = false; }
 	void SetRotQ(const DirectX::SimpleMath::Quaternion& rotq)	 { m_RotQ = rotq; m_UseQuternion = true; }
 	void SetScale(const DirectX::SimpleMath::Vector3& scale) { m_Scale = scale; }
-	void SetLocalWorld(const DirectX::SimpleMath::Matrix& mat) { m_LocalWorld = mat; }
+	void SetLocalWorld(const DirectX::SimpleMath::Matrix& mat) { m_World = mat; }
 	void SetParent(Obj3D* pParent)	{ m_pParent = pParent; }
-
+	//getter
 	const DirectX::SimpleMath::Vector3& GetTrans()	{ return m_Trans; }
 	const DirectX::SimpleMath::Vector3& GetRot()	{ return m_Rot; }
 	const DirectX::SimpleMath::Quaternion& GetRotQ()	{ return m_RotQ; }
 	const DirectX::SimpleMath::Vector3& GetScale()	{ return m_Scale; }
-	const DirectX::SimpleMath::Matrix& GetLocalWorld() { return m_LocalWorld; }
+	const DirectX::SimpleMath::Matrix& GetLocalWorld() { return m_World; }
 
 private:
 	// モデルデータへのポインタ
@@ -100,7 +112,7 @@ private:
 	// スケーリング
 	DirectX::SimpleMath::Vector3 m_Scale;
 	// ワールド行列
-	DirectX::SimpleMath::Matrix m_LocalWorld;
+	DirectX::SimpleMath::Matrix m_World;
 	// 親のワールド行列へのポインタ
 	Obj3D* m_pParent;
 };

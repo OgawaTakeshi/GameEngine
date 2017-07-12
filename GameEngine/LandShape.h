@@ -1,8 +1,8 @@
-//--------------------------------------------------------------------------------------
-// ƒtƒ@ƒCƒ‹–¼: LandShape
-// ì¬Ò:
-// ì¬“ú:
-// à–¾:’nŒ`“–‚½‚è
+ï»¿//--------------------------------------------------------------------------------------
+// ãƒ•ã‚¡ã‚¤ãƒ«å: LandShape
+// ä½œæˆè€…:
+// ä½œæˆæ—¥:
+// èª¬æ˜:åœ°å½¢å½“ãŸã‚Š
 //--------------------------------------------------------------------------------------
 
 #pragma once
@@ -17,79 +17,77 @@
 #include "Obj3D.h"
 #include "Collision.h"
 
-
-
-// ‹¤—pƒf[ƒ^‰Šú‰»—p\‘¢‘Ì
-struct LandShapeCommonDef
-{
-	// ƒfƒoƒCƒX(DirectX11)
-	ID3D11Device* pDevice;
-	// ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg(DirectX11)
-	ID3D11DeviceContext* pDeviceContext;
-	// ƒJƒƒ‰
-	Camera* pCamera;
-
-	LandShapeCommonDef()
-	{
-		pDevice = nullptr;
-		pDeviceContext = nullptr;
-		pCamera = nullptr;
-	}
-};
-
-// ‹¤—pƒf[ƒ^
+// å…±ç”¨ãƒ‡ãƒ¼ã‚¿
 class LandShapeCommon
 {
-	// LandShapeƒNƒ‰ƒX‚©‚çƒƒ“ƒo•Ï”‚ÉƒAƒNƒZƒX‚Å‚«‚é‚æ‚¤‚É‚·‚é
+	// LandShapeã‚¯ãƒ©ã‚¹ã‹ã‚‰ãƒ¡ãƒ³ãƒå¤‰æ•°ã«ã‚¢ã‚¯ã‚»ã‚¹ã§ãã‚‹ã‚ˆã†ã«ã™ã‚‹
 	friend class LandShape;
 public:
-	// ƒfƒoƒbƒO•\¦—p‚ÌÅ‘å’¸“_”
+	// å…±ç”¨ãƒ‡ãƒ¼ã‚¿åˆæœŸåŒ–ç”¨æ§‹é€ ä½“
+	struct Def
+	{
+		// ãƒ‡ãƒã‚¤ã‚¹(DirectX11)
+		ID3D11Device* pDevice;
+		// ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ(DirectX11)
+		ID3D11DeviceContext* pDeviceContext;
+		// ã‚«ãƒ¡ãƒ©
+		Camera* pCamera;
+
+		Def()
+		{
+			pDevice = nullptr;
+			pDeviceContext = nullptr;
+			pCamera = nullptr;
+		}
+	};
+
+	// ãƒ‡ãƒãƒƒã‚°è¡¨ç¤ºç”¨ã®æœ€å¤§é ‚ç‚¹æ•°
 	static const size_t BatchSize = 6144;
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	LandShapeCommon(LandShapeCommonDef def);
-	// ƒfƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	LandShapeCommon(Def def);
+	// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	~LandShapeCommon();
 protected:
-	// ‹¤’ÊƒJƒƒ‰
+	// å…±é€šã‚«ãƒ¡ãƒ©
 	Camera* m_pCamera;
-	// ƒRƒ‚ƒ“ƒXƒe[ƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// ã‚³ãƒ¢ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	std::unique_ptr<DirectX::CommonStates>	m_pStates;
-	// ƒGƒtƒFƒNƒgƒtƒ@ƒNƒgƒŠ
+	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¯ãƒˆãƒª
 	std::unique_ptr<DirectX::EffectFactory>	m_pEffectFactory;
-	// ƒx[ƒVƒbƒNƒGƒtƒFƒNƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// ãƒ™ãƒ¼ã‚·ãƒƒã‚¯ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	std::unique_ptr<DirectX::BasicEffect>	m_pEffect;
-	// ƒvƒŠƒ~ƒeƒBƒuƒoƒbƒ`‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ãƒãƒƒãƒã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>>	m_pPrimitiveBatch;
-	// “ü—ÍƒŒƒCƒAƒEƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// å…¥åŠ›ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	ID3D11InputLayout*	m_pInputLayout;
-	// ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	// ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿
 	ID3D11DeviceContext*	m_pDeviceContext;
 };
 
 
-// ’nŒ`“–‚½‚è
+// åœ°å½¢å½“ãŸã‚Š
 class LandShape
 {
 public:
-	// ƒGƒtƒFƒNƒgƒtƒ@ƒNƒgƒŠ¶¬
-	static void InitializeCommon(LandShapeCommonDef def);
+	// ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¯ãƒˆãƒªç”Ÿæˆ
+	static void InitializeCommon(LandShapeCommon::Def def);
 
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	LandShape();
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void Initialize(const wstring& filename_bin, const wstring& filename_cmo);
-	// ƒ[ƒ‹ƒhs—ñ‚ÌŒvZ
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã®è¨ˆç®—
 	void Update();
-	// ƒfƒoƒbƒO•`‰æ
+	// ãƒ‡ãƒãƒƒã‚°æç”»
 	void Draw();
-	// ƒ‰ƒCƒeƒBƒ“ƒOƒJƒbƒg
+	// ãƒ©ã‚¤ãƒ†ã‚£ãƒ³ã‚°ã‚«ãƒƒãƒˆ
 	void DisableLighting();
 
 	bool IntersectSphere(const Sphere& sphere, DirectX::SimpleMath::Vector3* reject);
 	bool IntersectSegmentFloor(const Segment& segment, DirectX::SimpleMath::Vector3* inter);
 	bool IntersectSegment(const Segment& segment, DirectX::SimpleMath::Vector3* inter);
 
-	// ƒAƒNƒZƒbƒT
+	// ã‚¢ã‚¯ã‚»ãƒƒã‚µ
 	void SetTrans(const DirectX::SimpleMath::Vector3& trans) { m_Obj.SetTrans(trans); }
 	void SetRot(const DirectX::SimpleMath::Vector3& rot) { m_Obj.SetRot(rot); }
 	void SetScale(float scale) { m_Obj.SetScale(DirectX::SimpleMath::Vector3(scale)); }
@@ -101,15 +99,15 @@ public:
 	const DirectX::SimpleMath::Matrix& GetLocalWorld() { return m_Obj.GetLocalWorld(); }
 
 protected:
-	// ‹¤’Êƒf[ƒ^
+	// å…±é€šãƒ‡ãƒ¼ã‚¿
 	static std::unique_ptr<LandShapeCommon> s_pCommon;
-	// ’nŒ`“–‚½‚èƒf[ƒ^ƒ}ƒbƒv
+	// åœ°å½¢å½“ãŸã‚Šãƒ‡ãƒ¼ã‚¿ãƒãƒƒãƒ—
 	static std::map<std::wstring, std::unique_ptr<LandShapeData>> s_dataarray;
 
-	// •\¦ƒIƒuƒWƒFƒNƒg
+	// è¡¨ç¤ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 	Obj3D m_Obj;
-	// ’nŒ`“–‚½‚èƒf[ƒ^
+	// åœ°å½¢å½“ãŸã‚Šãƒ‡ãƒ¼ã‚¿
 	const LandShapeData* m_pData;
-	// ƒ[ƒ‹ƒh¨ƒ‚ƒfƒ‹s—ñ
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰â†’ãƒ¢ãƒ‡ãƒ«è¡Œåˆ—
 	DirectX::SimpleMath::Matrix m_WorldLocal;
 };
