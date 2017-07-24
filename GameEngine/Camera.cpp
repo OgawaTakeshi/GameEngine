@@ -91,7 +91,7 @@ void Camera::UnProject(const Vector2& screenPos, Segment* worldSegment)
 
 /// <summary>
 /// ２Ｄ→３Ｄ座標変換
-/// スクリーン座標を、ニアクリップ、ファークリップ間の線分に変換する
+/// スクリーン座標を、ワールド座標に変換する
 /// </summary>
 /// <param name="screenPos">スクリーン座標</param>
 /// <param name="distance">カメラからの距離</param>
