@@ -57,5 +57,6 @@ public:
 
 	bool Project(const Vector3& worldPos, Vector2* screenPos);
 	void UnProject(const Vector2& screenPos, Segment* worldSegment);
+	void UnProject(const Vector2& screenPos, float distance, Vector3* worldPos);
 	void CalcBillboard();
 };

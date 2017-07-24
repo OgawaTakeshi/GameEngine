@@ -76,34 +76,43 @@ bool Camera::Project(const Vector3& worldPos, Vector2* screenPos)
 }
 
 /// <summary>
-/// ３Ｄ→２Ｄ座標変換
+/// ２Ｄ→３Ｄ座標変換
 /// スクリーン座標を、ニアクリップ、ファークリップ間の線分に変換する
 /// </summary>
 /// <param name="screenPos"></param>
 /// <param name="worldSegment"></param>
 void Camera::UnProject(const Vector2& screenPos, Segment* worldSegment)
 {
+	// ニアクリップ平面でのワールド座標を得る
+	UnProject(screenPos, m_NearClip, &worldSegment->start);
+	// ファークリップ平面でのワールド座標を得る
+	UnProject(screenPos, m_FarClip, &worldSegment->end);
+}
+
+/// <summary>
+/// ２Ｄ→３Ｄ座標変換
+/// スクリーン座標を、ニアクリップ、ファークリップ間の線分に変換する
+/// </summary>
+/// <param name="screenPos">スクリーン座標</param>
+/// <param name="distance">カメラからの距離</param>
+/// <param name="worldPos">ワールド座標（出力）</param>
+void Camera::UnProject(const Vector2& screenPos, float distance, Vector3* worldPos)
+{
 	Vector2 clipPos;
-	Vector4 clipPosNear;
-	Vector4 clipPosFar;
+	Vector4 clipPosV4;
 
 	// ビューポートの取得
 	D3D11_VIEWPORT viewport = DX::DeviceResources::GetInstance()->GetScreenViewport();
 
 	// スクリーン座標→射影座標
-	clipPos.x = (screenPos.x - viewport.TopLeftX) / (viewport.Width/2.0f) - 1.0f;
-	clipPos.y = (screenPos.y - viewport.TopLeftY) / (viewport.Height/2.0f) - 1.0f;
+	clipPos.x = (screenPos.x - viewport.TopLeftX) / (viewport.Width / 2.0f) - 1.0f;
+	clipPos.y = (screenPos.y - viewport.TopLeftY) / (viewport.Height / 2.0f) - 1.0f;
 	clipPos.y = -clipPos.y;
 
-	clipPosNear.x = m_NearClip * clipPos.x;
-	clipPosNear.y = m_NearClip * clipPos.y;
-	clipPosNear.z = 0;
-	clipPosNear.w = m_NearClip;
-
-	clipPosFar.x = m_FarClip * clipPos.x;
-	clipPosFar.y = m_FarClip * clipPos.y;
-	clipPosFar.z = m_FarClip;
-	clipPosFar.w = m_FarClip;
+	clipPosV4.x = distance * clipPos.x;
+	clipPosV4.y = distance * clipPos.y;
+	clipPosV4.z = (-distance * m_FarClip + m_NearClip * m_FarClip) / (m_NearClip - m_FarClip);
+	clipPosV4.w = distance;
 
 	// プロジェクション、ビュー逆変換
 	Matrix invMat = m_View * m_Proj;
@@ -116,19 +125,13 @@ void Camera::UnProject(const Vector2& screenPos, Segment* worldSegment)
 	m_Proj.Invert(invProj);
 
 	// 射影座標→ビュー座標
-	Vector4 viewStart = Vector4::Transform(clipPosNear, invProj);
-	Vector4 viewEnd = Vector4::Transform(clipPosFar, invProj);
+	Vector4 viewPos = Vector4::Transform(clipPosV4, invProj);
 	// ビュー座標→ワールド座標
-	Vector4 start = Vector4::Transform(viewStart, invView);
-	Vector4 end = Vector4::Transform(viewEnd, invView);
+	Vector4 world = Vector4::Transform(viewPos, invView);
 
-	worldSegment->start.x = start.x;
-	worldSegment->start.y = start.y;
-	worldSegment->start.z = start.z;
-
-	worldSegment->end.x = end.x;
-	worldSegment->end.y = end.y;
-	worldSegment->end.z = end.z;
+	worldPos->x = world.x;
+	worldPos->y = world.y;
+	worldPos->z = world.z;
 }
 
 /// <summary>
