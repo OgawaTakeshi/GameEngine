@@ -35,16 +35,16 @@ namespace
 };
 
 // static member variable
-DX::DeviceResources* DX::DeviceResources::m_Instance = nullptr;
+std::unique_ptr<DX::DeviceResources> DX::DeviceResources::m_Instance;
 
 DX::DeviceResources * DX::DeviceResources::GetInstance()
 {
 	if (!m_Instance)
 	{
-		m_Instance = new DX::DeviceResources();
+		m_Instance.reset(new DX::DeviceResources());
 	}
 
-	return m_Instance;
+	return m_Instance.get();
 }
 
 // Constructor for DeviceResources.
